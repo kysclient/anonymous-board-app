@@ -24,7 +24,7 @@ export default async function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        <div className="container max-w-4xl py-10 mx-auto">
+        <div className="container max-w-4xl py-10 mx-auto px-4">
           <header className="mb-6">
             <h1 className="text-3xl font-bold mb-4">스파이시 익명우편함 💌</h1>
             <Tabs isAdmin={isAdmin} />
