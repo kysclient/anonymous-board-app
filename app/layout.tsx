@@ -27,7 +27,7 @@ export default async function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         {/* <MarqueeBanner text="이호준 여미새련" speed="normal" /> */}
-        <SimpleMarquee />
+        {/* <SimpleMarquee /> */}
 
         <div className="container max-w-4xl py-10 mx-auto px-4">
           <header className="mb-6">
