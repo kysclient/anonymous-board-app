@@ -8,9 +8,11 @@ import type { Post, PaginationResult, SearchParams } from "./types";
 
 // 게시물 생성
 export async function createPost(data: { title: string; content: string }) {
-  const ip = getClientIp();
+  const ip = await getClientIp();
+  console.log("Client IP:", ip); // 디버깅용 로그 추가
 
   try {
+    // 서버 시간을 사용하여 게시물 생성 (UTC 기준)
     await sql`
       INSERT INTO posts (title, content, ip)
       VALUES (${data.title}, ${data.content}, ${ip})
@@ -28,54 +30,57 @@ export async function createPost(data: { title: string; content: string }) {
 }
 
 // 게시물 목록 조회 (페이지네이션 + 검색)
-export async function getPosts(page = 1, searchParams?: SearchParams): Promise<PaginationResult<Post>> {
-  const pageSize = 20
-  const offset = (page - 1) * pageSize
+export async function getPosts(
+  page = 1,
+  searchParams?: SearchParams
+): Promise<PaginationResult<Post>> {
+  const pageSize = 20;
+  const offset = (page - 1) * pageSize;
 
   try {
-    let countQuery = sql`SELECT COUNT(*) FROM posts`
+    let countQuery = sql`SELECT COUNT(*) FROM posts`;
     let postsQuery = sql`
       SELECT id, title, content, ip, created_at
       FROM posts
-    `
+    `;
 
     // 검색 조건이 있는 경우 WHERE 절 추가
     if (searchParams?.searchQuery && searchParams?.searchType) {
-      const searchValue = `%${searchParams.searchQuery}%` // LIKE 검색을 위한 와일드카드
+      const searchValue = `%${searchParams.searchQuery}%`; // LIKE 검색을 위한 와일드카드
 
       if (searchParams.searchType === "title") {
-        countQuery = sql`SELECT COUNT(*) FROM posts WHERE title ILIKE ${searchValue}`
+        countQuery = sql`SELECT COUNT(*) FROM posts WHERE title ILIKE ${searchValue}`;
         postsQuery = sql`
           SELECT id, title, content, ip, created_at
           FROM posts
           WHERE title ILIKE ${searchValue}
-        `
+        `;
       } else if (searchParams.searchType === "content") {
-        countQuery = sql`SELECT COUNT(*) FROM posts WHERE content ILIKE ${searchValue}`
+        countQuery = sql`SELECT COUNT(*) FROM posts WHERE content ILIKE ${searchValue}`;
         postsQuery = sql`
           SELECT id, title, content, ip, created_at
           FROM posts
           WHERE content ILIKE ${searchValue}
-        `
+        `;
       } else if (searchParams.searchType === "ip") {
-        countQuery = sql`SELECT COUNT(*) FROM posts WHERE ip ILIKE ${searchValue}`
+        countQuery = sql`SELECT COUNT(*) FROM posts WHERE ip ILIKE ${searchValue}`;
         postsQuery = sql`
           SELECT id, title, content, ip, created_at
           FROM posts
           WHERE ip ILIKE ${searchValue}
-        `
+        `;
       }
     }
 
     // ORDER BY와 LIMIT 추가
-    postsQuery = sql`${postsQuery} ORDER BY created_at DESC LIMIT ${pageSize} OFFSET ${offset}`
+    postsQuery = sql`${postsQuery} ORDER BY created_at DESC LIMIT ${pageSize} OFFSET ${offset}`;
 
     // 쿼리 실행
-    const countResult = await countQuery
-    const totalCount = Number.parseInt(countResult[0].count)
-    const totalPages = Math.ceil(totalCount / pageSize)
+    const countResult = await countQuery;
+    const totalCount = Number.parseInt(countResult[0].count);
+    const totalPages = Math.ceil(totalCount / pageSize);
 
-    const posts = await postsQuery
+    const posts = await postsQuery;
 
     return {
       data: posts as Post[],
@@ -83,16 +88,16 @@ export async function getPosts(page = 1, searchParams?: SearchParams): Promise<P
       currentPage: page,
       totalCount,
       searchParams,
-    }
+    };
   } catch (error) {
-    console.error("게시물 조회 오류:", error)
+    console.error("게시물 조회 오류:", error);
     return {
       data: [],
       totalPages: 0,
       currentPage: page,
       totalCount: 0,
       searchParams,
-    }
+    };
   }
 }
 

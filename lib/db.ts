@@ -4,10 +4,11 @@ import { headers } from "next/headers";
 // 데이터베이스 연결 설정
 export const sql = neon(process.env.DATABASE_URL!);
 
-// 클라이언트 IP 주소 가져오기 (개선된 버전)
-export function getClientIp(): string {
+// 클라이언트 IP 주소 가져오기 (개선된 버전) - 비동기 함수로 변경
+export async function getClientIp(): Promise<string> {
   try {
-    const headersList = headers();
+    // headers()를 await로 기다림
+    const headersList = await headers();
 
     // 다양한 헤더에서 IP 주소 확인 (우선순위 순)
     const forwardedFor = headersList.get("x-forwarded-for");
