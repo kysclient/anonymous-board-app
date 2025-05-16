@@ -22,49 +22,41 @@ export default function SearchForm() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [searchType, setSearchType] = useState(
-    searchParams.get("searchType") || "title"
-  );
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("searchQuery") || ""
-  );
+  // searchParams가 null일 경우를 대비해 기본값 설정
+  const initialSearchType = searchParams?.get("searchType") || "title";
+  const initialSearchQuery = searchParams?.get("searchQuery") || "";
+
+  const [searchType, setSearchType] = useState(initialSearchType);
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [isSearching, setIsSearching] = useState(false);
 
-  // URL 파라미터가 변경되면 상태 업데이트
+  // useEffect로 searchParams 변경 감지
   useEffect(() => {
-    setSearchType(searchParams.get("searchType") || "title");
-    setSearchQuery(searchParams.get("searchQuery") || "");
+    setSearchType(searchParams?.get("searchType") || "title");
+    setSearchQuery(searchParams?.get("searchQuery") || "");
     setIsSearching(false);
   }, [searchParams]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSearching(true);
 
-    const params = new URLSearchParams();
-
-    // 현재 searchParams의 모든 값을 새 params에 복사
-    searchParams.forEach((value, key) => {
-      // page는 제외 (검색 시 항상 첫 페이지로)
-      if (key !== "page") {
-        params.set(key, value);
-      }
-    });
-
-    // 검색 파라미터 설정
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page"); // 항상 첫 페이지로
     if (searchQuery) {
       params.set("searchType", searchType);
       params.set("searchQuery", searchQuery);
     } else {
-      // 검색어가 비어있으면 검색 파라미터 제거
       params.delete("searchType");
       params.delete("searchQuery");
     }
-
-    // 검색 시 항상 첫 페이지로 이동
     params.set("page", "1");
 
-    router.push(`${pathname}?${params.toString()}`);
+    try {
+      await router.push(`${pathname}?${params.toString()}`);
+    } finally {
+      setIsSearching(false); // 검색 완료 후 상태 복원
+    }
   };
 
   const handleReset = () => {

@@ -2,11 +2,11 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getAdminStatus, getPosts } from "@/lib/actions";
 import PostList from "@/components/post-list";
-import Pagination from "@/components/pagination";
 import AdminHeader from "@/components/admin-header";
 import SearchForm from "@/components/search-form";
 import LoadingSpinner from "@/components/loading-spinner";
 import type { SearchParams } from "@/lib/types";
+import { DynamicPagination } from "@/components/csr-wrapper";
 
 interface AdminPageProps {
   searchParams: Promise<{
@@ -64,8 +64,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   return (
     <main>
       <AdminHeader />
-
-      <SearchForm />
+      <Suspense
+        fallback={<LoadingSpinner message="검색 폼을 불러오는 중..." />}
+      >
+        <SearchForm />
+      </Suspense>
 
       {searchResultMessage && (
         <div className="mb-4 p-2 bg-muted rounded-md text-center">
@@ -75,7 +78,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
       <Suspense fallback={<LoadingSpinner message="게시물을 불러오는 중..." />}>
         <PostList posts={posts} />
-        <Pagination
+        <DynamicPagination
           totalPages={totalPages}
           currentPage={currentPage}
           totalCount={totalCount}

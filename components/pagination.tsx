@@ -42,6 +42,10 @@ export default function Pagination({
     (_, i) => startPage + i
   );
 
+  useEffect(() => {
+    setIsNavigating(false);
+  }, []);
+
   if (totalPages <= 1) {
     return (
       <div className="text-center text-sm text-muted-foreground mt-4">
@@ -49,11 +53,6 @@ export default function Pagination({
       </div>
     );
   }
-
-  useEffect(() => {
-    setIsNavigating(false);
-  }, []);
-
   return (
     <div className="space-y-2 mt-6">
       <div className="flex justify-center items-center gap-1">
