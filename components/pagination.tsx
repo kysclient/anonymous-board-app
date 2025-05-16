@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 
 interface PaginationProps {
@@ -49,6 +49,10 @@ export default function Pagination({
       </div>
     );
   }
+
+  useEffect(() => {
+    setIsNavigating(false);
+  }, []);
 
   return (
     <div className="space-y-2 mt-6">
