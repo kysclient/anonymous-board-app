@@ -17,11 +17,11 @@ export default function PostList({ posts }: PostListProps) {
         posts.map((post) => (
           <Card key={post.id}>
             <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:justify-between items-start">
                 <CardTitle className="text-xl">{post.title}</CardTitle>
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div>{formatDate(new Date(post.created_at))}</div>
-                  <div className="text-right">IP: {post.ip}</div>
+                  <div className="sm:text-right">IP: {post.ip}</div>
                 </div>
               </div>
             </CardHeader>
