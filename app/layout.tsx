@@ -5,6 +5,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { getAdminStatus } from "@/lib/actions";
 import { Tabs } from "@/components/tabs";
+import MarqueeBanner from "@/components/marquee-banner";
+import SimpleMarquee from "@/components/simple-marquee";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +26,9 @@ export default async function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
+        {/* <MarqueeBanner text="이호준 여미새련" speed="normal" /> */}
+        <SimpleMarquee />
+
         <div className="container max-w-4xl py-10 mx-auto px-4">
           <header className="mb-6">
             <h1 className="text-3xl font-bold mb-4">스파이시 익명우편함 💌</h1>
