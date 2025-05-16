@@ -62,11 +62,7 @@ export default function Pagination({
           onClick={() => goToPage(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1 || isNavigating}
         >
-          {isNavigating ? (
-            <Spinner size="sm" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          <ChevronLeft className="h-4 w-4" />
         </Button>
 
         {pageNumbers.map((page) => (
@@ -78,11 +74,7 @@ export default function Pagination({
             className="w-9"
             disabled={isNavigating}
           >
-            {isNavigating && page === currentPage ? (
-              <Spinner size="sm" />
-            ) : (
-              page
-            )}
+            {page}
           </Button>
         ))}
 
@@ -92,11 +84,7 @@ export default function Pagination({
           onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages || isNavigating}
         >
-          {isNavigating ? (
-            <Spinner size="sm" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
