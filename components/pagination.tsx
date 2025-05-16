@@ -60,7 +60,7 @@ export default function Pagination({
           variant="outline"
           size="icon"
           onClick={() => goToPage(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1 || isNavigating}
+          disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -72,7 +72,6 @@ export default function Pagination({
             size="sm"
             onClick={() => goToPage(page)}
             className="w-9"
-            disabled={isNavigating}
           >
             {page}
           </Button>
@@ -82,7 +81,7 @@ export default function Pagination({
           variant="outline"
           size="icon"
           onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
-          disabled={currentPage === totalPages || isNavigating}
+          disabled={currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
