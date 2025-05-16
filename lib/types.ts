@@ -6,10 +6,17 @@ export interface Post {
   created_at: string
 }
 
+export interface SearchParams {
+  searchType: "title" | "content" | "ip"
+  searchQuery: string
+}
+
 export interface PaginationResult<T> {
   data: T[]
   totalPages: number
   currentPage: number
+  totalCount?: number
+  searchParams?: SearchParams
 }
 
 export interface AdminStatus {

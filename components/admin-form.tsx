@@ -1,35 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { checkAdminKey } from "@/lib/actions"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { checkAdminKey } from "@/lib/actions";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AdminForm() {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
+    event.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
-    const formData = new FormData(event.currentTarget)
-    const isAdmin = await checkAdminKey(formData)
+    const formData = new FormData(event.currentTarget);
+    const isAdmin = await checkAdminKey(formData);
 
     if (isAdmin) {
-      router.refresh()
+      router.refresh();
     } else {
-      setError("관리자 키가 올바르지 않습니다.")
+      setError("관리자 키가 올바르지 않습니다.");
     }
 
-    setIsSubmitting(false)
+    setIsSubmitting(false);
   }
 
   return (
@@ -42,7 +49,14 @@ export default function AdminForm() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="adminKey">관리자 키</Label>
-              <Input id="adminKey" name="adminKey" type="password" placeholder="관리자 키를 입력하세요" required />
+              <Input
+                id="adminKey"
+                name="adminKey"
+                type="password"
+                placeholder="관리자 키를 입력하세요"
+                required
+                disabled={isSubmitting}
+              />
             </div>
 
             {error && <p className="text-sm text-red-500">{error}</p>}
@@ -50,10 +64,17 @@ export default function AdminForm() {
         </CardContent>
         <CardFooter>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "인증 중..." : "인증하기"}
+            {isSubmitting ? (
+              <>
+                <Spinner size="sm" className="mr-2" />
+                인증 중...
+              </>
+            ) : (
+              "인증하기"
+            )}
           </Button>
         </CardFooter>
       </form>
     </Card>
-  )
+  );
 }
