@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface TabsProps {
-  isAdmin: boolean
+  isAdmin: boolean;
 }
 
 export function Tabs({ isAdmin }: TabsProps) {
-  const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
   // 클라이언트 사이드 렌더링 확인
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
-    return null
+    return null;
   }
 
   return (
@@ -28,10 +28,24 @@ export function Tabs({ isAdmin }: TabsProps) {
         href="/"
         className={cn(
           "px-4 py-2 font-medium",
-          pathname === "/" ? "border-b-2 border-primary text-primary" : "text-muted-foreground",
+          pathname === "/"
+            ? "border-b-2 border-primary text-primary"
+            : "text-muted-foreground"
         )}
       >
         게시물 작성
+      </Link>
+
+      <Link
+        href="/survey"
+        className={cn(
+          "px-4 py-2 font-medium",
+          pathname === "/survey"
+            ? "border-b-2 border-primary text-primary"
+            : "text-muted-foreground"
+        )}
+      >
+        설문조사(벙)
       </Link>
 
       {isAdmin && (
@@ -39,12 +53,28 @@ export function Tabs({ isAdmin }: TabsProps) {
           href="/admin"
           className={cn(
             "px-4 py-2 font-medium",
-            pathname === "/admin" ? "border-b-2 border-primary text-primary" : "text-muted-foreground",
+            pathname === "/admin"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground"
           )}
         >
           게시물 목록
         </Link>
       )}
+
+      {isAdmin && (
+        <Link
+          href="/survey/list"
+          className={cn(
+            "px-4 py-2 font-medium",
+            pathname === "/survey/list"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground"
+          )}
+        >
+          설문조사 목록
+        </Link>
+      )}
     </div>
-  )
+  );
 }

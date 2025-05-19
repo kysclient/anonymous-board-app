@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { sql, getClientIp } from "./db";
-import type { Post, PaginationResult, SearchParams } from "./types";
+import type { Post, PaginationResult, SearchParams, Survey } from "./types";
 
 // 게시물 생성
 export async function createPost(data: { title: string; content: string }) {
@@ -146,4 +146,40 @@ export async function logoutAdmin() {
   cookie.delete("admin_auth");
   revalidatePath("/");
   redirect("/");
+}
+
+export async function createSurvey(formData: FormData) {
+  const ip = await getClientIp();
+  const meetingDate = formData.get("meetingDate") as string;
+  const meetingType = formData.get("meetingType") as string;
+
+  try {
+    await sql`
+      INSERT INTO surveys (meeting_date, meeting_type, ip)
+      VALUES (${meetingDate}, ${meetingType}, ${ip})
+    `;
+
+    revalidatePath("/survey");
+    return { success: true };
+  } catch (error) {
+    console.error("설문 생성 오류:", error);
+    return {
+      success: false,
+      error: "설문을 저장하는 중 오류가 발생했습니다.",
+    };
+  }
+}
+
+export async function getSurveys(): Promise<Survey[]> {
+  try {
+    const surveys = await sql`
+      SELECT id, meeting_date, meeting_type, ip, created_at
+      FROM surveys
+      ORDER BY created_at DESC
+    `;
+    return surveys as Survey[];
+  } catch (error) {
+    console.error("설문 조회 오류:", error);
+    return [];
+  }
 }
