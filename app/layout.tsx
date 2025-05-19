@@ -5,9 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { getAdminStatus } from "@/lib/actions";
 import { Tabs } from "@/components/tabs";
-import MarqueeBanner from "@/components/marquee-banner";
-import SimpleMarquee from "@/components/simple-marquee";
-
+import { Analytics } from "@vercel/analytics/next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -37,6 +35,7 @@ export default async function RootLayout({
           {children}
         </div>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
