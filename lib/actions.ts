@@ -7,16 +7,20 @@ import { sql, getClientIp } from "./db";
 import type { Post, PaginationResult, SearchParams, Survey } from "./types";
 
 // 게시물 생성
-export async function createPost(data: { title: string; content: string }) {
+export async function createPost(data: {
+  title: string;
+  content: string;
+  userId: string;
+}) {
   const ip = await getClientIp();
   console.log("Client IP:", ip); // 디버깅용 로그 추가
 
   try {
     // 서버 시간을 사용하여 게시물 생성 (UTC 기준)
     await sql`
-      INSERT INTO posts (title, content, ip)
-      VALUES (${data.title}, ${data.content}, ${ip})
-    `;
+    INSERT INTO posts (title, content, ip, user_id)
+    VALUES (${data.title}, ${data.content}, ${ip}, ${data.userId})
+  `;
 
     revalidatePath("/");
     return { success: true };
@@ -40,7 +44,7 @@ export async function getPosts(
   try {
     let countQuery = sql`SELECT COUNT(*) FROM posts`;
     let postsQuery = sql`
-      SELECT id, title, content, ip, created_at
+      SELECT id, title, content, ip, created_at, user_id
       FROM posts
     `;
 
@@ -51,21 +55,21 @@ export async function getPosts(
       if (searchParams.searchType === "title") {
         countQuery = sql`SELECT COUNT(*) FROM posts WHERE title ILIKE ${searchValue}`;
         postsQuery = sql`
-          SELECT id, title, content, ip, created_at
+          SELECT id, title, content, ip, created_at, user_id
           FROM posts
           WHERE title ILIKE ${searchValue}
         `;
       } else if (searchParams.searchType === "content") {
         countQuery = sql`SELECT COUNT(*) FROM posts WHERE content ILIKE ${searchValue}`;
         postsQuery = sql`
-          SELECT id, title, content, ip, created_at
+          SELECT id, title, content, ip, created_at, user_id
           FROM posts
           WHERE content ILIKE ${searchValue}
         `;
       } else if (searchParams.searchType === "ip") {
         countQuery = sql`SELECT COUNT(*) FROM posts WHERE ip ILIKE ${searchValue}`;
         postsQuery = sql`
-          SELECT id, title, content, ip, created_at
+          SELECT id, title, content, ip, created_at, user_id
           FROM posts
           WHERE ip ILIKE ${searchValue}
         `;

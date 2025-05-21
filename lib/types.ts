@@ -4,6 +4,7 @@ export interface Post {
   content: string;
   ip: string;
   created_at: string;
+  user_id: string;
 }
 
 export interface SearchParams {

@@ -14,6 +14,7 @@ import { formatDate } from "@/lib/utils";
 import { Camera } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import html2canvas from "html2canvas";
+import { id } from "date-fns/locale";
 
 interface PostListProps {
   posts: Post[];
@@ -38,6 +39,8 @@ export default function PostList({ posts }: PostListProps) {
         "[data-time]"
       ) as HTMLElement;
 
+      const idElement = postElement.querySelector("[data-id]") as HTMLElement;
+
       // IP 요소 찾기
       const ipElement = postElement.querySelector("[data-ip]") as HTMLElement;
       // 버튼 요소 찾기
@@ -46,9 +49,14 @@ export default function PostList({ posts }: PostListProps) {
       ) as HTMLElement;
 
       // 원래 상태 저장
+      const originalIdText = idElement?.innerText;
       const originalTimeText = timeElement?.innerText;
       const originalIpText = ipElement?.innerText;
       const originalButtonDisplay = buttonElement?.style.display;
+
+      if (idElement) {
+        idElement.innerText = "";
+      }
 
       if (timeElement) {
         timeElement.innerText = "";
@@ -70,6 +78,10 @@ export default function PostList({ posts }: PostListProps) {
         logging: false,
       });
 
+      // ID 텍스트 복원
+      if (idElement && originalIdText) {
+        idElement.innerText = originalIdText;
+      }
       // IP 텍스트 복원
       if (timeElement && originalTimeText) {
         timeElement.innerText = originalTimeText;
@@ -121,8 +133,12 @@ export default function PostList({ posts }: PostListProps) {
             className="relative"
           >
             <CardHeader className="pb-2">
+              <div className="sm:text-right text-xs sm:text-sm" data-id>
+                {post.user_id}
+              </div>
               <div className="flex flex-col sm:flex-row sm:justify-between items-start">
                 <CardTitle className="text-xl">{post.title}</CardTitle>
+
                 <div className="text-xs text-muted-foreground space-y-1">
                   <div data-time>{formatDate(new Date(post.created_at))}</div>
                   <div className="sm:text-right" data-ip>

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -12,20 +12,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { createPost } from "@/lib/actions";
 import { useToast } from "@/components/ui/use-toast";
 import { Spinner } from "@/components/ui/spinner";
-
+import { v4 as uuidv4 } from "uuid";
 export default function PostForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
 
+  useEffect(() => {
+    let storedUserId = localStorage.getItem("userId");
+    if (!storedUserId) {
+      storedUserId = uuidv4(); // 새 UUID 생성
+      localStorage.setItem("userId", storedUserId); // 로컬 스토리지에 저장
+    }
+    setUserId(storedUserId);
+  }, []);
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!userId) return; // userId가 준비되지 않았다면 중단
     setIsSubmitting(true);
 
-    const result = await createPost({ title, content });
-
+    const result = await createPost({ title, content, userId }); // userId 추가
     setIsSubmitting(false);
 
     if (result.success) {
