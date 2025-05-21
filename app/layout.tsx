@@ -29,7 +29,9 @@ export default async function RootLayout({
 
         <div className="container max-w-4xl py-10 mx-auto px-4">
           <header className="mb-6">
-            <h1 className="text-3xl font-bold mb-4">스파이시 익명우편함 💌</h1>
+            <h1 className="text-3xl font-bold mb-4">
+              스파이시 익명우편함 💌 - 비활성화 25.05.21
+            </h1>
             <Tabs isAdmin={isAdmin} />
           </header>
           {children}

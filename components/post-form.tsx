@@ -104,7 +104,8 @@ export default function PostForm() {
           >
             초기화
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={true}>
+            {/* <Button type="submit" disabled={isSubmitting}> */}
             {isSubmitting ? (
               <>
                 <Spinner size="sm" className="mr-2" />
