@@ -18,3 +18,14 @@ export function formatDate(date: Date): string {
     timeZone: "Asia/Seoul", // 명시적으로 한국 시간대 지정
   }).format(date);
 }
+
+export function formatDateString(dateString: string): string {
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date)
+}
+
+

@@ -3,15 +3,26 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { getAdminStatus } from "@/lib/actions";
-import { Tabs } from "@/components/tabs";
 import { Analytics } from "@vercel/analytics/next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "익명 게시판",
-  description: "익명으로 글을 작성하고 볼 수 있는 게시판입니다.",
-  generator: "kim yu shin",
+  title: "강남구 지역 모임 - 🔥SPICY🔥 외모커트라인 높아요❤️",
+  description: "지루한 일상 속 매운맛🌶️을 느끼고 싶다면",
+  icons: {
+    icon: "/favicon.png",
+  },
+  openGraph: {
+    images: [
+      {
+        url: "/og-image.jpeg", // OG 이미지 경로
+        width: 1200,
+        height: 630,
+        alt: "OG Image", // OG 이미지 설명
+      },
+    ],
+  },
+  keywords: ["소모임", "스파이시", "윈터"],
 };
 
 export default async function RootLayout({
@@ -19,23 +30,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isAdmin = await getAdminStatus();
-
   return (
     <html lang="ko">
       <body className={inter.className}>
-        {/* <MarqueeBanner text="이호준 여미새련" speed="normal" /> */}
-        {/* <SimpleMarquee /> */}
-
-        <div className="container max-w-4xl py-10 mx-auto px-4">
-          <header className="mb-6">
-            <h1 className="text-3xl font-bold mb-4">
-              스파이시 익명우편함 💌 - 비활성화 25.05.21
-            </h1>
-            <Tabs isAdmin={isAdmin} />
-          </header>
-          {children}
-        </div>
+        {children}
         <Toaster />
         <Analytics />
       </body>
