@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function UsersTableSkeleton() {
   return (
-    <div className="rounded-md border">
+    <div className="rounded-xl border w-full">
       <Table>
         <TableHeader>
           <TableRow>

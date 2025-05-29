@@ -50,7 +50,7 @@ export function UserCard({ user, onUpdate }: UserCardProps) {
             <div className="font-semibold">{user.total_meetup_count}회</div>
           </div>
         </div>
-        <div className="mt-4 flex justify-center">
+        <div className="mt-4 flex justify-end sm:justify-center">
           <IncrementMeetupButton userId={user.id} onSuccess={onUpdate} />
         </div>
       </CardContent>

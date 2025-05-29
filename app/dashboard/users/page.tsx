@@ -11,9 +11,8 @@ export default async function UsersPage() {
   const initialUsers = await getUsers();
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-       
         <UsersProvider initialUsers={initialUsers}>
           <div className="flex flex-col gap-2 sm:flex-row">
             <ResetMeetupCountsButton />

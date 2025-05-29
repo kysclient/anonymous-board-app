@@ -41,7 +41,7 @@ export const SearchInput = memo(function SearchInput() {
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          className="max-w-[300px] bg-background pl-8"
+          className="max-w-[300px] bg-background pl-8 rounded-lg"
           disabled={isLoading}
         />
       </div>
