@@ -20,7 +20,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
         <Header />
-        <div className="flex flex-1">
+        <div className="flex flex-1 ">
           <Sidebar className="hidden md:block" />
           <main className="flex-1 overflow-y-auto bg-muted/40 p-6 md:ml-64">
             {children}
