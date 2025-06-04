@@ -1,12 +1,13 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Table } from "@/components/ui/table";
 import { UserTableHeader } from "./user-table-header";
 import { UserTableBody } from "./user-table-body";
 import { UserCardList } from "./user-card-list";
 import { UsersTableSkeleton } from "./users-table-skeleton";
 import { useUsers } from "./users-context";
+import { revalidateUsers } from "../\bactions";
 
 export const UsersTable = memo(function UsersTable() {
   const { users, searchTerm, isLoading, refreshUsers } = useUsers();

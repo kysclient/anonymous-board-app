@@ -7,6 +7,8 @@ import { UsersTable } from "./users-table";
 import { UsersProvider } from "./users-context";
 import { getUsers } from "../\bactions";
 
+export const dynamic = "force-dynamic";
+
 export default async function UsersPage() {
   const initialUsers = await getUsers();
 

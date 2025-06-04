@@ -58,14 +58,18 @@ export async function createUser(data: {
 export async function getUsers(): Promise<User[]> {
   try {
     const users = await sql`
-      SELECT * FROM users 
-      ORDER BY id DESC
-    `;
+        SELECT * FROM users 
+        ORDER BY id DESC
+      `;
     return users as unknown as User[];
   } catch (error) {
     console.error("사용자 조회 오류:", error);
     return [];
   }
+}
+
+export async function revalidateUsers() {
+  revalidatePath("/users"); // 캐시 무효화
 }
 
 // 이름으로 사용자 검색
