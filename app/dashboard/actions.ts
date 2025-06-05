@@ -55,13 +55,41 @@ export async function createUser(data: {
 }
 
 // 모든 사용자 조회
-export async function getUsers(): Promise<User[]> {
+export async function getUsers(
+  sortKey: "join_date" | "last_meetup_date" | "name" = "join_date",
+  sortOrder: "asc" | "desc" = "desc",
+  searchTerm: string = ""
+): Promise<User[]> {
   try {
-    const users = await sql`
-        SELECT * FROM users 
-        ORDER BY id DESC
+    const validSortKeys = ["join_date", "last_meetup_date", "name"];
+    const validSortOrders = ["asc", "desc"];
+
+    const selectedSortKey = validSortKeys.includes(sortKey)
+      ? sortKey
+      : "join_date";
+    const selectedSortOrder = validSortOrders.includes(sortOrder)
+      ? sortOrder.toUpperCase()
+      : "DESC";
+
+    let query;
+    let params: any[] = [];
+
+    if (searchTerm) {
+      query = `
+        SELECT * FROM users
+        WHERE name ILIKE $1
+        ORDER BY ${selectedSortKey} ${selectedSortOrder}
       `;
-    return users as unknown as User[];
+      params.push(`%${searchTerm}%`);
+    } else {
+      query = `
+        SELECT * FROM users
+        ORDER BY ${selectedSortKey} ${selectedSortOrder}
+      `;
+    }
+
+    const users = (await sql.query(query, params)) as User[];
+    return users;
   } catch (error) {
     console.error("사용자 조회 오류:", error);
     return [];

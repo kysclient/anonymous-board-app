@@ -5,20 +5,35 @@ import { ResetMeetupCountsButton } from "./reset-meetup-counts-button";
 import { SearchInput } from "./search-input";
 import { UsersTable } from "./users-table";
 import { UsersProvider } from "./users-context";
+
 import { getUsers } from "../\bactions";
+import { SortUser } from "./sort-user";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
-export default async function UsersPage() {
-  const initialUsers = await getUsers();
+export type SortKey = "join_date" | "last_meetup_date" | "name";
+export type SortOrder = "asc" | "desc";
+
+interface UsersPageProps {
+  searchParams?: {
+    sort?: SortKey;
+    order?: SortOrder;
+  };
+}
+
+export default async function UsersPage({ searchParams }: UsersPageProps) {
+  const sortKey = searchParams?.sort || "join_date";
+  const sortOrder = searchParams?.order || "desc";
+  const initialUsers = await getUsers(sortKey, sortOrder);
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <UsersProvider initialUsers={initialUsers}>
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <ResetMeetupCountsButton />
             <CreateUserDialog />
+            <SortUser sortKey={sortKey} sortOrder={sortOrder} />
           </div>
         </UsersProvider>
       </div>
