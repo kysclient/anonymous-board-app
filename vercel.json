@@ -1,0 +1,8 @@
+{
+    "crons": [
+        {
+            "path": "/api/reset-meetup-count?token=tmvkdltlghkdlxld",
+            "schedule": "0 15 1 * *"
+        }
+    ]
+}
