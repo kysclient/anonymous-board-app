@@ -188,7 +188,9 @@ export default function SpicyBlocks() {
         <div className="w-full h-screen bg-gray-900">
             <header className="fixed top-0 left-0 w-full z-[9999] w-full p-4">
                 <div className="shadow-xl inline-block flex items-center justify-center w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full shadow-md">
-                    <Crown className="w-5 h-5 text-white" />
+                    <Link href="/ranking">
+                        <Crown className="w-5 h-5 text-white" />
+                    </Link>
                 </div>
             </header>
             <Canvas camera={{ position: [10.047021, -0.127436, -11.137374], fov: 50, rotation: [Math.PI, 0, 0] }}>
