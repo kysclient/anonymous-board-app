@@ -1,3 +1,4 @@
+'use server';
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, unlink } from 'fs/promises';
 import { createReadStream } from 'fs';
@@ -120,4 +121,8 @@ export async function POST(req: NextRequest) {
     console.error('Error processing file:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
+}
+
+export const config = {
+  runtime: 'nodejs' // 필수
 }
