@@ -101,7 +101,7 @@ export default function Page() {
                     <div className="flex items-center justify-between">
                         <div className="flex flex-row gap-3 items-center">
                             <SpicyLogo />
-                            <h1 className="text-xl font-bold text-gray-800">Kakao Chat Analyzer</h1>
+                            <h1 className="text-lg sm:text-xl font-bold text-gray-800">Kakao Chat Analyzer</h1>
                         </div>
                     </div>
                 </div>
@@ -111,8 +111,8 @@ export default function Page() {
                 {/* Upload Section */}
                 <div className="mb-8">
                     <div className="text-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">채팅 파일을 업로드하세요</h2>
-                        <p className="text-gray-600">카카오톡 대화 내용을 분석하여 통계를 확인할 수 있습니다</p>
+                        <h2 className="text-md sm:text-2xl font-bold text-gray-800 mb-2">채팅 파일을 업로드하세요</h2>
+                        <p className="text-sm sm:text-md text-gray-600">카카오톡 대화 내용을 분석하여 통계를 확인할 수 있습니다</p>
                     </div>
 
                     <div
@@ -143,7 +143,7 @@ export default function Page() {
                             </div>
 
                             <div>
-                                <p className="text-lg font-semibold text-gray-700 mb-1">
+                                <p className="text-md sm:text-lg font-semibold text-gray-700 mb-1">
                                     {isUploading ? <span>업로드 중...</span> : <span>파일을 드래그하거나 클릭하여 업로드</span>}
                                 </p>
                                 <p className="text-sm text-gray-500">지원 형식: .txt, .csv</p>
