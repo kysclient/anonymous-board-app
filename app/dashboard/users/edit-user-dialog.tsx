@@ -45,6 +45,8 @@ export function EditUserDialog({
     is_regular: user.is_regular as "신입" | "기존",
     meetup_count: user.meetup_count,
     total_meetup_count: user.total_meetup_count,
+    meetup_make_count: user.meetup_make_count,
+
   });
   const { toast } = useToast();
 
@@ -57,6 +59,8 @@ export function EditUserDialog({
       is_regular: user.is_regular as "신입" | "기존",
       meetup_count: user.meetup_count,
       total_meetup_count: user.total_meetup_count,
+      meetup_make_count: user.meetup_make_count,
+
     });
   }, [user]);
 
@@ -78,6 +82,7 @@ export function EditUserDialog({
         ...formData,
         meetup_count: Number(formData.meetup_count),
         total_meetup_count: Number(formData.total_meetup_count),
+        meetup_make_count: Number(formData.meetup_make_count),
       });
 
       if (result.success) {
@@ -186,6 +191,20 @@ export function EditUserDialog({
                 type="number"
                 min="0"
                 value={formData.meetup_count}
+                onChange={handleChange}
+                className="col-span-3"
+              />
+            </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-meetup_count" className="text-right">
+                이번 달 벙주 횟수
+              </Label>
+              <Input
+                id="edit-meetup_make_count"
+                name="meetup_make_count"
+                type="number"
+                min="0"
+                value={formData.meetup_make_count}
                 onChange={handleChange}
                 className="col-span-3"
               />

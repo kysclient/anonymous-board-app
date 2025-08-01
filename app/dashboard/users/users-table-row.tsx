@@ -5,6 +5,7 @@ import { formatDate, formatDateString } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { IncrementMeetupButton } from "./increment-meetup-button";
 import { User } from "../\bactions";
+import { IncreementMakeButton } from "./increment-make-button";
 
 interface UserTableRowProps {
   user: User;
@@ -31,11 +32,15 @@ export const UserTableRow = memo(function UserTableRow({
         </Badge>
       </TableCell>
       <TableCell className="text-center">{user.meetup_count}</TableCell>
+      <TableCell className="text-center">{user.meetup_make_count}</TableCell>
       <TableCell className="text-center hidden md:table-cell">
         {user.total_meetup_count}
       </TableCell>
       <TableCell className="text-center">
         <IncrementMeetupButton userId={user.id} onSuccess={onUpdate} />
+      </TableCell>
+      <TableCell className="text-center">
+        <IncreementMakeButton userId={user.id} onSuccess={onUpdate} />
       </TableCell>
       <TableCell className="text-right">
         <UserActions user={user} onUpdate={onUpdate} />

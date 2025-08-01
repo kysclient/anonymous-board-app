@@ -12,6 +12,7 @@ export type User = {
   is_regular: "신입" | "기존";
   meetup_count: number;
   total_meetup_count: number;
+  meetup_make_count: number;
 };
 
 // 사용자 생성
@@ -22,6 +23,7 @@ export async function createUser(data: {
   is_regular: "신입" | "기존";
   meetup_count: number;
   total_meetup_count: number;
+  meetup_make_count: number;
 }) {
   try {
     await sql`
@@ -31,7 +33,8 @@ export async function createUser(data: {
         last_meetup_date, 
         is_regular, 
         meetup_count, 
-        total_meetup_count
+        total_meetup_count,
+        meetup_make_count
       )
       VALUES (
         ${data.name}, 
@@ -39,7 +42,8 @@ export async function createUser(data: {
         ${data.last_meetup_date || null}, 
         ${data.is_regular}, 
         ${data.meetup_count}, 
-        ${data.total_meetup_count}
+        ${data.total_meetup_count},
+        ${data.meetup_make_count}
       )
     `;
 
@@ -144,6 +148,7 @@ export async function updateUser(
     is_regular: "신입" | "기존";
     meetup_count: number;
     total_meetup_count: number;
+    meetup_make_count: number;
   }
 ) {
   try {
@@ -155,7 +160,8 @@ export async function updateUser(
         last_meetup_date = ${data.last_meetup_date || null},
         is_regular = ${data.is_regular},
         meetup_count = ${data.meetup_count},
-        total_meetup_count = ${data.total_meetup_count}
+        total_meetup_count = ${data.total_meetup_count},
+        meetup_make_count = ${data.meetup_make_count}
       WHERE id = ${id}
     `;
 
@@ -212,13 +218,33 @@ export async function incrementMeetupCount(id: number) {
   }
 }
 
+export async function increementMeetupMakeCount(id: number) {
+  try {
+    await sql`
+      UPDATE users 
+      SET 
+        meetup_make_count = meetup_make_count + 1
+      WHERE id = ${id}
+    `;
+
+    revalidatePath("/users");
+    return { success: true };
+  } catch (error) {
+    console.error("벙주 횟수 업데이트 오류:", error);
+    return {
+      success: false,
+      error: "벙주 횟수를 업데이트하는 중 오류가 발생했습니다.",
+    };
+  }
+}
+
 // 모든 사용자 벙 참여 횟수 초기화 (월 초기화)
 export async function resetAllMeetupCounts() {
   try {
     await sql`
-      UPDATE users 
-      SET meetup_count = 0
-    `;
+  UPDATE users 
+  SET meetup_count = 0, meetup_make_count = 0
+`;
 
     revalidatePath("/users");
     return { success: true };

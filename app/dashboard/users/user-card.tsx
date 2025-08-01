@@ -4,6 +4,7 @@ import { formatDate, formatDateString } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { IncrementMeetupButton } from "./increment-meetup-button";
 import { User } from "../\bactions";
+import { IncreementMakeButton } from "./increment-make-button";
 
 interface UserCardProps {
   user: User;
@@ -45,13 +46,27 @@ export function UserCard({ user, onUpdate }: UserCardProps) {
             <div className="text-muted-foreground">이번 달 벙 참여</div>
             <div className="font-semibold">{user.meetup_count}회</div>
           </div>
+              <div>
+            <div className="text-muted-foreground">이번 달 벙주 횟수</div>
+            <div className="font-semibold">{user.meetup_make_count}회</div>
+          </div>
           <div>
             <div className="text-muted-foreground">누적 벙 참여</div>
             <div className="font-semibold">{user.total_meetup_count}회</div>
           </div>
         </div>
-        <div className="mt-4 flex justify-end sm:justify-center">
-          <IncrementMeetupButton userId={user.id} onSuccess={onUpdate} />
+        <div className="mt-4 flex justify-start sm:justify-center">
+          <div className="flex flex-row gap-2 text-xs">
+              <div className="flex flex-row items-center gap-1">
+              <span>벙주 횟수 추가</span>
+              <IncreementMakeButton userId={user.id} onSuccess={onUpdate} />
+            </div>
+
+            <div className="flex flex-row items-center gap-1">
+              <span>벙 참여 추가</span>
+              <IncrementMeetupButton userId={user.id} onSuccess={onUpdate} />
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
