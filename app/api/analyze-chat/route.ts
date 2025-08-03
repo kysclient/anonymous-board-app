@@ -6,7 +6,7 @@ import { createInterface } from 'readline';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
-export const dynamic = 'force-dynamic'; // Vercel 배포 시 동적 렌더링 강제
+// export const dynamic = 'force-dynamic'; 
 
 interface ChatAnalysis {
   userMessages: { user: string; count: number }[];
