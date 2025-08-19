@@ -23,7 +23,6 @@ export async function createUser(data: {
   is_regular: "신입" | "기존";
   meetup_count: number;
   total_meetup_count: number;
-  meetup_make_count: number;
 }) {
   try {
     await sql`
@@ -43,7 +42,7 @@ export async function createUser(data: {
         ${data.is_regular}, 
         ${data.meetup_count}, 
         ${data.total_meetup_count},
-        ${data.meetup_make_count}
+        0
       )
     `;
 
