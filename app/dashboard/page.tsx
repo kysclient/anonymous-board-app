@@ -1,6 +1,3 @@
-import { AvatarFallback } from "@/components/ui/avatar";
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -17,11 +14,14 @@ import {
   Trophy,
   TrendingUp,
   UserPlus,
+  Copy,
 } from "lucide-react";
 import { getUsers } from "./\bactions";
 import { getAdminStatus } from "@/lib/actions";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/copy-button";
 
 export default async function DashboardPage() {
   const isAdmin = await getAdminStatus();
@@ -61,6 +61,38 @@ export default async function DashboardPage() {
     )
     .slice(0, 10);
 
+  // 참여 기한 임박 + 초과 사용자
+  const now = new Date();
+
+  const deadlineUsers = users.filter((user) => {
+    if (!user.join_date) return false;
+
+    const joinDate = new Date(user.join_date);
+    let limitDate = new Date(joinDate);
+
+    // 신입은 1개월, 기존은 2개월
+    if (user.is_regular === "신입") {
+      limitDate.setMonth(limitDate.getMonth() + 1);
+    } else if (user.is_regular === "기존") {
+      if (!user.last_meetup_date) return false;
+      const lasetMeetupDate = new Date(user.last_meetup_date);
+      lasetMeetupDate.setMonth(lasetMeetupDate.getMonth() + 2);
+      const diffDays = Math.floor(
+        (lasetMeetupDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return diffDays <= 7;
+    } else {
+      return false;
+    }
+
+    // 남은 일 수 계산 (음수면 이미 초과)
+    const diffDays = Math.floor(
+      (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    // 이미 초과했거나 앞으로 7일 이내인 경우
+    return diffDays <= 7;
+  });
   return (
     <div className="flex flex-col gap-6">
       <Image
@@ -236,6 +268,57 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
           </div>
+
+          <Card className="w-full">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>참여 기한 임박자</CardTitle>
+                <CardDescription>
+                  마지막 기한이 일주일 남은 사용자
+                </CardDescription>
+              </div>
+
+              {/* 복사 버튼 */}
+            <CopyButton deadlineUsers={deadlineUsers} />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {deadlineUsers.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    데이터가 없습니다
+                  </p>
+                ) : (
+                  <div className="flex flex-row items-center gap-[20px] flex-wrap">
+                    {deadlineUsers.map((user) => {
+                      const joinDate = new Date(user.join_date || "");
+                      const limitDate = new Date(joinDate);
+                      if (user.is_regular === "신입") {
+                        limitDate.setMonth(limitDate.getMonth() + 1);
+                      } else if (user.is_regular === "기존") {
+                        limitDate.setMonth(limitDate.getMonth() + 2);
+                      }
+
+                      return (
+                        <div
+                          key={user.id}
+                          className="flex items-center gap-4 rounded-[12px] bg-muted p-2"
+                        >
+                          <div className="space-y-1">
+                            <p className="text-xs font-medium leading-none">
+                              {user.name} ({user.is_regular})
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              기한: {formatDateString(limitDate.toString())}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
