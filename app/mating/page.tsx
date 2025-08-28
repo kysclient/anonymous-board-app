@@ -1,35 +1,42 @@
-'use client';
+"use client"
+
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Plus, X, Users, Shuffle, Heart } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, X, Users, Shuffle, Download } from "lucide-react"
 
 interface Participant {
     id: string
     name: string
+    gender: "male" | "female"
 }
 
-interface Match {
-    person1: string
-    person2: string
+interface TableSeat {
+    participant: string
+    gender: "male" | "female"
+    position: number
 }
 
 export default function Page() {
     const [participants, setParticipants] = useState<Participant[]>([])
     const [newParticipantName, setNewParticipantName] = useState("")
-    const [matches, setMatches] = useState<Match[]>([])
+    const [newParticipantGender, setNewParticipantGender] = useState<"male" | "female">("male")
+    const [tableSeats, setTableSeats] = useState<TableSeat[]>([])
     const [isMatching, setIsMatching] = useState(false)
     const [showResults, setShowResults] = useState(false)
+    const resultsRef = useRef<HTMLDivElement>(null)
 
     const addParticipant = () => {
-        if (newParticipantName.trim() && participants.length < 20) {
+        if (newParticipantName.trim() && participants.length < 100) {
             const newParticipant: Participant = {
                 id: Date.now().toString(),
                 name: newParticipantName.trim(),
+                gender: newParticipantGender,
             }
             setParticipants([...participants, newParticipant])
             setNewParticipantName("")
@@ -39,7 +46,7 @@ export default function Page() {
     const removeParticipant = (id: string) => {
         setParticipants(participants.filter((p) => p.id !== id))
         setShowResults(false)
-        setMatches([])
+        setTableSeats([])
     }
 
     const shuffleArray = <T,>(array: T[]): T[] => {
@@ -58,29 +65,64 @@ export default function Page() {
         setShowResults(false)
 
         // 애니메이션을 위한 딜레이
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 700))
 
-        const shuffledParticipants = shuffleArray(participants)
-        const newMatches: Match[] = []
+        const males = participants.filter((p) => p.gender === "male")
+        const females = participants.filter((p) => p.gender === "female")
 
-        for (let i = 0; i < shuffledParticipants.length; i += 2) {
-            if (i + 1 < shuffledParticipants.length) {
-                newMatches.push({
-                    person1: shuffledParticipants[i].name,
-                    person2: shuffledParticipants[i + 1].name,
-                })
+        // 각 성별을 섞어줌
+        const shuffledMales = shuffleArray(males)
+        const shuffledFemales = shuffleArray(females)
+
+        const newTableSeats: TableSeat[] = []
+        const totalSeats = participants.length
+
+        // 남녀 교대로 배치하는 알고리즘
+        let maleIndex = 0
+        let femaleIndex = 0
+
+        // 첫 번째 자리부터 남녀 교대로 배치
+        for (let position = 0; position < totalSeats; position++) {
+            if (position % 2 === 0) {
+                // 짝수 자리 - 남성 우선
+                if (maleIndex < shuffledMales.length) {
+                    newTableSeats.push({
+                        participant: shuffledMales[maleIndex].name,
+                        gender: "male",
+                        position
+                    })
+                    maleIndex++
+                } else {
+                    // 남성이 없으면 여성
+                    newTableSeats.push({
+                        participant: shuffledFemales[femaleIndex].name,
+                        gender: "female",
+                        position
+                    })
+                    femaleIndex++
+                }
+            } else {
+                // 홀수 자리 - 여성 우선
+                if (femaleIndex < shuffledFemales.length) {
+                    newTableSeats.push({
+                        participant: shuffledFemales[femaleIndex].name,
+                        gender: "female",
+                        position
+                    })
+                    femaleIndex++
+                } else {
+                    // 여성이 없으면 남성
+                    newTableSeats.push({
+                        participant: shuffledMales[maleIndex].name,
+                        gender: "male",
+                        position
+                    })
+                    maleIndex++
+                }
             }
         }
 
-        // 홀수인 경우 마지막 사람은 "행운의 주인공"
-        if (shuffledParticipants.length % 2 === 1) {
-            newMatches.push({
-                person1: shuffledParticipants[shuffledParticipants.length - 1].name,
-                person2: "행운의 주인공 ✨",
-            })
-        }
-
-        setMatches(newMatches)
+        setTableSeats(newTableSeats)
         setIsMatching(false)
         setShowResults(true)
     }
@@ -89,6 +131,97 @@ export default function Page() {
         if (e.key === "Enter") {
             addParticipant()
         }
+    }
+
+    const getMaleCount = () => participants.filter((p) => p.gender === "male").length
+    const getFemaleCount = () => participants.filter((p) => p.gender === "female").length
+
+    // 이미지로 다운로드하는 함수
+    const downloadAsImage = async () => {
+        if (!resultsRef.current || tableSeats.length === 0) return
+
+        try {
+            // html2canvas를 동적으로 로드
+            const html2canvas = await import('html2canvas').then(module => module.default)
+
+            const canvas = await html2canvas(resultsRef.current, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            })
+
+            const link = document.createElement('a')
+            link.download = `테이블배치_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '')}.png`
+            link.href = canvas.toDataURL('image/png')
+            link.click()
+        } catch (error) {
+            // html2canvas가 없을 경우 대체 방법
+            console.log('html2canvas not available, using alternative method')
+
+            // SVG를 사용한 대체 이미지 생성
+            const svgData = createSVGImage()
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml' })
+            const url = URL.createObjectURL(svgBlob)
+
+            const link = document.createElement('a')
+            link.download = `테이블배치_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '')}.svg`
+            link.href = url
+            link.click()
+
+            URL.revokeObjectURL(url)
+        }
+    }
+
+    // SVG 이미지 생성 함수
+    const createSVGImage = () => {
+        const leftSeats = tableSeats.filter((seat) => seat.position < Math.ceil(tableSeats.length / 2))
+        const rightSeats = tableSeats.filter((seat) => seat.position >= Math.ceil(tableSeats.length / 2))
+
+        const maxSeats = Math.max(leftSeats.length, rightSeats.length)
+        const svgHeight = Math.max(400, maxSeats * 60 + 200)
+
+        return `
+            <svg width="600" height="${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="#ffffff"/>
+                
+                <!-- 제목 -->
+                <text x="300" y="40" text-anchor="middle" fill="#1f2937" font-size="24" font-weight="bold">🍻 테이블 배치 결과 🍻</text>
+                <text x="300" y="65" text-anchor="middle" fill="#6b7280" font-size="14">총 ${tableSeats.length}명 • 남성 ${tableSeats.filter(s => s.gender === "male").length}명 • 여성 ${tableSeats.filter(s => s.gender === "female").length}명</text>
+                
+                <!-- 테이블 배경 -->
+                <rect x="50" y="100" width="500" height="${svgHeight - 150}" rx="12" fill="#fef7cd" stroke="#f59e0b" stroke-width="2"/>
+                
+                <!-- 테이블 중앙 원 -->
+                <circle cx="300" cy="${svgHeight / 2}" r="40" fill="#f59e0b"/>
+                <text x="300" y="${svgHeight / 2 - 5}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">테이블</text>
+                <text x="300" y="${svgHeight / 2 + 25}" text-anchor="middle" font-size="16">🍻🥘</text>
+                
+                <!-- 왼쪽 열 제목 -->
+                <text x="150" y="130" text-anchor="middle" fill="#6b7280" font-size="12" font-weight="bold">왼쪽</text>
+                
+                <!-- 왼쪽 좌석들 -->
+                ${leftSeats.map((seat, index) => `
+                    <rect x="80" y="${150 + index * 50}" width="140" height="35" rx="8" 
+                          fill="${seat.gender === 'male' ? '#dbeafe' : '#fce7f3'}" 
+                          stroke="${seat.gender === 'male' ? '#93c5fd' : '#f9a8d4'}" stroke-width="2"/>
+                    <text x="100" y="${170 + index * 50}" fill="${seat.gender === 'male' ? '#1e40af' : '#be185d'}" font-size="16">${seat.gender === 'male' ? '👨' : '👩'}</text>
+                    <text x="125" y="${175 + index * 50}" fill="${seat.gender === 'male' ? '#1e40af' : '#be185d'}" font-size="12" font-weight="bold">${seat.participant}</text>
+                `).join('')}
+                
+                <!-- 오른쪽 열 제목 -->
+                <text x="450" y="130" text-anchor="middle" fill="#6b7280" font-size="12" font-weight="bold">오른쪽</text>
+                
+                <!-- 오른쪽 좌석들 -->
+                ${rightSeats.map((seat, index) => `
+                    <rect x="380" y="${150 + index * 50}" width="140" height="35" rx="8" 
+                          fill="${seat.gender === 'male' ? '#dbeafe' : '#fce7f3'}" 
+                          stroke="${seat.gender === 'male' ? '#93c5fd' : '#f9a8d4'}" stroke-width="2"/>
+                    <text x="400" y="${170 + index * 50}" fill="${seat.gender === 'male' ? '#1e40af' : '#be185d'}" font-size="16">${seat.gender === 'male' ? '👨' : '👩'}</text>
+                    <text x="425" y="${175 + index * 50}" fill="${seat.gender === 'male' ? '#1e40af' : '#be185d'}" font-size="12" font-weight="bold">${seat.participant}</text>
+                `).join('')}
+            </svg>
+        `
     }
 
     return (
@@ -104,11 +237,23 @@ export default function Page() {
                     <CardHeader className="pb-3 sm:pb-6">
                         <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                             <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            참가자 추가
+                            {newParticipantGender === "male" ? "여미새" : "남미새"} 추가
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 sm:space-y-4">
                         <div className="flex gap-2">
+                            <Select
+                                value={newParticipantGender}
+                                onValueChange={(value: "male" | "female") => setNewParticipantGender(value)}
+                            >
+                                <SelectTrigger className="w-20 sm:w-24 h-11 sm:h-10">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="male">👨 남</SelectItem>
+                                    <SelectItem value="female">👩 여</SelectItem>
+                                </SelectContent>
+                            </Select>
                             <Input
                                 placeholder="참가자 이름을 입력하세요"
                                 value={newParticipantName}
@@ -128,7 +273,7 @@ export default function Page() {
                             </Button>
                         </div>
                         <div className="text-xs sm:text-sm text-muted-foreground">
-                            {participants.length}/20명 • 최소 2명 이상 필요
+                            {participants.length}/100명 • 남성 {getMaleCount()}명, 여성 {getFemaleCount()}명 • 최소 2명 이상 필요
                         </div>
                     </CardContent>
                 </Card>
@@ -144,11 +289,13 @@ export default function Page() {
                                 {participants.map((participant, index) => (
                                     <Badge
                                         key={participant.id}
-                                        variant="secondary"
+                                        variant={participant.gender === "male" ? "default" : "secondary"}
                                         className="text-sm py-2.5 px-3 sm:py-2 sm:px-3 animate-in fade-in-0 slide-in-from-bottom-2 min-h-[36px] sm:min-h-auto flex items-center"
                                         style={{ animationDelay: `${index * 100}ms` }}
                                     >
-                                        <span className="mr-2">{participant.name}</span>
+                                        <span className="mr-2">
+                                            {participant.gender === "male" ? "👨" : "👩"} {participant.name}
+                                        </span>
                                         <button
                                             onClick={() => removeParticipant(participant.id)}
                                             className="hover:text-destructive transition-colors p-1 -m-1"
@@ -175,49 +322,162 @@ export default function Page() {
                             {isMatching ? (
                                 <>
                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground mr-2" />
-                                    매칭 중...
+                                    배치 중...
                                 </>
                             ) : (
                                 <>
                                     <Shuffle className="w-5 h-5 mr-2" />
-                                    짝짓기 시작!
+                                    테이블 배치 시작!
                                 </>
                             )}
                         </Button>
                     </div>
                 )}
 
-                {/* Results */}
-                {showResults && matches.length > 0 && (
+                {showResults && tableSeats.length > 0 && (
                     <Card className="shadow-lg border-0 bg-gradient-to-r from-primary/5 to-accent/5 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4">
-                        <CardHeader className="pb-3 sm:pb-6">
-                            <CardTitle className="text-center text-xl sm:text-2xl">🎉 매칭 결과 🎉</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3 sm:space-y-4">
-                            {matches.map((match, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center justify-center p-3 sm:p-4 bg-card rounded-lg shadow-sm animate-in fade-in-0 slide-in-from-left-4"
-                                    style={{ animationDelay: `${index * 200}ms` }}
-                                >
-                                    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-                                        <div className="flex items-center gap-2 sm:gap-4 text-base sm:text-lg font-medium">
-                                            <span className="text-primary font-semibold text-sm sm:text-base">{match.person1}</span>
-                                            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 animate-pulse flex-shrink-0" />
-                                            <span className="text-primary font-semibold text-sm sm:text-base">{match.person2}</span>
+                        <div ref={resultsRef}>
+                            <CardHeader className="pb-3 sm:pb-6">
+                                <CardTitle className="text-center text-xl sm:text-2xl">🍻 테이블 배치 결과 🍻</CardTitle>
+                                <p className="text-center text-sm text-muted-foreground">
+                                    총 {tableSeats.length}명 • 남성 {tableSeats.filter(s => s.gender === "male").length}명 •
+                                    여성 {tableSeats.filter(s => s.gender === "female").length}명
+                                </p>
+                            </CardHeader>
+                            <CardContent className="space-y-4 sm:space-y-6">
+                                {/* 2열 테이블 시각화 */}
+                                <div className="relative w-full max-w-lg mx-auto">
+                                    {/* 테이블 표면 */}
+                                    <div className="bg-gradient-to-r from-amber-100 to-amber-50 border-2 border-amber-200 rounded-lg p-4 shadow-inner">
+                                        <div className="flex justify-between items-start min-h-[200px]">
+                                            {/* 왼쪽 열 */}
+                                            <div className="flex flex-col gap-3 w-[45%]">
+                                                <h4 className="text-xs text-center text-muted-foreground font-medium mb-2">왼쪽</h4>
+                                                {tableSeats
+                                                    .filter((seat) => seat.position < Math.ceil(tableSeats.length / 2))
+                                                    .map((seat, index) => (
+                                                        <div
+                                                            key={seat.position}
+                                                            className="animate-in fade-in-0 slide-in-from-left-4"
+                                                            style={{ animationDelay: `${index * 150}ms` }}
+                                                        >
+                                                            <div
+                                                                className={`
+                                  px-3 py-2 rounded-lg text-sm font-medium shadow-md text-center
+                                  ${seat.gender === "male"
+                                                                        ? "bg-blue-100 text-blue-800 border border-blue-200"
+                                                                        : "bg-pink-100 text-pink-800 border border-pink-200"
+                                                                    }
+                                `}
+                                                            >
+                                                                <div className="text-lg mb-1">{seat.gender === "male" ? "👨" : "👩"}</div>
+                                                                <div className="text-xs">{seat.participant}</div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                            </div>
+
+                                            {/* 테이블 중앙 */}
+                                            <div className="flex-1 flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <div className="w-16 h-16 bg-amber-200 rounded-full flex items-center justify-center mb-2">
+                                                        <span className="text-xs text-amber-800 font-medium">테이블</span>
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground">🍻🥘</div>
+                                                </div>
+                                            </div>
+
+                                            {/* 오른쪽 열 */}
+                                            <div className="flex flex-col gap-3 w-[45%]">
+                                                <h4 className="text-xs text-center text-muted-foreground font-medium mb-2">오른쪽</h4>
+                                                {tableSeats
+                                                    .filter((seat) => seat.position >= Math.ceil(tableSeats.length / 2))
+                                                    .map((seat, index) => (
+                                                        <div
+                                                            key={seat.position}
+                                                            className="animate-in fade-in-0 slide-in-from-right-4"
+                                                            style={{ animationDelay: `${(index + Math.ceil(tableSeats.length / 2)) * 150}ms` }}
+                                                        >
+                                                            <div
+                                                                className={`
+                                  px-3 py-2 rounded-lg text-sm font-medium shadow-md text-center
+                                  ${seat.gender === "male"
+                                                                        ? "bg-blue-100 text-blue-800 border border-blue-200"
+                                                                        : "bg-pink-100 text-pink-800 border border-pink-200"
+                                                                    }
+                                `}
+                                                            >
+                                                                <div className="text-lg mb-1">{seat.gender === "male" ? "👨" : "👩"}</div>
+                                                                <div className="text-xs">{seat.participant}</div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                            <div className="text-center pt-2 sm:pt-4">
-                                <Button
-                                    onClick={startMatching}
-                                    variant="outline"
-                                    className="hover:bg-primary hover:text-primary-foreground transition-colors bg-transparent w-full sm:w-auto min-h-[44px]"
-                                >
-                                    <Shuffle className="w-4 h-4 mr-2" />
-                                    다시 매칭하기
-                                </Button>
+
+                                {/* 리스트 형태 결과 */}
+                                <div className="space-y-2">
+                                    <h4 className="text-center font-medium text-muted-foreground">좌석 배치 순서</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <div>
+                                            <h5 className="text-sm font-medium text-muted-foreground mb-2 text-center">왼쪽 열</h5>
+                                            {tableSeats
+                                                .filter((seat) => seat.position < Math.ceil(tableSeats.length / 2))
+                                                .map((seat, index) => (
+                                                    <div
+                                                        key={seat.position}
+                                                        className="flex items-center gap-2 p-2 bg-card rounded-lg shadow-sm animate-in fade-in-0 slide-in-from-left-4 mb-1"
+                                                        style={{ animationDelay: `${index * 100}ms` }}
+                                                    >
+                                                        <span className="text-xs text-muted-foreground w-8">#{seat.position + 1}</span>
+                                                        <span className="text-lg">{seat.gender === "male" ? "👨" : "👩"}</span>
+                                                        <span className="font-medium text-sm">{seat.participant}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                        <div>
+                                            <h5 className="text-sm font-medium text-muted-foreground mb-2 text-center">오른쪽 열</h5>
+                                            {tableSeats
+                                                .filter((seat) => seat.position >= Math.ceil(tableSeats.length / 2))
+                                                .map((seat, index) => (
+                                                    <div
+                                                        key={seat.position}
+                                                        className="flex items-center gap-2 p-2 bg-card rounded-lg shadow-sm animate-in fade-in-0 slide-in-from-right-4 mb-1"
+                                                        style={{ animationDelay: `${(index + Math.ceil(tableSeats.length / 2)) * 100}ms` }}
+                                                    >
+                                                        <span className="text-xs text-muted-foreground w-8">#{seat.position + 1}</span>
+                                                        <span className="text-lg">{seat.gender === "male" ? "👨" : "👩"}</span>
+                                                        <span className="font-medium text-sm">{seat.participant}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </div>
+
+                        <CardContent className="pt-0">
+                            <div className="text-center pt-2 sm:pt-4 space-y-2">
+                                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                                    <Button
+                                        onClick={downloadAsImage}
+                                        variant="default"
+                                        className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto min-h-[44px]"
+                                    >
+                                        <Download className="w-4 h-4 mr-2" />
+                                        이미지 다운로드
+                                    </Button>
+                                    <Button
+                                        onClick={startMatching}
+                                        variant="outline"
+                                        className="hover:bg-primary hover:text-primary-foreground transition-colors bg-transparent w-full sm:w-auto min-h-[44px]"
+                                    >
+                                        <Shuffle className="w-4 h-4 mr-2" />
+                                        다시 배치하기
+                                    </Button>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
