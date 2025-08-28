@@ -22,7 +22,15 @@ const CopyButton = ({ deadlineUsers }: any) => {
             if (user.is_regular === "신입") {
               limitDate.setMonth(limitDate.getMonth() + 1);
             } else if (user.is_regular === "기존") {
-              limitDate.setMonth(limitDate.getMonth() + 2);
+              const lasetMeetupDate = new Date(user.last_meetup_date);
+              lasetMeetupDate.setMonth(lasetMeetupDate.getMonth() + 2);
+              const year = lasetMeetupDate.getFullYear();
+              const month = String(lasetMeetupDate.getMonth() + 1).padStart(
+                2,
+                "0"
+              );
+              const day = String(lasetMeetupDate.getDate()).padStart(2, "0");
+              return `${user.name} ${year}-${month}-${day}`;
             }
 
             // YYYY-MM-DD 형식으로 변환
@@ -34,7 +42,7 @@ const CopyButton = ({ deadlineUsers }: any) => {
           })
           .join("\n");
         navigator.clipboard.writeText(copyText);
-        window.alert('복사되었습니다.')
+        window.alert("복사되었습니다.");
       }}
     >
       <Copy className="w-4 h-4" />
