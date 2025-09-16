@@ -229,7 +229,7 @@ export default function Page() {
             <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
                 {/* Header */}
                 <div className="text-center space-y-2 pt-4 sm:pt-8">
-                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">짝짓기</h1>
+                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">김형래(91/돼지)</h1>
                 </div>
 
                 {/* Add Participant Section */}
