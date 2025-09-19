@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useUsers } from "./users-context";
-import { deleteUser } from "../\bactions";
+import { deleteUser } from "../actions";
 
 interface DeleteUserDialogProps {
   userId: number;

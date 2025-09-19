@@ -1,4 +1,4 @@
-import { User } from "@/app/dashboard/\bactions"
+import { User } from "@/app/dashboard/actions"
 import { Badge } from "@/components/ui/badge"
 import { Crown, Medal, Award } from "lucide-react"
 

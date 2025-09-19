@@ -7,7 +7,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { searchUsersByName, User } from "../\bactions";
+import { searchUsersByName, User } from "../actions";
 
 interface UsersContextType {
   users: User[];

@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { updateUser, User } from "../\bactions";
+import { updateUser, User } from "../actions";
 
 interface EditUserDialogProps {
   user: User;

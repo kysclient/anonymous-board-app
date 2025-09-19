@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { incrementMeetupCount } from "../\bactions";
+import { incrementMeetupCount } from "../actions";
 
 interface IncrementMeetupButtonProps {
   userId: number;

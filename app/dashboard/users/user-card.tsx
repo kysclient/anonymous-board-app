@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate, formatDateString } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { IncrementMeetupButton } from "./increment-meetup-button";
-import { User } from "../\bactions";
+import { User } from "../actions";
 import { IncreementMakeButton } from "./increment-make-button";
 
 interface UserCardProps {

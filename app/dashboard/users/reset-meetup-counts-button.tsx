@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useUsers } from "./users-context";
-import { resetAllMeetupCounts } from "../\bactions";
+import { resetAllMeetupCounts } from "../actions";
 import { useRouter } from "next/navigation";
 
 export function ResetMeetupCountsButton() {

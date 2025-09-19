@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { User } from "../\bactions";
+import { User } from "../actions";
 import { UserTableRow } from "./users-table-row";
 
 interface UserTableBodyProps {

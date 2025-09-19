@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Search, RotateCcw, Users, TrendingUp, Calendar, BarChart3 } from "lucide-react"
 import { StatsCard } from "@/components/stats-card"
 import { RankingCard } from "@/components/ranking-card"
-import { getUsers, User } from "../dashboard/\bactions"
+import { getUsers, User } from "../dashboard/actions"
 import { SpicyLogo } from "@/components/spicy-logo"
 
 export default function RankingPage() {

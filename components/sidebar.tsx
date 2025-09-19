@@ -7,6 +7,8 @@ import { Home, LayoutDashboard, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./sidebar-context";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { getAdminStatus } from "@/lib/actions";
+import { useEffect, useState } from "react";
 
 interface SidebarProps {
   className?: string;
@@ -15,6 +17,7 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const { isOpen, close } = useSidebar();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const routes = [
     {
@@ -24,6 +27,12 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname === "/dashboard",
     },
     {
+      label: "짝짓기",
+      icon: Users,
+      href: "/mating",
+      active: pathname === "/mating",
+    },
+    {
       label: "멤버관리",
       icon: Users,
       href: "/dashboard/users",
@@ -31,27 +40,42 @@ export function Sidebar({ className }: SidebarProps) {
     },
   ];
 
+  useEffect(() => {
+    const cookieStore = async () => {
+      const status = await getAdminStatus();
+      setIsAdmin(status);
+    };
+
+    cookieStore();
+    return () => {
+      setIsAdmin(false);
+    };
+  }, []);
+
   // 모바일용 사이드바 내용
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto py-4 px-3">
         <nav className="space-y-1">
-          {routes.map((route) => (
-            <Link
-              key={route.href}
-              href={route.href}
-              onClick={close}
-              className={cn(
-                "flex items-center py-2 px-3 text-sm rounded-md group hover:bg-accent",
-                route.active
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground"
-              )}
-            >
-              <route.icon className={cn("h-4 w-4 mr-2")} />
-              {route.label}
-            </Link>
-          ))}
+          {routes.map((route) => {
+            if (route.href === "/dashboard/users" && !isAdmin) return;
+            return (
+              <Link
+                key={route.href}
+                href={route.href}
+                onClick={close}
+                className={cn(
+                  "flex items-center py-2 px-3 text-sm rounded-md group hover:bg-accent",
+                  route.active
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
+                <route.icon className={cn("h-4 w-4 mr-2")} />
+                {route.label}
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </div>
@@ -75,21 +99,25 @@ export function Sidebar({ className }: SidebarProps) {
       >
         <div className="px-3 py-4 overflow-y-auto flex-1">
           <nav className="space-y-1">
-            {routes.map((route) => (
-              <Link
-                key={route.href}
-                href={route.href}
-                className={cn(
-                  "flex items-center py-2 px-3 text-sm rounded-md group hover:bg-accent",
-                  route.active
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground"
-                )}
-              >
-                <route.icon className={cn("h-4 w-4 mr-2")} />
-                {route.label}
-              </Link>
-            ))}
+            {routes.map((route) => {
+              if (route.href === "/dashboard/users" && !isAdmin) return;
+
+              return (
+                <Link
+                  key={route.href}
+                  href={route.href}
+                  className={cn(
+                    "flex items-center py-2 px-3 text-sm rounded-md group hover:bg-accent",
+                    route.active
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  <route.icon className={cn("h-4 w-4 mr-2")} />
+                  {route.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </div>

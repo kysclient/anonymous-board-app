@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditUserDialog } from "./edit-user-dialog";
 import { DeleteUserDialog } from "./delete-user-dialog";
-import { User } from "../\bactions";
+import { User } from "../actions";
 
 interface UserActionsProps {
   user: User;

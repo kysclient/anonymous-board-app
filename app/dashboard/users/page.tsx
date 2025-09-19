@@ -6,8 +6,10 @@ import { SearchInput } from "./search-input";
 import { UsersTable } from "./users-table";
 import { UsersProvider } from "./users-context";
 
-import { getUsers } from "../\bactions";
+import { getUsers } from "../actions";
 import { SortUser } from "./sort-user";
+import { getAdminStatus } from "@/lib/actions";
+import { redirect } from "next/navigation";
 
 // export const dynamic = "force-dynamic";
 
@@ -22,6 +24,11 @@ interface UsersPageProps {
 }
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
+  const isAdmin = await getAdminStatus();
+
+  if (!isAdmin) {
+    redirect("/");
+  }
   const sortKey = searchParams?.sort || "join_date";
   const sortOrder = searchParams?.order || "desc";
   const initialUsers = await getUsers(sortKey, sortOrder);

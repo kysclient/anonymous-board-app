@@ -1,5 +1,6 @@
 "use client";
 
+import { getAdminStatus } from "@/lib/actions";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 interface SidebarContextType {
@@ -10,7 +11,7 @@ interface SidebarContextType {
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export function SidebarProvider({ children }: { children: ReactNode }) {
+export  function SidebarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => {

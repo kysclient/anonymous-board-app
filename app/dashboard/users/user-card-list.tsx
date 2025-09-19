@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { UserCard } from "./user-card";
-import { User } from "../\bactions";
+import { User } from "../actions";
 
 interface UserCardListProps {
   users: User[];

@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useUsers } from "./users-context";
-import { createUser } from "../\bactions";
+import { createUser } from "../actions";
 
 export function CreateUserDialog() {
   const [open, setOpen] = useState(false);

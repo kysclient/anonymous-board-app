@@ -32,7 +32,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={inter.className}>
+      <body className={`${inter.className} `}>
         {children}
         <Toaster />
         <Analytics />

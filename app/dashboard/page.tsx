@@ -16,7 +16,7 @@ import {
   UserPlus,
   Copy,
 } from "lucide-react";
-import { getUsers } from "./\bactions";
+import { getUsers } from "./actions";
 import { getAdminStatus } from "@/lib/actions";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -24,11 +24,7 @@ import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/copy-button";
 
 export default async function DashboardPage() {
-  const isAdmin = await getAdminStatus();
 
-  if (!isAdmin) {
-    redirect("/");
-  }
 
   // 사용자 데이터 가져오기
   const users = await getUsers();
@@ -95,12 +91,21 @@ export default async function DashboardPage() {
   });
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex flex-row flex-wrap gap-2 items-center">
+      <div className="w-[127px] tablet-x:w-[132px] h-[182px] bg-fc_superlight_gray rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"><div className="w-[70px] h-[70px] flex-shrink-0 relative mb-3"><img src="https://d228e474i2d5yf.cloudfront.net/ec95738c-7f8c-11ed-88ca-0af0e54df05d1n.png" alt="member face" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" /></div><div className="flex flex-col items-center"><div className="flex justify-center gap-[5px]"><p className="text-[15px] font-bold text-fc_black text-center line-clamp-1">놀버녀</p></div><p className="mt-2 text-xs text-gray-400 text-center line-clamp-1 min-h-[16px]">이휘원</p></div></div>
+      <div className="w-[127px] tablet-x:w-[132px] h-[182px] bg-fc_superlight_gray rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"><div className="w-[70px] h-[70px] flex-shrink-0 relative mb-3"><img src="https://d228e474i2d5yf.cloudfront.net/2958d6a6-cf72-11ef-9ce2-0a11cf6b2d491n.png" alt="member face" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" /></div><div className="flex flex-col items-center"><div className="flex justify-center gap-[5px]"><p className="text-[15px] font-bold text-fc_black text-center line-clamp-1">여자김유신</p></div><p className="mt-2 text-xs text-gray-400 text-center line-clamp-1 min-h-[16px]">박수빈</p></div></div>
+      <div className="w-[127px] tablet-x:w-[132px] h-[182px] bg-fc_superlight_gray rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"><div className="w-[70px] h-[70px] flex-shrink-0 relative mb-3"><img src="https://d228e474i2d5yf.cloudfront.net/969b9138-cd13-11ef-a2a8-0a94fe4cfbd91n.png" alt="member face" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" /></div><div className="flex flex-col items-center"><div className="flex justify-center gap-[5px]"><p className="text-[15px] font-bold text-fc_black text-center line-clamp-1">차은욱</p></div><p className="mt-2 text-xs text-gray-400 text-center line-clamp-1 min-h-[16px]">박성준</p></div></div>
+      <div className="w-[127px] tablet-x:w-[132px] h-[182px] bg-fc_superlight_gray rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"><div className="w-[70px] h-[70px] flex-shrink-0 relative mb-3"><img src="https://d228e474i2d5yf.cloudfront.net/50d9f408-6853-11ee-aba2-0a11f79edfdf1n.png" alt="member face" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" /></div><div className="flex flex-col items-center"><div className="flex justify-center gap-[5px]"><p className="text-[15px] font-bold text-fc_black text-center line-clamp-1">차희생</p></div><p className="mt-2 text-xs text-gray-400 text-center line-clamp-1 min-h-[16px]">차미진</p></div></div>
+      <div className="w-[127px] tablet-x:w-[132px] h-[182px] bg-fc_superlight_gray rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"><div className="w-[70px] h-[70px] flex-shrink-0 relative mb-3"><img src="https://d228e474i2d5yf.cloudfront.net/5400c5f0-df12-11ed-b691-0a5b7d2132231n.png" alt="member face" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" /></div><div className="flex flex-col items-center"><div className="flex justify-center gap-[5px]"><p className="text-[15px] font-bold text-fc_black text-center line-clamp-1">5년만..하</p></div><p className="mt-2 text-xs text-gray-400 text-center line-clamp-1 min-h-[16px]">최이윤</p></div></div>
+      <div className="w-[127px] tablet-x:w-[132px] h-[182px] bg-fc_superlight_gray rounded-lg flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-gray-100 transition-colors"><div className="w-[70px] h-[70px] flex-shrink-0 relative mb-3"><img src="https://d228e474i2d5yf.cloudfront.net/b1923106-ac39-11ed-a6ef-0ae0f7b9e3cb1n.png" alt="member face" className="w-full h-full rounded-full object-cover" loading="lazy" decoding="async" /></div><div className="flex flex-col items-center"><div className="flex justify-center gap-[5px]"><p className="text-[15px] font-bold text-fc_black text-center line-clamp-1">할아버지</p></div><p className="mt-2 text-xs text-gray-400 text-center line-clamp-1 min-h-[16px]">김석휘</p></div></div>
+
+      </div>
       <Image
-        src={"/banner.png"}
+        src={"/banner2.png"}
         alt="banner"
         width={2000}
         height={500}
-        className="w-full max-h-[210px] object-cover border border-border rounded-lg"
+        className="flex sm:hidden w-full max-h-[210px] object-cover border border-border rounded-xl"
       />
       <Tabs defaultValue="overview" className="space-y-4">
         {/* <TabsList>
@@ -289,7 +294,10 @@ export default async function DashboardPage() {
                   </p>
                 ) : (
                   <div className="flex flex-row items-center gap-[20px] flex-wrap">
-                    {deadlineUsers.map((user) => {
+                                      <p className="text-center text-muted-foreground py-8">
+                                        오빠 요새 바쁘니까 좀 이따 개발함
+                                        </p>
+                    {/* {deadlineUsers.map((user) => {
                       const joinDate = new Date(user.join_date || "");
                       const limitDate = new Date(joinDate);
                       if (user.is_regular === "신입") {
@@ -313,7 +321,7 @@ export default async function DashboardPage() {
                           </div>
                         </div>
                       );
-                    })}
+                    })} */}
                   </div>
                 )}
               </div>

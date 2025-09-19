@@ -7,7 +7,7 @@ import { UserTableBody } from "./user-table-body";
 import { UserCardList } from "./user-card-list";
 import { UsersTableSkeleton } from "./users-table-skeleton";
 import { useUsers } from "./users-context";
-import { revalidateUsers } from "../\bactions";
+import { revalidateUsers } from "../actions";
 
 export const UsersTable = memo(function UsersTable() {
   const { users, searchTerm, isLoading, refreshUsers } = useUsers();

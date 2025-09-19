@@ -9,7 +9,7 @@ export function MobileMenuButton() {
 
   return (
     <button className="md:hidden" onClick={toggle}>
-      <Menu className="h-5 w-5 text-white" />
+      <Menu className="h-5 w-5 text-foreground" />
       <span className="sr-only">메뉴 열기</span>
     </button>
   );

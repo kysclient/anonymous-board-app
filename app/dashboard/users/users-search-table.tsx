@@ -9,7 +9,7 @@ import { UserCardList } from "./user-card-list";
 import { SearchInput } from "./search-input";
 import { CreateUserDialog } from "./create-user-dialog";
 import { ResetMeetupCountsButton } from "./reset-meetup-counts-button";
-import { searchUsersByName, User } from "../\bactions";
+import { searchUsersByName, User } from "../actions";
 
 interface UsersSearchTableProps {
   initialUsers: User[];
