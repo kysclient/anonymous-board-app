@@ -242,7 +242,7 @@ export default async function DashboardPage() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="col-span-3">
+            <Card className="col-span-4 sm:col-span-3">
               <CardHeader>
                 <CardTitle>최근 벙 참여 활동</CardTitle>
                 <CardDescription>최근 벙에 참여한 사용자 목록</CardDescription>

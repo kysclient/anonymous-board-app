@@ -17,7 +17,7 @@ export function Header() {
       }
     >
       <div className="flex flex-row justify-between w-full items-center">
-        <div className="items-center gap-4 justify-between">
+        <div className="items-center gap-4 flex flex-row">
           <MobileMenuButton />
           <div className="flex flex-1 items-center gap-4 md:gap-6">
             <Link href={"/"}>
