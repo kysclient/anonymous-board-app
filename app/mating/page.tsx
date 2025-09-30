@@ -77,48 +77,91 @@ export default function Page() {
         const newTableSeats: TableSeat[] = []
         const totalSeats = participants.length
 
-        // 남녀 교대로 배치하는 알고리즘
+        // 개선된 남녀 배치 알고리즘 - 소수 성별을 균등하게 분산
         let maleIndex = 0
         let femaleIndex = 0
 
-        // 첫 번째 자리부터 남녀 교대로 배치
+        const maleCount = shuffledMales.length
+        const femaleCount = shuffledFemales.length
+
+        // 소수 성별과 다수 성별 구분
+        const isFemaleLess = femaleCount < maleCount
+        const minorCount = Math.min(maleCount, femaleCount)
+        const majorCount = Math.max(maleCount, femaleCount)
+
+        // 소수 성별을 배치할 간격 계산 (균등하게 분산)
+        const interval = minorCount > 0 ? totalSeats / (minorCount + 1) : totalSeats + 1
+
+        let consecutiveCount = 0
+        let lastGender: "male" | "female" | null = null
+
         for (let position = 0; position < totalSeats; position++) {
-            if (position % 2 === 0) {
-                // 짝수 자리 - 남성 우선
-                if (maleIndex < shuffledMales.length) {
-                    newTableSeats.push({
-                        participant: shuffledMales[maleIndex].name,
-                        gender: "male",
-                        position
-                    })
-                    maleIndex++
-                } else {
-                    // 남성이 없으면 여성
-                    newTableSeats.push({
-                        participant: shuffledFemales[femaleIndex].name,
-                        gender: "female",
-                        position
-                    })
-                    femaleIndex++
-                }
+            let selectedGender: "male" | "female" | null = null
+
+            const malesLeft = maleCount - maleIndex
+            const femalesLeft = femaleCount - femaleIndex
+            const remainingSeats = totalSeats - position
+
+            // 둘 중 하나가 다 떨어졌으면 나머지 성별 배치
+            if (malesLeft === 0) {
+                selectedGender = "female"
+            } else if (femalesLeft === 0) {
+                selectedGender = "male"
             } else {
-                // 홀수 자리 - 여성 우선
-                if (femaleIndex < shuffledFemales.length) {
-                    newTableSeats.push({
-                        participant: shuffledFemales[femaleIndex].name,
-                        gender: "female",
-                        position
-                    })
-                    femaleIndex++
+                // 같은 성별이 2명 연속이면 다른 성별을 우선 배치
+                if (consecutiveCount >= 2 && lastGender) {
+                    selectedGender = lastGender === "male" ? "female" : "male"
                 } else {
-                    // 여성이 없으면 남성
-                    newTableSeats.push({
-                        participant: shuffledMales[maleIndex].name,
-                        gender: "male",
-                        position
-                    })
-                    maleIndex++
+                    // 남은 좌석과 남은 인원의 비율을 고려하여 배치
+                    // 소수 성별이 남은 좌석 대비 부족하면 우선 배치
+                    const maleRatio = malesLeft / remainingSeats
+                    const femaleRatio = femalesLeft / remainingSeats
+
+                    // 이전과 다른 성별을 우선하되, 비율이 너무 낮으면 강제 배치
+                    if (lastGender === "male") {
+                        // 여성 비율이 0.3 이상이면 여성 배치
+                        if (femaleRatio >= 0.3) {
+                            selectedGender = "female"
+                        } else {
+                            selectedGender = "male"
+                        }
+                    } else if (lastGender === "female") {
+                        // 남성 비율이 0.3 이상이면 남성 배치
+                        if (maleRatio >= 0.3) {
+                            selectedGender = "male"
+                        } else {
+                            selectedGender = "female"
+                        }
+                    } else {
+                        // 첫 번째 자리는 더 많은 성별부터
+                        selectedGender = malesLeft >= femalesLeft ? "male" : "female"
+                    }
                 }
+            }
+
+            // 선택된 성별 배치
+            if (selectedGender === "male" && maleIndex < shuffledMales.length) {
+                newTableSeats.push({
+                    participant: shuffledMales[maleIndex].name,
+                    gender: "male",
+                    position
+                })
+                maleIndex++
+            } else if (selectedGender === "female" && femaleIndex < shuffledFemales.length) {
+                newTableSeats.push({
+                    participant: shuffledFemales[femaleIndex].name,
+                    gender: "female",
+                    position
+                })
+                femaleIndex++
+            }
+
+            // 연속 카운트 업데이트
+            if (selectedGender === lastGender) {
+                consecutiveCount++
+            } else {
+                consecutiveCount = 1
+                lastGender = selectedGender
             }
         }
 
