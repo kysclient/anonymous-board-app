@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, X, Users, Shuffle, Download } from "lucide-react"
+import Image from "next/image"
 
 interface Participant {
     id: string
@@ -271,8 +272,9 @@ export default function Page() {
         <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 p-3 sm:p-4">
             <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
                 {/* Header */}
-                <div className="text-center space-y-2 pt-4 sm:pt-8">
-                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">짝짓기</h1>
+                <div className="text-center flex justify-center items-center flex-col space-y-2 pt-4 sm:pt-8">
+                    <Image src="/hojun.jpeg" width={100} height={100} alt="hojun" className="rounded-full" />                
+                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">술을 곱게 먹자</h1>
                 </div>
 
                 {/* Add Participant Section */}
