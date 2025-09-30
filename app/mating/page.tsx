@@ -32,7 +32,7 @@ export default function Page() {
     const resultsRef = useRef<HTMLDivElement>(null)
 
     const addParticipant = () => {
-        if (newParticipantName.trim() && participants.length < 100) {
+        if (newParticipantName.trim() && participants.length < 50) {
             const newParticipant: Participant = {
                 id: Date.now().toString(),
                 name: newParticipantName.trim(),
@@ -307,7 +307,7 @@ export default function Page() {
                             />
                             <Button
                                 onClick={addParticipant}
-                                disabled={!newParticipantName.trim() || participants.length >= 20}
+                                disabled={!newParticipantName.trim() || participants.length >= 50}
                                 className="shrink-0 h-11 w-11 sm:h-10 sm:w-auto sm:px-4"
                                 size="sm"
                             >
@@ -316,7 +316,7 @@ export default function Page() {
                             </Button>
                         </div>
                         <div className="text-xs sm:text-sm text-muted-foreground">
-                            {participants.length}/100명 • 남성 {getMaleCount()}명, 여성 {getFemaleCount()}명 • 최소 2명 이상 필요
+                            {participants.length}/50명 • 남성 {getMaleCount()}명, 여성 {getFemaleCount()}명 • 최소 2명 이상 필요
                         </div>
                     </CardContent>
                 </Card>
