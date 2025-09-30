@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Users } from "lucide-react";
+import { Home, LayoutDashboard, Users, Gamepad2, Heart } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./sidebar-context";
@@ -26,9 +26,15 @@ export function Sidebar({ className }: SidebarProps) {
       href: "/dashboard",
       active: pathname === "/dashboard",
     },
+    // {
+    //   label: "미니게임",
+    //   icon: Gamepad2,
+    //   href: "/dashboard/games",
+    //   active: pathname === "/dashboard/games",
+    // },
     {
       label: "짝짓기",
-      icon: Users,
+      icon: Heart,
       href: "/mating",
       active: pathname === "/mating",
     },
