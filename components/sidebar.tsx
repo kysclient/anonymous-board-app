@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Users, Gamepad2, Heart } from "lucide-react";
+import { Home, LayoutDashboard, Users, Gamepad2, Heart, Trophy, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./sidebar-context";
@@ -25,24 +25,38 @@ export function Sidebar({ className }: SidebarProps) {
       icon: LayoutDashboard,
       href: "/dashboard",
       active: pathname === "/dashboard",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      hoverColor: "hover:bg-blue-500/20",
     },
-    // {
-    //   label: "미니게임",
-    //   icon: Gamepad2,
-    //   href: "/dashboard/games",
-    //   active: pathname === "/dashboard/games",
-    // },
+    {
+      label: "이상형 월드컵",
+      icon: Trophy,
+      href: "/dashboard/worldcup/profile",
+      active: pathname.startsWith("/dashboard/worldcup"),
+      color: "text-pink-500",
+      bgColor: "bg-pink-500/10",
+      hoverColor: "hover:bg-pink-500/20",
+      badge: "NEW",
+    },
     {
       label: "짝짓기",
       icon: Heart,
       href: "/mating",
       active: pathname === "/mating",
+      color: "text-red-500",
+      bgColor: "bg-red-500/10",
+      hoverColor: "hover:bg-red-500/20",
     },
     {
       label: "멤버관리",
       icon: Users,
       href: "/dashboard/users",
       active: pathname === "/dashboard/users",
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10",
+      hoverColor: "hover:bg-purple-500/20",
+      adminOnly: true,
     },
   ];
 
@@ -60,25 +74,46 @@ export function Sidebar({ className }: SidebarProps) {
 
   // 모바일용 사이드바 내용
   const sidebarContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gradient-to-b from-background to-accent/5">
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+          스파이시 관리
+        </h2>
+        <p className="text-xs text-muted-foreground mt-1">멤버 통합 관리 시스템</p>
+      </div>
       <div className="flex-1 overflow-y-auto py-4 px-3">
-        <nav className="space-y-1">
+        <nav className="space-y-2">
           {routes.map((route) => {
-            if (route.href === "/dashboard/users" && !isAdmin) return;
+            if (route.adminOnly && !isAdmin) return null;
             return (
               <Link
                 key={route.href}
                 href={route.href}
                 onClick={close}
                 className={cn(
-                  "flex items-center py-2 px-3 text-sm rounded-md group hover:bg-accent",
+                  "flex items-center justify-between py-3 px-4 text-sm rounded-xl group transition-all duration-200",
                   route.active
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground"
+                    ? `${route.bgColor} ${route.color} font-semibold shadow-sm`
+                    : `text-muted-foreground ${route.hoverColor} hover:translate-x-1`
                 )}
               >
-                <route.icon className={cn("h-4 w-4 mr-2")} />
-                {route.label}
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "p-2 rounded-lg transition-colors",
+                    route.active ? route.bgColor : "bg-accent/50"
+                  )}>
+                    <route.icon className={cn(
+                      "h-4 w-4",
+                      route.active ? route.color : "text-muted-foreground"
+                    )} />
+                  </div>
+                  <span>{route.label}</span>
+                </div>
+                {route.badge && (
+                  <span className="px-2 py-1 text-[10px] font-bold rounded-full bg-gradient-to-r from-pink-500 to-orange-500 text-white animate-pulse">
+                    {route.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -99,28 +134,49 @@ export function Sidebar({ className }: SidebarProps) {
       {/* 데스크톱용 고정 사이드바 */}
       <div
         className={cn(
-          "fixed left-0 top-16 z-40 hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 bg-background border-r",
+          "fixed left-0 top-16 z-40 hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 bg-gradient-to-b from-background to-accent/5 border-r",
           className
         )}
       >
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+            스파이시 관리
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1">멤버 통합 관리 시스템</p>
+        </div>
         <div className="px-3 py-4 overflow-y-auto flex-1">
-          <nav className="space-y-1">
+          <nav className="space-y-2">
             {routes.map((route) => {
-              if (route.href === "/dashboard/users" && !isAdmin) return;
+              if (route.adminOnly && !isAdmin) return null;
 
               return (
                 <Link
                   key={route.href}
                   href={route.href}
                   className={cn(
-                    "flex items-center py-2 px-3 text-sm rounded-md group hover:bg-accent",
+                    "flex items-center justify-between py-3 px-4 text-sm rounded-xl group transition-all duration-200",
                     route.active
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground"
+                      ? `${route.bgColor} ${route.color} font-semibold shadow-sm`
+                      : `text-muted-foreground ${route.hoverColor} hover:translate-x-1`
                   )}
                 >
-                  <route.icon className={cn("h-4 w-4 mr-2")} />
-                  {route.label}
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "p-2 rounded-lg transition-colors",
+                      route.active ? route.bgColor : "bg-accent/50"
+                    )}>
+                      <route.icon className={cn(
+                        "h-4 w-4",
+                        route.active ? route.color : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <span>{route.label}</span>
+                  </div>
+                  {route.badge && (
+                    <span className="px-2 py-1 text-[10px] font-bold rounded-full bg-gradient-to-r from-pink-500 to-orange-500 text-white animate-pulse">
+                      {route.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}

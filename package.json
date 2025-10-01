@@ -42,6 +42,7 @@
     "@react-three/fiber": "^9.2.0",
     "@types/three": "^0.178.1",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/blob": "^2.0.0",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

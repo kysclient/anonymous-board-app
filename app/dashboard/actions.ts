@@ -13,6 +13,9 @@ export type User = {
   meetup_count: number;
   total_meetup_count: number;
   meetup_make_count: number;
+  profile_image?: string | null;
+  gender?: "남" | "여" | "기타" | null;
+  last_ip?: string | null;
 };
 
 // 사용자 생성
