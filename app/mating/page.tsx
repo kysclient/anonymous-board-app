@@ -273,8 +273,8 @@ export default function Page() {
             <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
                 {/* Header */}
                 <div className="text-center flex justify-center items-center flex-col space-y-2 pt-4 sm:pt-8">
-                    <Image src="/hojun.jpeg" width={100} height={100} alt="hojun" className="rounded-full" />                
-                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">술을 곱게 먹자</h1>
+                    <Image src="/hojun.jpeg" width={100} height={100} alt="hojun" className="rounded-full blur-sm" />                
+                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">???(95/솔로):술을 곱게 먹자</h1>
                 </div>
 
                 {/* Add Participant Section */}

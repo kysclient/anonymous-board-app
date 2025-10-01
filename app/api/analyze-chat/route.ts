@@ -82,15 +82,20 @@ export async function POST(req: NextRequest) {
     });
 
     for await (const line of rl) {
-      // CSV 형식 파싱: 2025-08-01 16:35:12,"김은서/98/성수","허거덩"
       if (!line.trim()) continue; // 빈 줄 무시
 
-      // 쉼표로 분리, 따옴표로 묶인 필드 처리
-      const fields = line
-        .match(/(?:"[^"]*"|[^,]+)(?=\s*,|\s*$)/g)
-        ?.map((field) => field.replace(/^"|"$/g, "").trim());
+      let fields: string[];
 
-      if (!fields || fields.length < 3) {
+      // 탭 구분 또는 CSV 구분 자동 감지
+      if (line.includes('\t')) {
+        fields = line.split('\t');
+      } else {
+        // CSV 형식: 쉼표로 분리, 따옴표로 묶인 필드 처리
+        const matches = line.match(/(?:"[^"]*"|[^,]+)(?=\s*,|\s*$)/g);
+        fields = matches ? matches.map((field) => field.replace(/^"|"$/g, "").trim()) : [];
+      }
+
+      if (fields.length < 2) {
         console.warn(`Invalid line format: ${line}`);
         continue;
       }
