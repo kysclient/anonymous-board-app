@@ -28,7 +28,7 @@ export const UsersTable = memo(function UsersTable() {
       </div>
 
       {/* 데스크톱 테이블 뷰 */}
-      <div className="hidden sm:block rounded-xl border overflow-x-auto bg-white py-2">
+      <div className="hidden sm:block rounded-xl border overflow-x-auto py-2">
         <Table>
           <UserTableHeader />
           <UserTableBody
