@@ -43,7 +43,9 @@ export default async function DashboardPage() {
   ).length;
 
   // 이달의 벙킹 Top 10 (이번 달 벙 참여 횟수 기준)
+  const now = new Date();
   const topUsers = [...users]
+    .filter((user) => user.meetup_count > 0)
     .sort((a, b) => b.meetup_count - a.meetup_count)
     .slice(0, 10);
 
@@ -58,37 +60,49 @@ export default async function DashboardPage() {
     .slice(0, 10);
 
   // 참여 기한 임박 + 초과 사용자
-  const now = new Date();
-
-  const deadlineUsers = users.filter((user) => {
-    if (!user.join_date) return false;
-
-    const joinDate = new Date(user.join_date);
-    let limitDate = new Date(joinDate);
-
-    // 신입은 1개월, 기존은 2개월
-    if (user.is_regular === "신입") {
-      limitDate.setMonth(limitDate.getMonth() + 1);
-    } else if (user.is_regular === "기존") {
-      if (!user.last_meetup_date) return false;
-      const lasetMeetupDate = new Date(user.last_meetup_date);
-      lasetMeetupDate.setMonth(lasetMeetupDate.getMonth() + 2);
-      const diffDays = Math.floor(
-        (lasetMeetupDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      return diffDays <= 7;
-    } else {
+  const deadlineUsers = users
+    .filter((user) => {
+      if (user.is_regular === "신입") {
+        // 신입: join_date 기준 1개월
+        if (!user.join_date) return false;
+        const joinDate = new Date(user.join_date);
+        const limitDate = new Date(joinDate);
+        limitDate.setMonth(limitDate.getMonth() + 1);
+        const diffDays = Math.floor(
+          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        return diffDays <= 7;
+      } else if (user.is_regular === "기존") {
+        // 기존: last_meetup_date 기준 2개월
+        if (!user.last_meetup_date) return false;
+        const lastMeetupDate = new Date(user.last_meetup_date);
+        const limitDate = new Date(lastMeetupDate);
+        limitDate.setMonth(limitDate.getMonth() + 2);
+        const diffDays = Math.floor(
+          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        return diffDays <= 7;
+      }
       return false;
-    }
-
-    // 남은 일 수 계산 (음수면 이미 초과)
-    const diffDays = Math.floor(
-      (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    // 이미 초과했거나 앞으로 7일 이내인 경우
-    return diffDays <= 7;
-  });
+    })
+    .map((user) => {
+      // 각 사용자의 기한 날짜 계산
+      let limitDate: Date;
+      if (user.is_regular === "신입") {
+        const joinDate = new Date(user.join_date!);
+        limitDate = new Date(joinDate);
+        limitDate.setMonth(limitDate.getMonth() + 1);
+      } else {
+        const lastMeetupDate = new Date(user.last_meetup_date!);
+        limitDate = new Date(lastMeetupDate);
+        limitDate.setMonth(limitDate.getMonth() + 2);
+      }
+      const diffDays = Math.floor(
+        (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return { ...user, limitDate, diffDays };
+    })
+    .sort((a, b) => a.diffDays - b.diffDays); // 남은 기한이 적은 순으로 정렬
   return (
     <div className="flex flex-col gap-6 pb-8">
      
@@ -183,7 +197,7 @@ export default async function DashboardPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card className="overflow-hidden border-primary/20 hover:shadow-lg hover:border-primary/40 transition-all">
+            {/* <Card className="overflow-hidden border-primary/20 hover:shadow-lg hover:border-primary/40 transition-all">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-red-500/5 to-transparent">
                 <CardTitle className="text-sm font-medium">
                   이번 달 벙 참여
@@ -203,7 +217,7 @@ export default async function DashboardPage() {
                   인당 평균 참여
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
             <Card className="overflow-hidden border-primary/20 hover:shadow-lg hover:border-primary/40 transition-all">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-br from-orange-500/5 to-transparent">
                 <CardTitle className="text-sm font-medium">
@@ -366,34 +380,42 @@ export default async function DashboardPage() {
                   </p>
                 ) : (
                   <div className="flex flex-row items-center gap-[20px] flex-wrap">
-                                      <p className="text-center text-muted-foreground py-8">
-                                        오빠 요새 바쁘니까 좀 이따 개발함
-                                        </p>
-                    {/* {deadlineUsers.map((user) => {
-                      const joinDate = new Date(user.join_date || "");
-                      const limitDate = new Date(joinDate);
-                      if (user.is_regular === "신입") {
-                        limitDate.setMonth(limitDate.getMonth() + 1);
-                      } else if (user.is_regular === "기존") {
-                        limitDate.setMonth(limitDate.getMonth() + 2);
-                      }
-
+                    {deadlineUsers.map((user) => {
+                      const isOverdue = user.diffDays < 0;
                       return (
                         <div
                           key={user.id}
-                          className="flex items-center gap-4 rounded-[12px] bg-muted p-2"
+                          className={`flex items-center gap-4 rounded-[12px] p-3 ${
+                            isOverdue
+                              ? "bg-red-500/10 border border-red-500/30"
+                              : "bg-orange-500/10 border border-orange-500/30"
+                          }`}
                         >
                           <div className="space-y-1">
-                            <p className="text-xs font-medium leading-none">
-                              {user.name} ({user.is_regular})
+                            <p className="text-sm font-medium leading-none flex items-center gap-2">
+                              {user.name}
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                user.is_regular === "신입"
+                                  ? "bg-blue-500/20 text-blue-600"
+                                  : "bg-purple-500/20 text-purple-600"
+                              }`}>
+                                {user.is_regular}
+                              </span>
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              기한: {formatDateString(limitDate.toString())}
+                              기한: {formatDateString(user.limitDate.toString())}
+                            </p>
+                            <p className={`text-xs font-semibold ${
+                              isOverdue ? "text-red-600" : "text-orange-600"
+                            }`}>
+                              {isOverdue
+                                ? `${Math.abs(user.diffDays)}일 초과`
+                                : `${user.diffDays}일 남음`}
                             </p>
                           </div>
                         </div>
                       );
-                    })} */}
+                    })}
                   </div>
                 )}
               </div>
