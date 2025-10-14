@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Users, Gamepad2, Heart, Trophy, Sparkles, Image } from "lucide-react";
+import {
+  Home,
+  LayoutDashboard,
+  Users,
+  Gamepad2,
+  Heart,
+  Trophy,
+  Sparkles,
+  Image,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./sidebar-context";
@@ -50,7 +59,7 @@ export function Sidebar({ className }: SidebarProps) {
     },
     {
       label: "갤러리",
-      icon: Image, // lucide-react 아이콘
+      icon: Image,
       href: "/dashboard/gallery",
       active: pathname.startsWith("/dashboard/gallery"),
       color: "text-emerald-500",
@@ -59,12 +68,13 @@ export function Sidebar({ className }: SidebarProps) {
     },
     {
       label: "블랑 구경",
-      icon: Image, 
+      icon: Image,
       href: "/dashboard/blanc",
       active: pathname.startsWith("/dashboard/blanc"),
       color: "text-emerald-500",
       bgColor: "bg-black/10",
       hoverColor: "hover:bg-black/20",
+      adminOnly: true,
     },
     {
       label: "멤버관리",
@@ -97,7 +107,9 @@ export function Sidebar({ className }: SidebarProps) {
         <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
           스파이시 관리
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">멤버 통합 관리 시스템</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          멤버 통합 관리 시스템
+        </p>
       </div>
       <div className="flex-1 overflow-y-auto py-4 px-3">
         <nav className="space-y-2">
@@ -116,14 +128,18 @@ export function Sidebar({ className }: SidebarProps) {
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "p-2 rounded-lg transition-colors",
-                    route.active ? route.bgColor : "bg-accent/50"
-                  )}>
-                    <route.icon className={cn(
-                      "h-4 w-4",
-                      route.active ? route.color : "text-muted-foreground"
-                    )} />
+                  <div
+                    className={cn(
+                      "p-2 rounded-lg transition-colors",
+                      route.active ? route.bgColor : "bg-accent/50"
+                    )}
+                  >
+                    <route.icon
+                      className={cn(
+                        "h-4 w-4",
+                        route.active ? route.color : "text-muted-foreground"
+                      )}
+                    />
                   </div>
                   <span>{route.label}</span>
                 </div>
@@ -160,7 +176,9 @@ export function Sidebar({ className }: SidebarProps) {
           <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
             스파이시 관리
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">멤버 통합 관리 시스템</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            멤버 통합 관리 시스템
+          </p>
         </div>
         <div className="px-3 py-4 overflow-y-auto flex-1">
           <nav className="space-y-2">
@@ -179,14 +197,18 @@ export function Sidebar({ className }: SidebarProps) {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "p-2 rounded-lg transition-colors",
-                      route.active ? route.bgColor : "bg-accent/50"
-                    )}>
-                      <route.icon className={cn(
-                        "h-4 w-4",
-                        route.active ? route.color : "text-muted-foreground"
-                      )} />
+                    <div
+                      className={cn(
+                        "p-2 rounded-lg transition-colors",
+                        route.active ? route.bgColor : "bg-accent/50"
+                      )}
+                    >
+                      <route.icon
+                        className={cn(
+                          "h-4 w-4",
+                          route.active ? route.color : "text-muted-foreground"
+                        )}
+                      />
                     </div>
                     <span>{route.label}</span>
                   </div>
