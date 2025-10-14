@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Users, Gamepad2, Heart, Trophy, Sparkles } from "lucide-react";
+import { Home, LayoutDashboard, Users, Gamepad2, Heart, Trophy, Sparkles, Image } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./sidebar-context";
@@ -42,11 +42,29 @@ export function Sidebar({ className }: SidebarProps) {
     {
       label: "짝짓기",
       icon: Heart,
-      href: "/mating",
+      href: "/dashboard/mating",
       active: pathname === "/mating",
       color: "text-red-500",
       bgColor: "bg-red-500/10",
       hoverColor: "hover:bg-red-500/20",
+    },
+    {
+      label: "갤러리",
+      icon: Image, // lucide-react 아이콘
+      href: "/dashboard/gallery",
+      active: pathname.startsWith("/dashboard/gallery"),
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-500/10",
+      hoverColor: "hover:bg-emerald-500/20",
+    },
+    {
+      label: "블랑 구경",
+      icon: Image, 
+      href: "/dashboard/blanc",
+      active: pathname.startsWith("/dashboard/blanc"),
+      color: "text-emerald-500",
+      bgColor: "bg-black/10",
+      hoverColor: "hover:bg-black/20",
     },
     {
       label: "멤버관리",
