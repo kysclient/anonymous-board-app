@@ -23,6 +23,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/copy-button";
 
+export const revalidate = 0;
+
 export default async function DashboardPage() {
 
 
