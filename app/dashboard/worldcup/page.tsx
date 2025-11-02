@@ -124,66 +124,73 @@ function WorldCupContent() {
     }
   };
 
- const handleChoice = (winner: Candidate) => {
-  const newWinners = [...winners, winner];
-  setWinners(newWinners);
+  const handleChoice = (winner: Candidate) => {
+    const newWinners = [...winners, winner];
+    setWinners(newWinners);
 
-  const nextPairIndex = pairIndex + 2;
+    const nextPairIndex = pairIndex + 2;
 
-  // 🧩 다음 대결이 없을 경우 → 라운드 종료 판단
-  if (nextPairIndex >= currentRound.length) {
-    let nextRound = [...newWinners];
+    // 🔹 현재 라운드 끝났을 경우
+    if (nextPairIndex >= currentRound.length) {
+      let nextRound = [...newWinners];
 
-    // 🧩 이번 라운드가 홀수였으면 마지막 한 명 부전승 처리
-    if (currentRound.length % 2 !== 0) {
-      const byeCandidate = currentRound[currentRound.length - 1];
-      // 아직 승자 목록에 없는 경우만 추가
-      if (!nextRound.some((c) => c.id === byeCandidate.id)) {
-        nextRound.push(byeCandidate);
+      // 🔹 부전승 처리
+      if (currentRound.length % 2 !== 0) {
+        const byeCandidate = currentRound[currentRound.length - 1];
+        if (!nextRound.some((c) => c.id === byeCandidate.id)) {
+          nextRound.push(byeCandidate);
+        }
       }
-    }
 
-    // 🎯 라운드 종료 후 우승자 판단
-    if (nextRound.length === 1) {
-      setFinalWinner(nextRound[0]);
-      setGameFinished(true);
-      saveResult(nextRound[0].id);
-    } else {
-      // 🎯 다음 라운드로
+      // 🔹 우승자 확정
+      if (nextRound.length === 1) {
+        setFinalWinner(nextRound[0]);
+        setGameFinished(true);
+        saveResult(nextRound[0].id);
+        return;
+      }
+
+      // 🔹 다음 라운드로
       setCurrentRound(nextRound);
       setWinners([]);
       setRoundNumber(nextRound.length);
       setPairIndex(0);
-      setCurrentPair([
-        nextRound[0],
-        nextRound.length > 1 ? nextRound[1] : null, // 안전하게 처리
-      ]);
+
+      if (nextRound.length >= 2) {
+        setCurrentPair([nextRound[0], nextRound[1]]);
+      } else {
+        // 짝이 안 되면 null로
+        setCurrentPair(null);
+      }
+
+      return;
     }
-  } else {
-    // 🧩 아직 현재 라운드 남음
+
+    // 🔹 아직 라운드가 남아 있을 때
     const next1 = currentRound[nextPairIndex];
     const next2 = currentRound[nextPairIndex + 1];
 
-    // 다음 대결이 1명뿐인 경우 (홀수)
     if (!next2) {
-      // 다음 라운드 자동 진출
+      // 홀수일 때 짝이 없는 경우 → 부전승 처리
       const nextRound = [...newWinners, next1];
       setWinners([]);
       setCurrentRound(nextRound);
       setRoundNumber(nextRound.length);
       setPairIndex(0);
-      setCurrentPair([
-        nextRound[0],
-        nextRound.length > 1 ? nextRound[1] : null,
-      ]);
+
+      if (nextRound.length >= 2) {
+        setCurrentPair([nextRound[0], nextRound[1]]);
+      } else {
+        setCurrentPair(null);
+      }
+
       return;
     }
 
-    // 정상적인 다음 대결
+    // 🔹 다음 대결 세팅
     setPairIndex(nextPairIndex);
     setCurrentPair([next1, next2]);
-  }
-};
+  };
 
   const saveResult = async (winnerId: number) => {
     try {
