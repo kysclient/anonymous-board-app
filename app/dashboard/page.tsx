@@ -122,14 +122,14 @@ export default async function DashboardPage() {
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
                 <img src="https://d228e474i2d5yf.cloudfront.net/ec95738c-7f8c-11ed-88ca-0af0e54df05d1n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
               </div>
-              <p className="text-sm font-bold text-center">놀버녀</p>
+              <p className="text-sm font-bold text-center">뒷방늙은이</p>
               <p className="text-xs text-muted-foreground">이휘원</p>
             </div>
             <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
                 <img src="https://d228e474i2d5yf.cloudfront.net/2958d6a6-cf72-11ef-9ce2-0a11cf6b2d491n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
               </div>
-              <p className="text-sm font-bold text-center">여자김유신</p>
+              <p className="text-sm font-bold text-center">차기모임장</p>
               <p className="text-xs text-muted-foreground">박수빈</p>
             </div>
             <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
@@ -153,13 +153,13 @@ export default async function DashboardPage() {
               <p className="text-sm font-bold text-center">5년만..하</p>
               <p className="text-xs text-muted-foreground">최이윤</p>
             </div>
-            <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
+            {/* <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
                 <img src="https://d228e474i2d5yf.cloudfront.net/b1923106-ac39-11ed-a6ef-0ae0f7b9e3cb1n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
               </div>
               <p className="text-sm font-bold text-center">할아버지</p>
               <p className="text-xs text-muted-foreground">김석휘</p>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>

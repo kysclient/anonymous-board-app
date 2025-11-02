@@ -143,8 +143,8 @@ function WorldCupProfileContent() {
         throw new Error("프로필 업데이트에 실패했습니다.");
       }
 
-      window.alert("프로필이 성공적으로 저장되었습니다 서비스는 최소 인원이 등록되면 진행됩니다!");
-      // router.push(`/dashboard/worldcup?userId=${selectedUser.id}`);
+      // window.alert("프로필이 성공적으로 저장되었습니다 서비스는 최소 인원이 등록되면 진행됩니다!");
+      router.push(`/dashboard/worldcup?userId=${selectedUser.id}`);
     } catch (error) {
       console.error("프로필 업데이트 오류:", error);
       window.alert("프로필 저장에 실패했습니다.");
@@ -208,7 +208,7 @@ function WorldCupProfileContent() {
                         >
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={user.profile_image} />
+                              <AvatarImage src={user?.profile_image} />
                               <AvatarFallback>{user.name[0]}</AvatarFallback>
                             </Avatar>
                             <span>{user.name}</span>
