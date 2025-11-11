@@ -233,7 +233,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
       <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden bg-background p-4 sm:p-6 md:p-10">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 z-[9999]"
         >
           {positions.map(({ wish, position }) => (
             <span
