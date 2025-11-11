@@ -49,6 +49,16 @@ export function Sidebar({ className }: SidebarProps) {
       badge: "NEW",
     },
     {
+      label: "이호준 솔로기원",
+      icon: Sparkles,
+      href: "/dashboard/hojun-solo",
+      active: pathname.startsWith("/dashboard/hojun-solo"),
+      color: "text-rose-500",
+      bgColor: "bg-rose-500/10",
+      hoverColor: "hover:bg-rose-500/20",
+      badge: "HOT",
+    },
+    {
       label: "짝짓기",
       icon: Heart,
       href: "/dashboard/mating",
@@ -134,12 +144,18 @@ export function Sidebar({ className }: SidebarProps) {
                       route.active ? route.bgColor : "bg-accent/50"
                     )}
                   >
-                    <route.icon
-                      className={cn(
-                        "h-4 w-4",
-                        route.active ? route.color : "text-muted-foreground"
-                      )}
-                    />
+                    {
+                      route.href === '/dashboard/hojun-solo' ? (
+                        <img src="/hojun.jpeg" className="overflow-hidden w-4 h-4 rounded-full" alt="hojun" />
+                      )
+                        :
+                        <route.icon
+                          className={cn(
+                            "h-4 w-4",
+                            route.active ? route.color : "text-muted-foreground"
+                          )}
+                        />
+                    }
                   </div>
                   <span>{route.label}</span>
                 </div>
@@ -203,12 +219,18 @@ export function Sidebar({ className }: SidebarProps) {
                         route.active ? route.bgColor : "bg-accent/50"
                       )}
                     >
-                      <route.icon
-                        className={cn(
-                          "h-4 w-4",
-                          route.active ? route.color : "text-muted-foreground"
-                        )}
-                      />
+                      {
+                        route.href === '/dashboard/hojun-solo' ? (
+                          <img src="/hojun.jpeg" className="overflow-hidden w-4 h-4 rounded-full" alt="hojun" />
+                        )
+                          :
+                          <route.icon
+                            className={cn(
+                              "h-4 w-4",
+                              route.active ? route.color : "text-muted-foreground"
+                            )}
+                          />
+                      }
                     </div>
                     <span>{route.label}</span>
                   </div>

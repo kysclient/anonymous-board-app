@@ -34,5 +34,16 @@ CREATE TABLE IF NOT EXISTS worldcup_results (
 CREATE INDEX IF NOT EXISTS idx_worldcup_results_user_id ON worldcup_results(user_id);
 CREATE INDEX IF NOT EXISTS idx_worldcup_results_winner_id ON worldcup_results(winner_id);
 
+-- 5. 이호준 솔로기원 운동 메시지 저장용 테이블 생성
+CREATE TABLE IF NOT EXISTS hojun_solo_wishes (
+  id SERIAL PRIMARY KEY,
+  message TEXT NOT NULL CHECK (char_length(message) <= 160),
+  client_ip VARCHAR(64),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_hojun_solo_wishes_created_at
+  ON hojun_solo_wishes (created_at DESC);
+
 -- 완료
 SELECT 'Database schema updated successfully for 이상형 월드컵!' as message;
