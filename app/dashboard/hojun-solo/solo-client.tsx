@@ -240,7 +240,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
                     value={message}
                     maxLength={MAX_LENGTH + 10}
                     onChange={(event) => setMessage(event.target.value)}
-                    className="min-h-[120px] resize-none border-rose-200 bg-white/90 focus-visible:ring-rose-400"
+                    className="min-h-[120px] resize-none border-rose-200 bg-background/90 focus-visible:ring-rose-400 text-foreground"
                   />
                   <div
                     className={cn(
@@ -279,7 +279,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
                   key={wish.id}
                   className="rounded-2xl border border-rose-100 bg-white/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
-                  <p className="text-sm leading-relaxed text-muted-foreground">
+                  <p className="text-sm leading-relaxed text-foreground">
                     {wish.message}
                   </p>
                   <p className="mt-3 text-right text-xs text-rose-400">
