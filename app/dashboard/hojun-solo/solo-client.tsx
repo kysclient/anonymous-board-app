@@ -61,13 +61,18 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
   const [message, setMessage] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const animationContainerRef = useRef<HTMLDivElement | null>(null);
   const animationInstanceRef = useRef<AnimationItem | null>(null);
 
   const charactersLeft = MAX_LENGTH - message.length;
   const isSubmitDisabled =
-    !message.trim() || charactersLeft < 0 || isPending || isAnimating;
+    !message.trim() ||
+    charactersLeft < 0 ||
+    isPending ||
+    isAnimating ||
+    isLoading;
 
   const positions = useMemo(() => {
     return wishes.map((wish) => ({
@@ -75,6 +80,47 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
       position: computePosition(wish.id),
     }));
   }, [wishes]);
+
+  const fetchLatestWishes = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/hojun-solo?limit=200", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+        },
+        cache: "no-store",
+      });
+
+      const data = (await response.json()) as {
+        success: boolean;
+        data?: HojunSoloWish[];
+        error?: string;
+      };
+
+      if (!response.ok || !data.success || !data.data) {
+        throw new Error(data.error || "기원 메시지를 불러오지 못했습니다.");
+      }
+
+      setWishes(data.data);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "불러오기 실패",
+        description:
+          error instanceof Error
+            ? error.message
+            : "기원 메시지를 불러오는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    void fetchLatestWishes();
+  }, [fetchLatestWishes]);
 
   const triggerHeartAnimation = useCallback(() => {
     setIsAnimating(true);
@@ -151,6 +197,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
           }
 
           setWishes((prev) => [data.data!, ...prev].slice(0, 200));
+          void fetchLatestWishes();
           setMessage("");
 
           toast({
@@ -171,7 +218,14 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
         }
       });
     },
-    [isSubmitDisabled, message, startTransition, toast, triggerHeartAnimation]
+    [
+      fetchLatestWishes,
+      isSubmitDisabled,
+      message,
+      startTransition,
+      toast,
+      triggerHeartAnimation,
+    ]
   );
 
   return (
@@ -209,7 +263,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
         )}
 
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col gap-6">
-          <Card className="border-0 bg-secondary shadow-xl backdrop-blur">
+          <Card className="border-0 bg-white/80 shadow-xl backdrop-blur">
             <CardHeader className="space-y-2 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-500 shadow-inner">
                 <HeartCrack />
@@ -240,7 +294,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
                     value={message}
                     maxLength={MAX_LENGTH + 10}
                     onChange={(event) => setMessage(event.target.value)}
-                    className="min-h-[120px] resize-none border-rose-200 bg-background focus-visible:ring-rose-400 text-foreground"
+                    className="min-h-[120px] resize-none border-rose-200 bg-white/90 focus-visible:ring-rose-400"
                   />
                   <div
                     className={cn(
@@ -267,28 +321,34 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-secondary backdrop-blur">
+          <Card className="border-0 bg-white/70 backdrop-blur">
             <CardHeader>
               <CardTitle className="text-lg font-semibold sm:text-xl">
                 최근 기원 모음
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              {wishes.slice(0, 6).map((wish) => (
-                <div
-                  key={wish.id}
-                  className="rounded-2xl border border-rose-100 bg-background/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-                >
-                  <p className="text-sm leading-relaxed text-foreground">
-                    {wish.message}
-                  </p>
-                  <p className="mt-3 text-right text-xs text-rose-400">
-                    {formatDate(wish.created_at)}
-                  </p>
+              {isLoading && (
+                <div className="col-span-full flex justify-center text-sm text-muted-foreground">
+                  기원 메시지를 불러오는 중입니다...
                 </div>
-              ))}
-              {wishes.length === 0 && (
-                <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-rose-200 bg-background/60 p-6 text-center text-sm text-muted-foreground">
+              )}
+              {!isLoading &&
+                wishes.slice(0, 6).map((wish) => (
+                  <div
+                    key={wish.id}
+                    className="rounded-2xl border border-rose-100 bg-white/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                  >
+                    <p className="text-sm leading-relaxed text-foreground">
+                      {wish.message}
+                    </p>
+                    <p className="mt-3 text-right text-xs text-rose-400">
+                      {formatDate(wish.created_at)}
+                    </p>
+                  </div>
+                ))}
+              {!isLoading && wishes.length === 0 && (
+                <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-rose-200 bg-white/60 p-6 text-center text-sm text-muted-foreground">
                   아직 기원이 없습니다. 첫 기원의 주인공이 되어주세요!
                 </div>
               )}
