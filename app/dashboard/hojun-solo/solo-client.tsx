@@ -176,7 +176,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
 
   return (
     <>
-      <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden bg-gradient-to-br from-rose-200 via-rose-100 to-amber-100 p-4 sm:p-6 md:p-10">
+      <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden bg-background p-4 sm:p-6 md:p-10">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -209,7 +209,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
         )}
 
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col gap-6">
-          <Card className="border-0 bg-white/80 shadow-xl backdrop-blur">
+          <Card className="border-0 bg-secondary shadow-xl backdrop-blur">
             <CardHeader className="space-y-2 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-500 shadow-inner">
                 <HeartCrack />
@@ -240,7 +240,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
                     value={message}
                     maxLength={MAX_LENGTH + 10}
                     onChange={(event) => setMessage(event.target.value)}
-                    className="min-h-[120px] resize-none border-rose-200 bg-background/90 focus-visible:ring-rose-400 text-foreground"
+                    className="min-h-[120px] resize-none border-rose-200 bg-background focus-visible:ring-rose-400 text-foreground"
                   />
                   <div
                     className={cn(
@@ -267,7 +267,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/70 backdrop-blur">
+          <Card className="border-0 bg-secondary backdrop-blur">
             <CardHeader>
               <CardTitle className="text-lg font-semibold sm:text-xl">
                 최근 기원 모음
@@ -277,7 +277,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
               {wishes.slice(0, 6).map((wish) => (
                 <div
                   key={wish.id}
-                  className="rounded-2xl border border-rose-100 bg-white/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                  className="rounded-2xl border border-rose-100 bg-background/80 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
                   <p className="text-sm leading-relaxed text-foreground">
                     {wish.message}
@@ -288,7 +288,7 @@ export function HojunSoloClient({ initialWishes }: HojunSoloClientProps) {
                 </div>
               ))}
               {wishes.length === 0 && (
-                <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-rose-200 bg-white/60 p-6 text-center text-sm text-muted-foreground">
+                <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-rose-200 bg-background/60 p-6 text-center text-sm text-muted-foreground">
                   아직 기원이 없습니다. 첫 기원의 주인공이 되어주세요!
                 </div>
               )}
