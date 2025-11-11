@@ -29,7 +29,9 @@ function WorldCupContent() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [currentRound, setCurrentRound] = useState<Candidate[]>([]);
-  const [currentPair, setCurrentPair] = useState<[Candidate, Candidate] | null>(null);
+  const [currentPair, setCurrentPair] = useState<[Candidate, Candidate] | null>(
+    null
+  );
   const [winners, setWinners] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [roundNumber, setRoundNumber] = useState(16);
@@ -66,7 +68,9 @@ function WorldCupContent() {
       console.log("✅ User data received:", data);
 
       if (!data.user.gender || !data.user.profile_image) {
-        console.log("⚠️ User missing gender or profile image, redirecting to profile setup");
+        console.log(
+          "⚠️ User missing gender or profile image, redirecting to profile setup"
+        );
         router.push(`/dashboard/worldcup/profile?userId=${userId}`);
         return;
       }
@@ -82,7 +86,9 @@ function WorldCupContent() {
 
   const loadCandidates = async (userGender: GenderType, userId: number) => {
     try {
-      const response = await fetch(`/api/worldcup/candidates?userGender=${userGender}&userId=${userId}`);
+      const response = await fetch(
+        `/api/worldcup/candidates?userGender=${userGender}&userId=${userId}`
+      );
       if (!response.ok) {
         throw new Error("후보자 불러오기 실패");
       }
@@ -98,8 +104,12 @@ function WorldCupContent() {
       // 후보자를 랜덤하게 섞기
       const shuffled = [...data.candidates].sort(() => Math.random() - 0.5);
 
-      // 16강으로 제한 (최대 16명)
-      const selected = shuffled.slice(0, Math.min(16, shuffled.length));
+      let selected = shuffled;
+
+      // 무조건 짝수로 맞추기
+      // if (selected.length % 2 !== 0) {
+      //   selected = selected.slice(0, -1);
+      // }
 
       setCandidates(selected);
       setCurrentRound(selected);
@@ -120,26 +130,66 @@ function WorldCupContent() {
 
     const nextPairIndex = pairIndex + 2;
 
+    // 🔹 현재 라운드 끝났을 경우
     if (nextPairIndex >= currentRound.length) {
-      // 현재 라운드 종료
-      if (newWinners.length === 1) {
-        // 게임 종료
-        setFinalWinner(winner);
-        setGameFinished(true);
-        saveResult(winner.id);
-      } else {
-        // 다음 라운드로
-        setCurrentRound(newWinners);
-        setWinners([]);
-        setRoundNumber(newWinners.length);
-        setPairIndex(0);
-        setCurrentPair([newWinners[0], newWinners[1]]);
+      let nextRound = [...newWinners];
+
+      // 🔹 부전승 처리
+      if (currentRound.length % 2 !== 0) {
+        const byeCandidate = currentRound[currentRound.length - 1];
+        if (!nextRound.some((c) => c.id === byeCandidate.id)) {
+          nextRound.push(byeCandidate);
+        }
       }
-    } else {
-      // 현재 라운드 계속
-      setPairIndex(nextPairIndex);
-      setCurrentPair([currentRound[nextPairIndex], currentRound[nextPairIndex + 1]]);
+
+      // 🔹 우승자 확정
+      if (nextRound.length === 1) {
+        setFinalWinner(nextRound[0]);
+        setGameFinished(true);
+        saveResult(nextRound[0].id);
+        return;
+      }
+
+      // 🔹 다음 라운드로
+      setCurrentRound(nextRound);
+      setWinners([]);
+      setRoundNumber(nextRound.length);
+      setPairIndex(0);
+
+      if (nextRound.length >= 2) {
+        setCurrentPair([nextRound[0], nextRound[1]]);
+      } else {
+        // 짝이 안 되면 null로
+        setCurrentPair(null);
+      }
+
+      return;
     }
+
+    // 🔹 아직 라운드가 남아 있을 때
+    const next1 = currentRound[nextPairIndex];
+    const next2 = currentRound[nextPairIndex + 1];
+
+    if (!next2) {
+      // 홀수일 때 짝이 없는 경우 → 부전승 처리
+      const nextRound = [...newWinners, next1];
+      setWinners([]);
+      setCurrentRound(nextRound);
+      setRoundNumber(nextRound.length);
+      setPairIndex(0);
+
+      if (nextRound.length >= 2) {
+        setCurrentPair([nextRound[0], nextRound[1]]);
+      } else {
+        setCurrentPair(null);
+      }
+
+      return;
+    }
+
+    // 🔹 다음 대결 세팅
+    setPairIndex(nextPairIndex);
+    setCurrentPair([next1, next2]);
   };
 
   const saveResult = async (winnerId: number) => {
@@ -276,29 +326,31 @@ function WorldCupContent() {
                   className="border-primary/20 shadow-xl hover:shadow-2xl transition-all cursor-pointer group overflow-hidden"
                   onClick={() => handleChoice(candidate)}
                 >
-                    <CardContent className="p-0">
-                      <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-b from-accent/20 to-accent/5">
-                        <img
-                          src={candidate.profile_image}
-                          alt={candidate.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <CardContent className="p-0">
+                    <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-b from-accent/20 to-accent/5">
+                      <img
+                        src={candidate?.profile_image}
+                        alt={candidate?.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
-                          <h3 className="text-2xl font-bold text-white mb-2">
-                            {candidate.name}
-                          </h3>
-                          <div className="flex items-center gap-2">
-                            <Heart className="h-5 w-5 text-pink-500" />
-                            <span className="text-white/90 text-sm">선택하기</span>
-                          </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                        <h3 className="text-2xl font-bold text-white mb-2">
+                          {candidate?.name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <Heart className="h-5 w-5 text-pink-500" />
+                          <span className="text-white/90 text-sm">
+                            선택하기
+                          </span>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
           </div>
         )}
 
@@ -313,14 +365,16 @@ function WorldCupContent() {
 
 export default function WorldCupPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-accent/20">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">로딩 중...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-accent/20">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">로딩 중...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <WorldCupContent />
     </Suspense>
   );

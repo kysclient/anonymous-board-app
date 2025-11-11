@@ -18,7 +18,7 @@ export default function Page() {
     const [images, setImages] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [url, setUrl] = useState('https://www.somoim.co.kr/44bbcf96-2591-11f0-9ece-0a85f80529671');
+    const [url, setUrl] = useState('https://www.somoim.co.kr/046f7cba-5ae7-11ee-8483-0ad92de4214b1');
     const [s_t, setST] = useState<number | null>(0);
     const [hasMore, setHasMore] = useState(true);
 
