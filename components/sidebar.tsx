@@ -11,6 +11,7 @@ import {
   Trophy,
   Sparkles,
   Image,
+  Bomb,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -34,18 +35,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: LayoutDashboard,
       href: "/dashboard",
       active: pathname === "/dashboard",
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      hoverColor: "hover:bg-blue-500/20",
     },
     {
       label: "이상형 월드컵",
       icon: Trophy,
       href: "/dashboard/worldcup/profile",
       active: pathname.startsWith("/dashboard/worldcup"),
-      color: "text-pink-500",
-      bgColor: "bg-pink-500/10",
-      hoverColor: "hover:bg-pink-500/20",
       badge: "NEW",
     },
     {
@@ -53,47 +48,38 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Sparkles,
       href: "/dashboard/hojun-solo",
       active: pathname.startsWith("/dashboard/hojun-solo"),
-      color: "text-rose-500",
-      bgColor: "bg-rose-500/10",
-      hoverColor: "hover:bg-rose-500/20",
       badge: "HOT",
     },
     {
       label: "짝짓기",
       icon: Heart,
       href: "/dashboard/mating",
-      active: pathname === "/mating",
-      color: "text-red-500",
-      bgColor: "bg-red-500/10",
-      hoverColor: "hover:bg-red-500/20",
+      active: pathname === "/dashboard/mating",
     },
     {
       label: "갤러리",
       icon: Image,
       href: "/dashboard/gallery",
       active: pathname.startsWith("/dashboard/gallery"),
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-500/10",
-      hoverColor: "hover:bg-emerald-500/20",
     },
     {
       label: "블랑 구경",
       icon: Image,
       href: "/dashboard/blanc",
       active: pathname.startsWith("/dashboard/blanc"),
-      color: "text-emerald-500",
-      bgColor: "bg-black/10",
-      hoverColor: "hover:bg-black/20",
       adminOnly: true,
+    },
+    {
+      label: "구성원들의 민낯",
+      icon: Bomb,
+      href: "/dashboard/chat-analysis",
+      active: pathname.startsWith("/dashboard/chat-analysis"),
     },
     {
       label: "멤버관리",
       icon: Users,
       href: "/dashboard/users",
       active: pathname === "/dashboard/users",
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      hoverColor: "hover:bg-purple-500/20",
       adminOnly: true,
     },
   ];
@@ -133,34 +119,36 @@ export function Sidebar({ className }: SidebarProps) {
                 className={cn(
                   "flex items-center justify-between py-3 px-4 text-sm rounded-xl group transition-all duration-200",
                   route.active
-                    ? `${route.bgColor} ${route.color} font-semibold shadow-sm`
-                    : `text-muted-foreground ${route.hoverColor} hover:translate-x-1`
+                    ? "bg-secondary text-red-600 font-semibold shadow-sm"
+                    : "text-foreground hover:bg-secondary hover:text-red-600"
                 )}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={cn(
                       "p-2 rounded-lg transition-colors",
-                      route.active ? route.bgColor : "bg-accent/50"
                     )}
                   >
-                    {
-                      route.href === '/dashboard/hojun-solo' ? (
-                        <img src="/hojun.jpeg" className="overflow-hidden w-4 h-4 rounded-full" alt="hojun" />
-                      )
-                        :
-                        <route.icon
-                          className={cn(
-                            "h-4 w-4",
-                            route.active ? route.color : "text-muted-foreground"
-                          )}
-                        />
-                    }
+                    {route.href === "/dashboard/hojun-solo" ? (
+                      <img
+                        src="/hojun.jpeg"
+                        className="overflow-hidden w-4 h-4 rounded-full"
+                        alt="hojun"
+                      />
+                    ) : (
+                      <route.icon
+                        className={cn(
+                          "h-4 w-4 transition-colors",
+                          route.active ? "text-red-600" : "text-foreground group-hover:text-red-600"
+                        )}
+                      />
+                    )}
                   </div>
                   <span>{route.label}</span>
                 </div>
+
                 {route.badge && (
-                  <span className="px-2 py-1 text-[10px] font-bold rounded-full bg-gradient-to-r from-pink-500 to-orange-500 text-white animate-pulse">
+                  <span className="px-2 py-1 text-[9px] font-bold rounded-full bg-red-500 text-white">
                     {route.badge}
                   </span>
                 )}
@@ -205,37 +193,40 @@ export function Sidebar({ className }: SidebarProps) {
                 <Link
                   key={route.href}
                   href={route.href}
+                  onClick={close}
                   className={cn(
                     "flex items-center justify-between py-3 px-4 text-sm rounded-xl group transition-all duration-200",
                     route.active
-                      ? `${route.bgColor} ${route.color} font-semibold shadow-sm`
-                      : `text-muted-foreground ${route.hoverColor} hover:translate-x-1`
+                      ? "bg-secondary text-red-600 font-semibold shadow-sm"
+                      : "text-foreground hover:bg-secondary hover:text-red-600"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
                         "p-2 rounded-lg transition-colors",
-                        route.active ? route.bgColor : "bg-accent/50"
                       )}
                     >
-                      {
-                        route.href === '/dashboard/hojun-solo' ? (
-                          <img src="/hojun.jpeg" className="overflow-hidden w-4 h-4 rounded-full" alt="hojun" />
-                        )
-                          :
-                          <route.icon
-                            className={cn(
-                              "h-4 w-4",
-                              route.active ? route.color : "text-muted-foreground"
-                            )}
-                          />
-                      }
+                      {route.href === "/dashboard/hojun-solo" ? (
+                        <img
+                          src="/hojun.jpeg"
+                          className="overflow-hidden w-4 h-4 rounded-full"
+                          alt="hojun"
+                        />
+                      ) : (
+                        <route.icon
+                          className={cn(
+                            "h-4 w-4 transition-colors",
+                            route.active ? "text-red-600" : "text-foreground group-hover:text-red-600"
+                          )}
+                        />
+                      )}
                     </div>
                     <span>{route.label}</span>
                   </div>
+
                   {route.badge && (
-                    <span className="px-2 py-1 text-[10px] font-bold rounded-full bg-gradient-to-r from-pink-500 to-orange-500 text-white animate-pulse">
+                    <span className="px-2 py-1 text-[9px] font-bold rounded-full bg-red-500 text-white">
                       {route.badge}
                     </span>
                   )}
