@@ -12,6 +12,7 @@ import {
   Sparkles,
   Image,
   Bomb,
+  Calculator,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -37,11 +38,17 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname === "/dashboard",
     },
     {
+      label: "정산",
+      icon: Calculator,
+      href: "/dashboard/settlement",
+      active: pathname.startsWith("/dashboard/settlement"),
+      badge: "NEW",
+    },
+    {
       label: "이상형 월드컵",
       icon: Trophy,
       href: "/dashboard/worldcup/profile",
       active: pathname.startsWith("/dashboard/worldcup"),
-      badge: "NEW",
     },
     {
       label: "이호준 솔로기원",
