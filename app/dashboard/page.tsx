@@ -107,7 +107,7 @@ export default async function DashboardPage() {
     .sort((a, b) => a.diffDays - b.diffDays); // 남은 기한이 적은 순으로 정렬
   return (
     <div className="flex flex-col gap-6 pb-8">
-     
+
 
       {/* 인기 멤버 섹션 */}
       <Card className="overflow-hidden border-primary/20">
@@ -118,6 +118,7 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+       
             <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
                 <img src="https://d228e474i2d5yf.cloudfront.net/ec95738c-7f8c-11ed-88ca-0af0e54df05d1n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
@@ -127,7 +128,14 @@ export default async function DashboardPage() {
             </div>
             <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
-                <img src="https://d228e474i2d5yf.cloudfront.net/2958d6a6-cf72-11ef-9ce2-0a11cf6b2d491n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
+                <video
+                  src="/subin.mp4"
+                  playsInline
+                  autoPlay
+                  loop
+                  muted
+                  className="w-full h-full object-cover rounded-full"
+                />
               </div>
               <p className="text-sm font-bold text-center">차기모임장</p>
               <p className="text-xs text-muted-foreground">박수빈</p>
@@ -163,6 +171,7 @@ export default async function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+
 
       <Image
         src={"/banner2.png"}
@@ -292,15 +301,14 @@ export default async function DashboardPage() {
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-transform group-hover:scale-110 ${
-                              index === 0
-                                ? "bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg"
-                                : index === 1
+                            className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-transform group-hover:scale-110 ${index === 0
+                              ? "bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg"
+                              : index === 1
                                 ? "bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md"
                                 : index === 2
-                                ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-md"
-                                : "bg-muted text-muted-foreground"
-                            }`}
+                                  ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-md"
+                                  : "bg-muted text-muted-foreground"
+                              }`}
                           >
                             {index + 1}
                           </div>
@@ -372,7 +380,7 @@ export default async function DashboardPage() {
               </div>
 
               {/* 복사 버튼 */}
-            <CopyButton deadlineUsers={deadlineUsers} />
+              <CopyButton deadlineUsers={deadlineUsers} />
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -387,29 +395,26 @@ export default async function DashboardPage() {
                       return (
                         <div
                           key={user.id}
-                          className={`flex items-center gap-4 rounded-[12px] p-3 ${
-                            isOverdue
-                              ? "bg-red-500/10 border border-red-500/30"
-                              : "bg-orange-500/10 border border-orange-500/30"
-                          }`}
+                          className={`flex items-center gap-4 rounded-[12px] p-3 ${isOverdue
+                            ? "bg-red-500/10 border border-red-500/30"
+                            : "bg-orange-500/10 border border-orange-500/30"
+                            }`}
                         >
                           <div className="space-y-1">
                             <p className="text-sm font-medium leading-none flex items-center gap-2">
                               {user.name}
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                user.is_regular === "신입"
-                                  ? "bg-blue-500/20 text-blue-600"
-                                  : "bg-purple-500/20 text-purple-600"
-                              }`}>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${user.is_regular === "신입"
+                                ? "bg-blue-500/20 text-blue-600"
+                                : "bg-purple-500/20 text-purple-600"
+                                }`}>
                                 {user.is_regular}
                               </span>
                             </p>
                             <p className="text-xs text-muted-foreground">
                               기한: {formatDateString(user.limitDate.toString())}
                             </p>
-                            <p className={`text-xs font-semibold ${
-                              isOverdue ? "text-red-600" : "text-orange-600"
-                            }`}>
+                            <p className={`text-xs font-semibold ${isOverdue ? "text-red-600" : "text-orange-600"
+                              }`}>
                               {isOverdue
                                 ? `${Math.abs(user.diffDays)}일 초과`
                                 : `${user.diffDays}일 남음`}
