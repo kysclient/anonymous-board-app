@@ -270,19 +270,13 @@ export default function Page() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/10 p-3 sm:p-4">
-            <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
-                {/* Header */}
-                <div className="text-center flex justify-center items-center flex-col space-y-2 pt-4 sm:pt-8">
-                    <Image src="/hojun.jpeg" width={100} height={100} alt="hojun" className="rounded-full blur-sm" />                
-                    <h1 className="text-2xl sm:text-4xl font-bold text-foreground text-balance">???(95/솔로):술을 곱게 먹자</h1>
-                </div>
-
+            <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
                 {/* Add Participant Section */}
                 <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
                     <CardHeader className="pb-3 sm:pb-6">
                         <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                             <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                            {newParticipantGender === "male" ? "여미새" : "남미새"} 추가
+                            {newParticipantGender === "male" ? "여성" : "남성"} 추가
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 sm:space-y-4">
@@ -295,8 +289,19 @@ export default function Page() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="male">👨 남</SelectItem>
-                                    <SelectItem value="female">👩 여</SelectItem>
+                                    <SelectItem value="male">
+                                        <div className="flex flex-row items-center gap-1">
+                                            <svg className="w-4 h-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5" /><path d="m21 3-6.75 6.75" /><circle cx="10" cy="14" r="6" /></svg>
+                                            남
+                                        </div>
+                                    </SelectItem>
+
+                                    <SelectItem value="female">
+                                        <div className="flex flex-row items-center gap-1">
+                                            <svg className="w-4 h-4 text-red-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v7" /><path d="M9 19h6" /><circle cx="12" cy="9" r="6" /></svg>
+                                            여
+                                        </div>
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                             <Input
