@@ -39,7 +39,7 @@ export default function Home() {
 
     return (
         <main className="min-h-screen bg-background p-4 md:p-8">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-6xl mx-auto">
           
 
                 {/* Main Content */}
@@ -61,7 +61,7 @@ export default function Home() {
 
                 {/* Footer Info */}
                 <div className="mt-12 bg-background/60 backdrop-blur-sm rounded-lg p-6 border border-border">
-                    <h3 className="font-bold text-freground mb-3">📋 정산 규칙</h3>
+                    <h3 className="font-bold text-freground mb-3">정산 규칙</h3>
                     <ul className="text-sm text-foreground space-y-2">
                         <li>✓ 늦참 상관없이 모두 1/n 계산</li>
                         <li>✓ 신입: 첫 참석 시 5만원 선입금 (정산 후 페이백)</li>
