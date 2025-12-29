@@ -149,10 +149,10 @@ export default async function DashboardPage() {
             </div>
             <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
-                <img src="https://d228e474i2d5yf.cloudfront.net/50d9f408-6853-11ee-aba2-0a11f79edfdf1n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
+                <img src="https://d228e474i2d5yf.cloudfront.net/d368f740-9c3a-11ea-ac32-0a5530b40d721n.png" alt="member" className="w-full h-full rounded-full object-cover" loading="lazy" />
               </div>
-              <p className="text-sm font-bold text-center">차희생</p>
-              <p className="text-xs text-muted-foreground">차미진</p>
+              <p className="text-sm font-bold text-center">안치현</p>
+              <p className="text-xs text-muted-foreground">안치현</p>
             </div>
             <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-accent/50 to-background hover:from-accent hover:shadow-lg transition-all cursor-pointer group">
               <div className="w-16 h-16 md:w-20 md:h-20 relative mb-3 ring-2 ring-primary/20 group-hover:ring-primary/60 rounded-full transition-all">
