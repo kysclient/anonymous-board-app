@@ -17,10 +17,10 @@ export type SortKey = "join_date" | "last_meetup_date" | "name";
 export type SortOrder = "asc" | "desc";
 
 interface UsersPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     sort?: SortKey;
     order?: SortOrder;
-  };
+  }>;
 }
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
@@ -29,14 +29,19 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
   if (!isAdmin) {
     redirect("/");
   }
-  const sortKey = searchParams?.sort || "join_date";
-  const sortOrder = searchParams?.order || "desc";
+  const params = await searchParams;
+  const sortKey = params?.sort || "join_date";
+  const sortOrder = params?.order || "desc";
   const initialUsers = await getUsers(sortKey, sortOrder);
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <UsersProvider initialUsers={initialUsers}>
+        <UsersProvider
+          initialUsers={initialUsers}
+          initialSortKey={sortKey}
+          initialSortOrder={sortOrder}
+        >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <ResetMeetupCountsButton />
             <CreateUserDialog />
@@ -46,7 +51,11 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       </div>
 
       <Suspense fallback={<UsersTableSkeleton />}>
-        <UsersProvider initialUsers={initialUsers}>
+        <UsersProvider
+          initialUsers={initialUsers}
+          initialSortKey={sortKey}
+          initialSortOrder={sortOrder}
+        >
           <div className="space-y-4">
             <SearchInput />
             <UsersTable />

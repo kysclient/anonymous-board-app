@@ -1,4 +1,5 @@
 "use client";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -14,13 +15,20 @@ interface SortUserProps {
 }
 
 export function SortUser({ sortKey, sortOrder }: SortUserProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleSortChange = (value: string) => {
+    const [sort, order] = value.split(":");
+    const url = `${pathname}?sort=${sort}&order=${order}`;
+    router.push(url);
+    router.refresh(); // 서버 컴포넌트 강제 새로고침
+  };
+
   return (
     <Select
       defaultValue={`${sortKey}:${sortOrder}`}
-      onValueChange={(value) => {
-        const [sort, order] = value.split(":");
-        window.location.href = `?sort=${sort}&order=${order}`;
-      }}
+      onValueChange={handleSortChange}
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="정렬 선택" />

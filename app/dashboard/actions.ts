@@ -107,17 +107,33 @@ export async function revalidateUsers() {
 }
 
 // 이름으로 사용자 검색
-export async function searchUsersByName(searchTerm: string): Promise<User[]> {
+export async function searchUsersByName(
+  searchTerm: string,
+  sortKey: "join_date" | "last_meetup_date" | "name" = "join_date",
+  sortOrder: "asc" | "desc" = "desc"
+): Promise<User[]> {
   try {
     if (!searchTerm.trim()) {
-      return await getUsers();
+      return await getUsers(sortKey, sortOrder);
     }
 
-    const users = await sql`
+    const validSortKeys = ["join_date", "last_meetup_date", "name"];
+    const validSortOrders = ["asc", "desc"];
+
+    const selectedSortKey = validSortKeys.includes(sortKey)
+      ? sortKey
+      : "join_date";
+    const selectedSortOrder = validSortOrders.includes(sortOrder)
+      ? sortOrder.toUpperCase()
+      : "DESC";
+
+    const query = `
       SELECT * FROM users 
-      WHERE name ILIKE ${`%${searchTerm}%`}
-      ORDER BY id DESC
+      WHERE name ILIKE $1
+      ORDER BY ${selectedSortKey} ${selectedSortOrder}
     `;
+
+    const users = await sql.query(query, [`%${searchTerm}%`]);
     return users as unknown as User[];
   } catch (error) {
     console.error("사용자 검색 오류:", error);
