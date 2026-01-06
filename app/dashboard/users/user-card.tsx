@@ -1,17 +1,19 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatDateString } from "@/lib/utils";
+import { formatDateString } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { IncrementMeetupButton } from "./increment-meetup-button";
 import { User } from "../actions";
 import { IncreementMakeButton } from "./increment-make-button";
+import { useUsers } from "./users-context";
 
 interface UserCardProps {
   user: User;
-  onUpdate: () => Promise<void>;
 }
 
-export function UserCard({ user, onUpdate }: UserCardProps) {
+export function UserCard({ user }: UserCardProps) {
+  const { refreshUsers } = useUsers();
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -25,7 +27,7 @@ export function UserCard({ user, onUpdate }: UserCardProps) {
               {user.is_regular}
             </Badge>
           </div>
-          <UserActions user={user} onUpdate={onUpdate} />
+          <UserActions user={user} onUpdate={refreshUsers} />
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -46,7 +48,7 @@ export function UserCard({ user, onUpdate }: UserCardProps) {
             <div className="text-muted-foreground">이번 달 벙 참여</div>
             <div className="font-semibold">{user.meetup_count}회</div>
           </div>
-              <div>
+          <div>
             <div className="text-muted-foreground">이번 달 벙주 횟수</div>
             <div className="font-semibold">{user.meetup_make_count}회</div>
           </div>
@@ -57,14 +59,14 @@ export function UserCard({ user, onUpdate }: UserCardProps) {
         </div>
         <div className="mt-4 flex justify-start sm:justify-center">
           <div className="flex flex-row gap-2 text-xs">
-              <div className="flex flex-row items-center gap-1">
+            <div className="flex flex-row items-center gap-1">
               <span>벙주 횟수 추가</span>
-              <IncreementMakeButton userId={user.id} onSuccess={onUpdate} />
+              <IncreementMakeButton userId={user.id} onSuccess={refreshUsers} />
             </div>
 
             <div className="flex flex-row items-center gap-1">
               <span>벙 참여 추가</span>
-              <IncrementMeetupButton userId={user.id} onSuccess={onUpdate} />
+              <IncrementMeetupButton userId={user.id} onSuccess={refreshUsers} />
             </div>
           </div>
         </div>

@@ -17,14 +17,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useUsers } from "./users-context";
 import { resetAllMeetupCounts } from "../actions";
-import { useRouter } from "next/navigation";
 
 export function ResetMeetupCountsButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const { refreshUsers } = useUsers();
   const { toast } = useToast();
-  const router = useRouter();
 
   const handleReset = async () => {
     setIsLoading(true);
@@ -38,10 +36,9 @@ export function ResetMeetupCountsButton() {
           description: "모든 사용자의 이번 달 벙 참여 횟수가 초기화되었습니다.",
         });
         setOpen(false);
-        // 데이터 업데이트 후 목록 새로고침
-        // await refreshUsers();
-        window.location.reload();
-        // router.replace("/dashboard/users");
+        
+        // 데이터 새로고침
+        await refreshUsers();
       } else {
         toast({
           title: "벙 참여 횟수 초기화 실패",

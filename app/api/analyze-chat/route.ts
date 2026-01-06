@@ -139,37 +139,73 @@ export async function POST(req: NextRequest) {
     for await (const line of rl) {
       if (!line.trim()) continue; // 빈 줄 무시
 
-      let fields: string[];
+      let parsedData: { timestamp: Date; user: string; message: string } | null = null;
 
-      // 탭 구분 또는 CSV 구분 자동 감지
-      if (line.includes('\t')) {
-        fields = line.split('\t');
+      // 카카오톡 TXT 형식 파싱: "2024. 1. 1. 오후 9:00, 홍길동 : 메시지 내용"
+      const kakaoPattern = /^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(오전|오후)\s*(\d{1,2}):(\d{2}),\s*([^:]+)\s*:\s*(.*)$/;
+      const kakaoMatch = line.match(kakaoPattern);
+      
+      if (kakaoMatch) {
+        const [, year, month, day, period, hour, minute, user, message] = kakaoMatch;
+        let hour24 = parseInt(hour);
+        
+        // 12시간 형식을 24시간 형식으로 변환
+        if (period === "오후" && hour24 !== 12) {
+          hour24 += 12;
+        } else if (period === "오전" && hour24 === 12) {
+          hour24 = 0;
+        }
+        
+        const timestamp = new Date(
+          parseInt(year),
+          parseInt(month) - 1,
+          parseInt(day),
+          hour24,
+          parseInt(minute)
+        );
+        
+        if (!isNaN(timestamp.getTime())) {
+          parsedData = {
+            timestamp,
+            user: user.trim(),
+            message: message.trim(),
+          };
+        }
       } else {
-        // CSV 형식: 쉼표로 분리, 따옴표로 묶인 필드 처리
-        const matches = line.match(/(?:"[^"]*"|[^,]+)(?=\s*,|\s*$)/g);
-        fields = matches ? matches.map((field) => field.replace(/^"|"$/g, "").trim()) : [];
+        // CSV 또는 탭 구분 형식 파싱
+        let fields: string[];
+
+        if (line.includes('\t')) {
+          fields = line.split('\t');
+        } else {
+          // CSV 형식: 쉼표로 분리, 따옴표로 묶인 필드 처리
+          const matches = line.match(/(?:"[^"]*"|[^,]+)(?=\s*,|\s*$)/g);
+          fields = matches ? matches.map((field) => field.replace(/^"|"$/g, "").trim()) : [];
+        }
+
+        if (fields.length >= 2) {
+          const [timestampRaw, userInfo, ...messageParts] = fields;
+          const message = messageParts.join(" ").trim();
+
+          // 타임스탬프 파싱 시도
+          const timestamp = new Date(timestampRaw);
+          if (!isNaN(timestamp.getTime())) {
+            const user = userInfo.split("/")[0].trim();
+            parsedData = { timestamp, user, message };
+          }
+        }
       }
 
-      if (fields.length < 2) {
-        console.warn(`Invalid line format: ${line}`);
+      // 파싱된 데이터 처리
+      if (!parsedData) {
         continue;
       }
 
-      const [timestampRaw, userInfo, ...messageParts] = fields; // 타임스탬프, 사용자 정보, 메시지
-      const message = messageParts.join(" ").trim();
-
-      // 타임스탬프 파싱
-      const timestamp = new Date(timestampRaw);
-      if (isNaN(timestamp.getTime())) {
-        console.warn(`Invalid timestamp: ${timestampRaw}`);
-        continue;
-      }
+      const { timestamp, user, message } = parsedData;
 
       // 날짜 범위 필터링
       if (startDate && timestamp < startDate) continue;
       if (endDate && timestamp > endDate) continue;
-
-      const user = userInfo.split("/")[0]; // 첫 번째 토큰: "김은서"
 
       if (user) {
         let aggregate = userAggregates.get(user);

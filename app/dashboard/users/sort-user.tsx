@@ -1,5 +1,4 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -8,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SortKey, SortOrder } from "./page";
+import { useUsers } from "./users-context";
 
 interface SortUserProps {
   sortKey: SortKey;
@@ -15,19 +15,16 @@ interface SortUserProps {
 }
 
 export function SortUser({ sortKey, sortOrder }: SortUserProps) {
-  const router = useRouter();
-  const pathname = usePathname();
+  const { setSorting } = useUsers();
 
   const handleSortChange = (value: string) => {
-    const [sort, order] = value.split(":");
-    const url = `${pathname}?sort=${sort}&order=${order}`;
-    router.push(url);
-    router.refresh(); // 서버 컴포넌트 강제 새로고침
+    const [sort, order] = value.split(":") as [SortKey, SortOrder];
+    setSorting(sort, order);
   };
 
   return (
     <Select
-      defaultValue={`${sortKey}:${sortOrder}`}
+      value={`${sortKey}:${sortOrder}`}
       onValueChange={handleSortChange}
     >
       <SelectTrigger className="w-[180px]">

@@ -1,21 +1,22 @@
 import { memo } from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatDateString } from "@/lib/utils";
+import { formatDateString } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { IncrementMeetupButton } from "./increment-meetup-button";
 import { User } from "../actions";
 import { IncreementMakeButton } from "./increment-make-button";
+import { useUsers } from "./users-context";
 
 interface UserTableRowProps {
   user: User;
-  onUpdate: () => Promise<void>;
 }
 
 export const UserTableRow = memo(function UserTableRow({
   user,
-  onUpdate,
 }: UserTableRowProps) {
+  const { refreshUsers } = useUsers();
+
   return (
     <TableRow>
       <TableCell className="font-medium">{user.id}</TableCell>
@@ -37,13 +38,13 @@ export const UserTableRow = memo(function UserTableRow({
         {user.total_meetup_count}
       </TableCell>
       <TableCell className="text-center">
-        <IncrementMeetupButton userId={user.id} onSuccess={onUpdate} />
+        <IncrementMeetupButton userId={user.id} onSuccess={refreshUsers} />
       </TableCell>
       <TableCell className="text-center">
-        <IncreementMakeButton userId={user.id} onSuccess={onUpdate} />
+        <IncreementMakeButton userId={user.id} onSuccess={refreshUsers} />
       </TableCell>
       <TableCell className="text-right">
-        <UserActions user={user} onUpdate={onUpdate} />
+        <UserActions user={user} onUpdate={refreshUsers} />
       </TableCell>
     </TableRow>
   );

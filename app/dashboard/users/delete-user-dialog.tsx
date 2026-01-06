@@ -11,7 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { useUsers } from "./users-context";
 import { deleteUser } from "../actions";
 
 interface DeleteUserDialogProps {
@@ -30,7 +29,6 @@ export function DeleteUserDialog({
   onSuccess,
 }: DeleteUserDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { refreshUsers } = useUsers();
   const { toast } = useToast();
 
   const handleDelete = async () => {
@@ -45,7 +43,8 @@ export function DeleteUserDialog({
           description: "사용자가 삭제되었습니다.",
         });
         onOpenChange(false);
-        // 데이터 업데이트 후 목록 새로고침
+        
+        // 데이터 새로고침
         await onSuccess();
       } else {
         toast({

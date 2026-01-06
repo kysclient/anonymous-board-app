@@ -75,9 +75,9 @@ export function CreateUserDialog() {
           meetup_count: 0,
           total_meetup_count: 0,
         });
-        // 데이터 업데이트 후 목록 새로고침
+        
+        // 데이터 새로고침
         await refreshUsers();
-        window.location.reload();
       } else {
         toast({
           title: "사용자 생성 실패",

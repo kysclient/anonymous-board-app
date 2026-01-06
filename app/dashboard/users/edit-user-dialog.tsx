@@ -46,7 +46,6 @@ export function EditUserDialog({
     meetup_count: user.meetup_count,
     total_meetup_count: user.total_meetup_count,
     meetup_make_count: user.meetup_make_count,
-
   });
   const { toast } = useToast();
 
@@ -60,7 +59,6 @@ export function EditUserDialog({
       meetup_count: user.meetup_count,
       total_meetup_count: user.total_meetup_count,
       meetup_make_count: user.meetup_make_count,
-
     });
   }, [user]);
 
@@ -91,7 +89,8 @@ export function EditUserDialog({
           description: "사용자 정보가 업데이트되었습니다.",
         });
         onOpenChange(false);
-        // 데이터 업데이트 후 목록 새로고침
+        
+        // 데이터 새로고침
         await onSuccess();
       } else {
         toast({
@@ -195,8 +194,8 @@ export function EditUserDialog({
                 className="col-span-3"
               />
             </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-meetup_count" className="text-right">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-meetup_make_count" className="text-right">
                 이번 달 벙주 횟수
               </Label>
               <Input

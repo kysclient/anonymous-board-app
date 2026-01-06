@@ -1,60 +1,62 @@
 "use client";
 
 import type React from "react";
-import { memo, useState } from "react";
-import { Search } from "lucide-react";
+import { memo, useState, useEffect } from "react";
+import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUsers } from "./users-context";
 
 export const SearchInput = memo(function SearchInput() {
   const [inputValue, setInputValue] = useState("");
-  const { isLoading, searchUsers, resetSearch } = useUsers();
+  const { setSearchTerm, searchTerm } = useUsers();
+
+  // 실시간 검색 (디바운싱)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(inputValue);
+    }, 300); // 300ms 디바운스
+
+    return () => clearTimeout(timer);
+  }, [inputValue, setSearchTerm]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
-  const handleSearch = () => {
-    searchUsers(inputValue);
-  };
-
   const handleReset = () => {
     setInputValue("");
-    resetSearch();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
+    setSearchTerm("");
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2">
-      <div className="relative">
+    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+      <div className="relative flex-1 w-full">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="사용자 이름으로 검색..."
+          placeholder="사용자 이름으로 검색... (실시간 검색)"
           value={inputValue}
           onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          className="max-w-[300px] bg-background pl-8 rounded-lg"
-          disabled={isLoading}
+          className="bg-background pl-8 pr-10 rounded-lg"
         />
-      </div>
-      <div className="flex gap-2">
-        <Button onClick={handleSearch} disabled={isLoading}>
-          {isLoading ? "검색 중..." : "검색"}
-        </Button>
         {inputValue && (
-          <Button variant="outline" onClick={handleReset} disabled={isLoading}>
-            초기화
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1 h-7 w-7"
+            onClick={handleReset}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">검색어 지우기</span>
           </Button>
         )}
       </div>
+      {searchTerm && (
+        <p className="text-sm text-muted-foreground">
+          &quot;{searchTerm}&quot; 검색 결과
+        </p>
+      )}
     </div>
   );
 });

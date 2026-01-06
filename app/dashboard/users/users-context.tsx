@@ -5,10 +5,11 @@ import {
   useContext,
   useState,
   useCallback,
+  useMemo,
   useEffect,
   type ReactNode,
 } from "react";
-import { searchUsersByName, User } from "../actions";
+import { getUsers, User } from "../actions";
 import { SortKey, SortOrder } from "./page";
 
 interface UsersContextType {
@@ -18,9 +19,8 @@ interface UsersContextType {
   sortKey: SortKey;
   sortOrder: SortOrder;
   setSearchTerm: (term: string) => void;
+  setSorting: (key: SortKey, order: SortOrder) => void;
   refreshUsers: () => Promise<void>;
-  searchUsers: (term: string) => Promise<void>;
-  resetSearch: () => void;
 }
 
 const UsersContext = createContext<UsersContextType | undefined>(undefined);
@@ -39,79 +39,72 @@ export function UsersProvider({
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sortKey] = useState<SortKey>(initialSortKey);
-  const [sortOrder] = useState<SortOrder>(initialSortOrder);
+  const [sortKey, setSortKey] = useState<SortKey>(initialSortKey);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(initialSortOrder);
 
-  // initialUsers가 변경되면 users 상태 업데이트
+  // 정렬 파라미터가 변경되면 데이터 다시 가져오기
   useEffect(() => {
-    setUsers(initialUsers);
-  }, [initialUsers]);
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      try {
+        const newUsers = await getUsers(sortKey, sortOrder);
+        setUsers(newUsers);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // 초기 로드가 아닐 때만 다시 fetch
+    if (sortKey !== initialSortKey || sortOrder !== initialSortOrder) {
+      fetchUsers();
+    }
+  }, [sortKey, sortOrder, initialSortKey, initialSortOrder]);
 
   // 사용자 목록 새로고침
   const refreshUsers = useCallback(async () => {
     setIsLoading(true);
     try {
-      // 검색어가 있으면 검색 결과를, 없으면 전체 목록을 가져옴
-      const refreshedUsers = await searchUsersByName(
-        searchTerm,
-        sortKey,
-        sortOrder
-      );
+      const refreshedUsers = await getUsers(sortKey, sortOrder);
       setUsers(refreshedUsers);
     } catch (error) {
-      console.error("사용자 목록 새로고침 오류:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchTerm, sortKey, sortOrder]);
-
-  // 사용자 검색 (검색어를 받아서 처리)
-  const searchUsers = useCallback(
-    async (term: string) => {
-      setIsLoading(true);
-      try {
-        setSearchTerm(term);
-        const searchResults = await searchUsersByName(term, sortKey, sortOrder);
-        setUsers(searchResults);
-      } catch (error) {
-        console.error("사용자 검색 오류:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [sortKey, sortOrder]
-  );
-
-  // 검색 초기화
-  const resetSearch = useCallback(async () => {
-    setSearchTerm("");
-    setIsLoading(true);
-    try {
-      const allUsers = await searchUsersByName("", sortKey, sortOrder);
-      setUsers(allUsers);
-    } catch (error) {
-      console.error("검색 초기화 오류:", error);
+      console.error("Failed to refresh users:", error);
     } finally {
       setIsLoading(false);
     }
   }, [sortKey, sortOrder]);
 
+  // 정렬 변경
+  const setSorting = useCallback((key: SortKey, order: SortOrder) => {
+    setSortKey(key);
+    setSortOrder(order);
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      users,
+      searchTerm,
+      isLoading,
+      sortKey,
+      sortOrder,
+      setSearchTerm,
+      setSorting,
+      refreshUsers,
+    }),
+    [
+      users,
+      searchTerm,
+      isLoading,
+      sortKey,
+      sortOrder,
+      setSorting,
+      refreshUsers,
+    ]
+  );
+
   return (
-    <UsersContext.Provider
-      value={{
-        users,
-        searchTerm,
-        isLoading,
-        sortKey,
-        sortOrder,
-        setSearchTerm,
-        refreshUsers,
-        searchUsers,
-        resetSearch,
-      }}
-    >
-      {children}
-    </UsersContext.Provider>
+    <UsersContext.Provider value={value}>{children}</UsersContext.Provider>
   );
 }
 
