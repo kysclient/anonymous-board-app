@@ -11,16 +11,8 @@ import { useUsers } from "./users-context";
 export const UsersTable = memo(function UsersTable() {
   const { users, searchTerm, isLoading } = useUsers();
 
-  // 검색 필터링
-  const filteredUsers = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return users;
-    }
-    const lowerSearch = searchTerm.toLowerCase();
-    return users.filter((user) =>
-      user.name.toLowerCase().includes(lowerSearch)
-    );
-  }, [users, searchTerm]);
+  // 서버에서 이미 검색된 결과를 받아오므로 클라이언트 필터링 불필요
+  const filteredUsers = users;
 
   if (isLoading) {
     return <UsersTableSkeleton />;
@@ -46,8 +38,8 @@ export const UsersTable = memo(function UsersTable() {
       </div>
 
       {/* 데스크톱 테이블 뷰 */}
-      <div className="hidden sm:block rounded-xl border overflow-x-auto py-2">
-        <Table>
+      <div className="hidden sm:block rounded-xl border bg-card shadow-sm overflow-hidden">
+        <Table className="text-xs">
           <UserTableHeader />
           <UserTableBody users={filteredUsers} />
         </Table>

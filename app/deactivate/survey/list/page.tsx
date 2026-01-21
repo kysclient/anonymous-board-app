@@ -8,7 +8,7 @@ export default async function Page() {
   const isAdmin = await getAdminStatus();
 
   if (!isAdmin) {
-    redirect("/");
+    redirect("/deactivate");
   }
 
   return (
@@ -19,3 +19,4 @@ export default async function Page() {
     </main>
   );
 }
+

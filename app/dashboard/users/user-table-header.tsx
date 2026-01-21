@@ -3,9 +3,9 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export const UserTableHeader = memo(function UserTableHeader() {
   return (
-    <TableHeader>
-      <TableRow>
-        <TableHead className="w-[80px]">ID</TableHead>
+    <TableHeader className="sticky top-0 z-10 bg-muted/60 backdrop-blur">
+      <TableRow className="text-[11px] uppercase tracking-wide text-muted-foreground">
+        <TableHead className="w-[70px]">ID</TableHead>
         <TableHead>이름</TableHead>
         <TableHead className="hidden md:table-cell">가입일</TableHead>
         <TableHead className="hidden lg:table-cell">최근 벙 참석일</TableHead>

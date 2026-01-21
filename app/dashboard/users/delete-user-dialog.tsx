@@ -50,14 +50,12 @@ export function DeleteUserDialog({
         toast({
           title: "사용자 삭제 실패",
           description: result.error || "오류가 발생했습니다.",
-          variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "사용자 삭제 실패",
         description: "오류가 발생했습니다.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -82,11 +80,7 @@ export function DeleteUserDialog({
           >
             취소
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isLoading}
-          >
+          <Button variant="secondary" onClick={handleDelete} disabled={isLoading}>
             {isLoading ? "삭제 중..." : "삭제"}
           </Button>
         </DialogFooter>

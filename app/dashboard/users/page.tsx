@@ -29,7 +29,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
   const isAdmin = await getAdminStatus();
 
   if (!isAdmin) {
-    redirect("/");
+    redirect("/deactivate");
   }
   
   const params = await searchParams;
@@ -43,22 +43,22 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       initialSortKey={sortKey}
       initialSortOrder={sortOrder}
     >
-      <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 sm:gap-6 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <ResetMeetupCountsButton />
             <CreateUserDialog />
-            <SortUser sortKey={sortKey} sortOrder={sortOrder} />
+            <SortUser />
           </div>
-        </div>
+      </div>
 
-        <Suspense fallback={<UsersTableSkeleton />}>
+      <Suspense fallback={<UsersTableSkeleton />}>
           <div className="space-y-4">
             <SearchInput />
             <UsersTable />
           </div>
-        </Suspense>
-      </div>
+      </Suspense>
+    </div>
     </UsersProvider>
   );
 }

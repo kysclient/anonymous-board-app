@@ -6,19 +6,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SortKey, SortOrder } from "./page";
 import { useUsers } from "./users-context";
 
-interface SortUserProps {
-  sortKey: SortKey;
-  sortOrder: SortOrder;
-}
-
-export function SortUser({ sortKey, sortOrder }: SortUserProps) {
-  const { setSorting } = useUsers();
+export function SortUser() {
+  const { sortKey, sortOrder, setSorting } = useUsers();
 
   const handleSortChange = (value: string) => {
-    const [sort, order] = value.split(":") as [SortKey, SortOrder];
+    const [sort, order] = value.split(":") as [typeof sortKey, typeof sortOrder];
     setSorting(sort, order);
   };
 

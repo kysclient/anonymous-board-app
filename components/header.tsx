@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { MobileMenuButton } from "./mobile-menu-button";
 import { SpicyLogo } from "./spicy-logo";
 import { Button } from "./ui/button";
@@ -9,6 +8,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { getAdminStatus } from "@/lib/actions";
+import { AdminLoginDialog } from "@/components/admin-login-dialog";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -34,7 +34,7 @@ export function Header() {
           <div className="items-center gap-4 flex flex-row">
             <MobileMenuButton />
             <div className="flex flex-1 items-center gap-4 md:gap-6">
-              <Link href={"/"}>
+              <Link href={"/dashboard"}>
                 <SpicyLogo />
               </Link>
             </div>
@@ -43,11 +43,7 @@ export function Header() {
             <Button variant="ghost" size="icon" className="rounded-xl">
               <Sun className="h-5 w-5" />
             </Button>
-            <Link href="/">
-              <Button className="rounded-xl" variant="secondary">
-                관리자 로그인
-              </Button>
-            </Link>
+            <AdminLoginDialog />
           </div>
         </div>
       </header>
@@ -60,7 +56,7 @@ export function Header() {
         <div className="items-center gap-4 flex flex-row">
           <MobileMenuButton />
           <div className="flex flex-1 items-center gap-4 md:gap-6">
-            <Link href={"/"}>
+            <Link href={"/dashboard"}>
               <SpicyLogo />
             </Link>
           </div>
@@ -78,14 +74,7 @@ export function Header() {
               <Moon className="h-5 w-5" />
             )}
           </Button>
-          {
-            !isAdmin &&
-            <Link href="/">
-              <Button className="rounded-xl" variant="secondary">
-                관리자 로그인
-              </Button>
-            </Link>
-          }
+          {!isAdmin && <AdminLoginDialog />}
         </div>
       </div>
     </header>

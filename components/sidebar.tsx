@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { LucideIcon } from "lucide-react";
 import {
-  Home,
   LayoutDashboard,
   Users,
   Gamepad2,
@@ -13,6 +13,10 @@ import {
   Image,
   Bomb,
   Calculator,
+  Archive,
+  FileText,
+  ClipboardList,
+  PenSquare,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -25,12 +29,21 @@ interface SidebarProps {
   className?: string;
 }
 
+interface RouteItem {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  active: boolean;
+  badge?: string;
+  adminOnly?: boolean;
+}
+
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const { isOpen, close } = useSidebar();
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const routes = [
+  const mainRoutes: RouteItem[] = [
     {
       label: "대시보드",
       icon: LayoutDashboard,
@@ -38,57 +51,38 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname === "/dashboard",
     },
     {
-      label: "정산",
-      icon: Calculator,
-      href: "/dashboard/settlement",
-      active: pathname.startsWith("/dashboard/settlement"),
-      badge: "NEW",
-    },
-    // {
-    //   label: "이상형 월드컵",
-    //   icon: Trophy,
-    //   href: "/dashboard/worldcup/profile",
-    //   active: pathname.startsWith("/dashboard/worldcup"),
-    // },
-    // {
-    //   label: "이호준 솔로기원",
-    //   icon: Sparkles,
-    //   href: "/dashboard/hojun-solo",
-    //   active: pathname.startsWith("/dashboard/hojun-solo"),
-    //   badge: "HOT",
-    // },
-    {
-      label: "짝짓기",
-      icon: Heart,
-      href: "/dashboard/mating",
-      active: pathname === "/dashboard/mating",
-    },
-    {
       label: "갤러리",
       icon: Image,
       href: "/dashboard/gallery",
       active: pathname.startsWith("/dashboard/gallery"),
     },
-    // {
-    //   label: "블랑 구경",
-    //   icon: Image,
-    //   href: "/dashboard/blanc",
-    //   active: pathname.startsWith("/dashboard/blanc"),
-    //   adminOnly: true,
-    // },
-    // {
-    //   label: "구성원들의 민낯",
-    //   icon: Bomb,
-    //   href: "/dashboard/chat-analysis",
-    //   active: pathname.startsWith("/dashboard/chat-analysis"),
-    // },
     {
       label: "멤버관리",
       icon: Users,
       href: "/dashboard/users",
-      active: pathname === "/dashboard/users",
+      active: pathname.startsWith("/dashboard/users"),
       adminOnly: true,
     },
+  ];
+
+  const deactivatedRoutes: RouteItem[] = [
+    {
+      label: "정산",
+      icon: Calculator,
+      href: "/dashboard/settlement",
+      active: pathname.startsWith("/dashboard/settlement"),
+      badge: "OFF",
+      adminOnly: true,
+    },
+    {
+      label: "우편함",
+      icon: PenSquare,
+      href: "/deactivate/submit",
+      active: pathname === "/deactivate/submit",
+      badge: "OFF",
+      adminOnly: true,
+    },
+
   ];
 
   useEffect(() => {
@@ -104,65 +98,69 @@ export function Sidebar({ className }: SidebarProps) {
   }, []);
 
   // 모바일용 사이드바 내용
-  const sidebarContent = (
-    <div className="flex flex-col h-full bg-gradient-to-b from-background to-accent/5">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-          스파이시 관리
-        </h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          멤버 통합 관리 시스템
-        </p>
-      </div>
-      <div className="flex-1 overflow-y-auto py-4 px-3">
-        <nav className="space-y-2">
-          {routes.map((route) => {
-            if (route.adminOnly && !isAdmin) return null;
-            return (
-              <Link
-                key={route.href}
-                href={route.href}
-                onClick={close}
-                className={cn(
-                  "flex items-center justify-between py-3 px-4 text-sm rounded-xl group transition-all duration-200",
-                  route.active
-                    ? "bg-secondary text-red-600 font-semibold shadow-sm"
-                    : "text-foreground hover:bg-secondary hover:text-red-600"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "p-2 rounded-lg transition-colors",
-                    )}
-                  >
-                    {route.href === "/dashboard/hojun-solo" ? (
-                      <img
-                        src="/hojun.jpeg"
-                        className="overflow-hidden w-4 h-4 rounded-full"
-                        alt="hojun"
-                      />
-                    ) : (
-                      <route.icon
-                        className={cn(
-                          "h-4 w-4 transition-colors",
-                          route.active ? "text-red-600" : "text-foreground group-hover:text-red-600"
-                        )}
-                      />
-                    )}
-                  </div>
-                  <span>{route.label}</span>
-                </div>
+  const renderRoutes = (routes: RouteItem[]) => (
+    <nav className="space-y-1">
+      {routes.map((route) => {
+        if (route.adminOnly && !isAdmin) return null;
 
-                {route.badge && (
-                  <span className="px-2 py-1 text-[9px] font-bold rounded-full bg-red-500 text-white">
-                    {route.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        return (
+          <Link
+            key={route.href}
+            href={route.href}
+            onClick={close}
+            className={cn(
+              "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors group",
+              route.active
+                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold"
+                : "text-foreground/80 hover:bg-accent/60 hover:text-foreground"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted/40">
+                <route.icon
+                  className={cn(
+                    "h-4 w-4 transition-colors",
+                    route.active
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-muted-foreground group-hover:text-blue-500"
+                  )}
+                />
+              </div>
+              <span>{route.label}</span>
+            </div>
+
+            {route.badge && (
+              <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-muted text-muted-foreground">
+                {route.badge}
+              </span>
+            )}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-background">
+
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+        <div className="space-y-2">
+          <p className="px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            활성 메뉴
+          </p>
+          {renderRoutes(mainRoutes)}
+        </div>
+        {
+          isAdmin && (
+
+            <div className="space-y-2">
+              <p className="px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                비활성화 메뉴
+              </p>
+              {renderRoutes(deactivatedRoutes)}
+            </div>
+          )
+        }
       </div>
     </div>
   );
@@ -179,69 +177,11 @@ export function Sidebar({ className }: SidebarProps) {
       {/* 데스크톱용 고정 사이드바 */}
       <div
         className={cn(
-          "fixed left-0 top-16 z-40 hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 bg-gradient-to-b from-background to-accent/5 border-r",
+          "fixed left-0 top-16 z-40 hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 border-r bg-background/95 backdrop-blur",
           className
         )}
       >
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-            스파이시 관리
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            멤버 통합 관리 시스템
-          </p>
-        </div>
-        <div className="px-3 py-4 overflow-y-auto flex-1">
-          <nav className="space-y-2">
-            {routes.map((route) => {
-              if (route.adminOnly && !isAdmin) return null;
-
-              return (
-                <Link
-                  key={route.href}
-                  href={route.href}
-                  onClick={close}
-                  className={cn(
-                    "flex items-center justify-between py-3 px-4 text-sm rounded-xl group transition-all duration-200",
-                    route.active
-                      ? "bg-secondary text-red-600 font-semibold shadow-sm"
-                      : "text-foreground hover:bg-secondary hover:text-red-600"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "p-2 rounded-lg transition-colors",
-                      )}
-                    >
-                      {route.href === "/dashboard/hojun-solo" ? (
-                        <img
-                          src="/hojun.jpeg"
-                          className="overflow-hidden w-4 h-4 rounded-full"
-                          alt="hojun"
-                        />
-                      ) : (
-                        <route.icon
-                          className={cn(
-                            "h-4 w-4 transition-colors",
-                            route.active ? "text-red-600" : "text-foreground group-hover:text-red-600"
-                          )}
-                        />
-                      )}
-                    </div>
-                    <span>{route.label}</span>
-                  </div>
-
-                  {route.badge && (
-                    <span className="px-2 py-1 text-[9px] font-bold rounded-full bg-red-500 text-white">
-                      {route.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+        {sidebarContent}
       </div>
     </>
   );

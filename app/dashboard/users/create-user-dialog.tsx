@@ -75,21 +75,19 @@ export function CreateUserDialog() {
           meetup_count: 0,
           total_meetup_count: 0,
         });
-        
+
         // 데이터 새로고침
         await refreshUsers();
       } else {
         toast({
           title: "사용자 생성 실패",
           description: result.error || "오류가 발생했습니다.",
-          variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "사용자 생성 실패",
         description: "오류가 발생했습니다.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -99,7 +97,7 @@ export function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full sm:w-auto">
+        <Button variant="outline" className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">멤버 추가</span>
           <span className="sm:hidden">추가</span>

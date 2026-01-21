@@ -35,7 +35,7 @@ export const SearchInput = memo(function SearchInput() {
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="사용자 이름으로 검색... (실시간 검색)"
+          placeholder="사용자 이름으로 검색..."
           value={inputValue}
           onChange={handleInputChange}
           className="bg-background pl-8 pr-10 rounded-lg"

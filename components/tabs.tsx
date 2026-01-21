@@ -12,6 +12,7 @@ interface TabsProps {
 export function Tabs({ isAdmin }: TabsProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const basePath = "/deactivate";
 
   // 클라이언트 사이드 렌더링 확인
   useEffect(() => {
@@ -25,10 +26,10 @@ export function Tabs({ isAdmin }: TabsProps) {
   return (
     <div className="flex border-b mb-6">
       <Link
-        href="/"
+        href={basePath}
         className={cn(
           "px-4 py-2 font-medium",
-          pathname === "/"
+          pathname === basePath
             ? "border-b-2 border-primary text-primary"
             : "text-muted-foreground"
         )}
@@ -37,10 +38,10 @@ export function Tabs({ isAdmin }: TabsProps) {
       </Link>
 
       <Link
-        href="/survey"
+        href={`${basePath}/survey`}
         className={cn(
           "px-4 py-2 font-medium",
-          pathname === "/survey"
+          pathname === `${basePath}/survey`
             ? "border-b-2 border-primary text-primary"
             : "text-muted-foreground"
         )}
@@ -50,10 +51,10 @@ export function Tabs({ isAdmin }: TabsProps) {
 
       {isAdmin && (
         <Link
-          href="/admin"
+          href={`${basePath}/admin`}
           className={cn(
             "px-4 py-2 font-medium",
-            pathname === "/admin"
+            pathname === `${basePath}/admin`
               ? "border-b-2 border-primary text-primary"
               : "text-muted-foreground"
           )}
@@ -64,10 +65,10 @@ export function Tabs({ isAdmin }: TabsProps) {
 
       {isAdmin && (
         <Link
-          href="/survey/list"
+          href={`${basePath}/survey/list`}
           className={cn(
             "px-4 py-2 font-medium",
-            pathname === "/survey/list"
+            pathname === `${basePath}/survey/list`
               ? "border-b-2 border-primary text-primary"
               : "text-muted-foreground"
           )}

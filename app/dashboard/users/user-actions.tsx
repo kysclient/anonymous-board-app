@@ -38,10 +38,7 @@ export function UserActions({ user, onUpdate }: UserActionsProps) {
             편집
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-destructive focus:text-destructive"
-          >
+          <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
             <Trash className="mr-2 h-4 w-4" />
             삭제
           </DropdownMenuItem>

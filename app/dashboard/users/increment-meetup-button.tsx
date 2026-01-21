@@ -35,14 +35,12 @@ export function IncrementMeetupButton({
         toast({
           title: "벙 참여 추가 실패",
           description: result.error || "오류가 발생했습니다.",
-          variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "벙 참여 추가 실패",
         description: "오류가 발생했습니다.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

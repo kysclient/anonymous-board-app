@@ -7,6 +7,7 @@ import {
   useCallback,
   useMemo,
   useEffect,
+  useRef,
   type ReactNode,
 } from "react";
 import { getUsers, User } from "../actions";
@@ -41,39 +42,74 @@ export function UsersProvider({
   const [isLoading, setIsLoading] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>(initialSortKey);
   const [sortOrder, setSortOrder] = useState<SortOrder>(initialSortOrder);
+  
+  // 최신 값을 항상 참조할 수 있도록 ref 사용
+  const searchTermRef = useRef(searchTerm);
+  const sortKeyRef = useRef(sortKey);
+  const sortOrderRef = useRef(sortOrder);
 
-  // 정렬 파라미터가 변경되면 데이터 다시 가져오기
+  // ref 업데이트
   useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      try {
-        const newUsers = await getUsers(sortKey, sortOrder);
-        setUsers(newUsers);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    searchTermRef.current = searchTerm;
+  }, [searchTerm]);
 
-    // 초기 로드가 아닐 때만 다시 fetch
-    if (sortKey !== initialSortKey || sortOrder !== initialSortOrder) {
-      fetchUsers();
-    }
-  }, [sortKey, sortOrder, initialSortKey, initialSortOrder]);
+  useEffect(() => {
+    sortKeyRef.current = sortKey;
+  }, [sortKey]);
 
-  // 사용자 목록 새로고침
-  const refreshUsers = useCallback(async () => {
+  useEffect(() => {
+    sortOrderRef.current = sortOrder;
+  }, [sortOrder]);
+
+  // 데이터 가져오기 함수
+  const fetchUsers = useCallback(async (
+    key: SortKey,
+    order: SortOrder,
+    term: string
+  ) => {
+    console.log('[fetchUsers] 호출됨:', { key, order, term });
     setIsLoading(true);
     try {
-      const refreshedUsers = await getUsers(sortKey, sortOrder);
+      const newUsers = await getUsers(key, order, term);
+      console.log('[fetchUsers] 결과:', newUsers.length, '명');
+      setUsers(newUsers);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // 정렬 파라미터나 검색어가 변경되면 데이터 다시 가져오기
+  useEffect(() => {
+    console.log('[useEffect] 트리거됨:', { sortKey, sortOrder, searchTerm });
+    fetchUsers(sortKey, sortOrder, searchTerm);
+  }, [sortKey, sortOrder, searchTerm, fetchUsers]);
+
+  // 사용자 목록 새로고침 (현재 검색어와 정렬 유지)
+  const refreshUsers = useCallback(async () => {
+    // ref를 사용하여 항상 최신 검색어, 정렬값 사용
+    const currentSearchTerm = searchTermRef.current;
+    const currentSortKey = sortKeyRef.current;
+    const currentSortOrder = sortOrderRef.current;
+    
+    console.log('[refreshUsers] 호출됨:', { currentSortKey, currentSortOrder, currentSearchTerm });
+    
+    setIsLoading(true);
+    try {
+      const refreshedUsers = await getUsers(
+        currentSortKey,
+        currentSortOrder,
+        currentSearchTerm
+      );
+      console.log('[refreshUsers] 결과:', refreshedUsers.length, '명');
       setUsers(refreshedUsers);
     } catch (error) {
       console.error("Failed to refresh users:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [sortKey, sortOrder]);
+  }, []);
 
   // 정렬 변경
   const setSorting = useCallback((key: SortKey, order: SortOrder) => {

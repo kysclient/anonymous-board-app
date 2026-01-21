@@ -22,7 +22,7 @@ export async function createPost(data: {
     VALUES (${data.title}, ${data.content}, ${ip}, ${data.userId})
   `;
 
-    revalidatePath("/");
+    revalidatePath("/deactivate");
     return { success: true };
   } catch (error) {
     console.error("게시물 생성 오류:", error);
@@ -148,8 +148,8 @@ export async function getAdminStatus(): Promise<boolean> {
 export async function logoutAdmin() {
   const cookie = await cookies();
   cookie.delete("admin_auth");
-  revalidatePath("/");
-  redirect("/");
+  revalidatePath("/deactivate");
+  redirect("/deactivate");
 }
 
 export async function createSurvey(formData: FormData) {
@@ -163,7 +163,7 @@ export async function createSurvey(formData: FormData) {
       VALUES (${meetingDate}, ${meetingType}, ${ip})
     `;
 
-    revalidatePath("/survey");
+    revalidatePath("/deactivate/survey");
     return { success: true };
   } catch (error) {
     console.error("설문 생성 오류:", error);

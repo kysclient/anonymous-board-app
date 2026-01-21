@@ -21,7 +21,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const isAdmin = await getAdminStatus();
 
   if (!isAdmin) {
-    redirect("/");
+    redirect("/deactivate");
   }
 
   // searchParams를 await로 기다림
@@ -87,3 +87,4 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     </main>
   );
 }
+

@@ -18,13 +18,15 @@ export const UserTableRow = memo(function UserTableRow({
   const { refreshUsers } = useUsers();
 
   return (
-    <TableRow>
-      <TableCell className="font-medium">{user.id}</TableCell>
-      <TableCell className="font-medium">{user.name}</TableCell>
-      <TableCell className="hidden md:table-cell">
+    <TableRow className="text-[13px]">
+      <TableCell className="font-mono text-[11px] text-muted-foreground">
+        {user.id}
+      </TableCell>
+      <TableCell className="font-semibold">{user.name}</TableCell>
+      <TableCell className="hidden md:table-cell text-muted-foreground">
         {user.join_date ? formatDateString(user.join_date) : "-"}
       </TableCell>
-      <TableCell className="hidden lg:table-cell">
+      <TableCell className="hidden lg:table-cell text-muted-foreground">
         {user.last_meetup_date ? formatDateString(user.last_meetup_date) : "-"}
       </TableCell>
       <TableCell>
@@ -32,9 +34,13 @@ export const UserTableRow = memo(function UserTableRow({
           {user.is_regular}
         </Badge>
       </TableCell>
-      <TableCell className="text-center">{user.meetup_count}</TableCell>
-      <TableCell className="text-center">{user.meetup_make_count}</TableCell>
-      <TableCell className="text-center hidden md:table-cell">
+      <TableCell className="text-center tabular-nums">
+        {user.meetup_count}
+      </TableCell>
+      <TableCell className="text-center tabular-nums">
+        {user.meetup_make_count}
+      </TableCell>
+      <TableCell className="text-center hidden md:table-cell tabular-nums">
         {user.total_meetup_count}
       </TableCell>
       <TableCell className="text-center">

@@ -20,9 +20,9 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
         <Header />
-        <div className="flex flex-1 ">
+        <div className="flex flex-1">
           <Sidebar className="hidden md:block" />
-          <main className="flex-1 overflow-y-auto bg-background p-2 sm:p-6 md:ml-64">
+          <main className="flex-1 overflow-y-auto bg-muted/30 px-4 py-6 sm:px-6 md:ml-64 md:px-8">
             {children}
           </main>
         </div>

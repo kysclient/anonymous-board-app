@@ -35,14 +35,12 @@ export function IncreementMakeButton({
                 toast({
                     title: "벙주 횟수 추가 실패",
                     description: result.error || "오류가 발생했습니다.",
-                    variant: "destructive",
                 });
             }
         } catch (error) {
             toast({
                 title: "벙주 횟수 추가 실패",
                 description: "오류가 발생했습니다.",
-                variant: "destructive",
             });
         } finally {
             setIsLoading(false);

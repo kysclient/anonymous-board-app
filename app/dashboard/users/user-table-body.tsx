@@ -11,7 +11,7 @@ export const UserTableBody = memo(function UserTableBody({
   users,
 }: UserTableBodyProps) {
   return (
-    <TableBody>
+    <TableBody className="[&_tr:nth-child(even)]:bg-muted/30">
       {users.map((user) => (
         <UserTableRow key={user.id} user={user} />
       ))}
