@@ -57,6 +57,12 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname.startsWith("/dashboard/gallery"),
     },
     {
+      label: "자리배치",
+      icon: Heart,
+      href: "/dashboard/mating",
+      active: pathname.startsWith("/dashboard/mating"),
+    },
+    {
       label: "멤버관리",
       icon: Users,
       href: "/dashboard/users",

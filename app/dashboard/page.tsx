@@ -104,10 +104,10 @@ export default async function DashboardPage() {
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-              스파이시 멤버 운영 현황
+              26년도 솔로일 사람들 모임
             </h1>
             <p className="text-xs text-muted-foreground">
-              핵심 지표를 한눈에 요약합니다.
+              ㅋ
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
