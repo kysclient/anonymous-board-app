@@ -14,8 +14,6 @@ import MastersStrip from "@/components/masters-strip";
 export const revalidate = 0;
 
 export default async function DashboardPage() {
-
-
   // 사용자 데이터 가져오기
   const users = await getUsers();
 
@@ -29,7 +27,7 @@ export default async function DashboardPage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const newUsers = users.filter(
-    (user) => user.join_date && new Date(user.join_date) >= thirtyDaysAgo
+    (user) => user.join_date && new Date(user.join_date) >= thirtyDaysAgo,
   ).length;
 
   // 이달의 벙킹 Top 10 (이번 달 벙 참여 횟수 기준)
@@ -45,7 +43,7 @@ export default async function DashboardPage() {
     .sort(
       (a, b) =>
         new Date(b.last_meetup_date || "").getTime() -
-        new Date(a.last_meetup_date || "").getTime()
+        new Date(a.last_meetup_date || "").getTime(),
     )
     .slice(0, 10);
 
@@ -59,7 +57,7 @@ export default async function DashboardPage() {
         const limitDate = new Date(joinDate);
         limitDate.setMonth(limitDate.getMonth() + 1);
         const diffDays = Math.floor(
-          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
         );
         return diffDays <= 7;
       } else if (user.is_regular === "기존") {
@@ -69,7 +67,7 @@ export default async function DashboardPage() {
         const limitDate = new Date(lastMeetupDate);
         limitDate.setMonth(limitDate.getMonth() + 2);
         const diffDays = Math.floor(
-          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
         );
         return diffDays <= 7;
       }
@@ -88,7 +86,7 @@ export default async function DashboardPage() {
         limitDate.setMonth(limitDate.getMonth() + 2);
       }
       const diffDays = Math.floor(
-        (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
       );
       return { ...user, limitDate, diffDays };
     })
@@ -106,9 +104,7 @@ export default async function DashboardPage() {
             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
               26년도 솔로일 사람들 모임
             </h1>
-            <p className="text-xs text-muted-foreground">
-              ㅋ
-            </p>
+            <p className="text-xs text-muted-foreground">ㅋ</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-lg border bg-background/80 px-3 py-2">
@@ -156,9 +152,7 @@ export default async function DashboardPage() {
                 {newUsers}
               </p>
               <p className="mt-1 text-[10px] text-muted-foreground">
-                {totalUsers > 0
-                  ? Math.round((newUsers / totalUsers) * 100)
-                  : 0}
+                {totalUsers > 0 ? Math.round((newUsers / totalUsers) * 100) : 0}
                 % 비중
               </p>
             </div>
@@ -190,10 +184,11 @@ export default async function DashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${index < 3
-                        ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                        : "bg-muted text-muted-foreground"
-                        }`}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
+                        index < 3
+                          ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                          : "bg-muted text-muted-foreground"
+                      }`}
                     >
                       {index + 1}
                     </div>
@@ -280,19 +275,21 @@ export default async function DashboardPage() {
                   return (
                     <div
                       key={user.id}
-                      className={`flex items-center gap-4 rounded-lg border p-3 ${isOverdue
-                        ? "bg-red-500/10 border-red-500/30"
-                        : "bg-muted/40 border-border/60"
-                        }`}
+                      className={`flex items-center gap-4 rounded-lg border p-3 ${
+                        isOverdue
+                          ? "bg-red-500/10 border-red-500/30"
+                          : "bg-muted/40 border-border/60"
+                      }`}
                     >
                       <div className="space-y-1">
                         <p className="text-sm font-medium leading-none flex items-center gap-2">
                           {user.name}
                           <span
-                            className={`text-[11px] px-2 py-0.5 rounded-full ${user.is_regular === "신입"
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "bg-muted text-muted-foreground"
-                              }`}
+                            className={`text-[11px] px-2 py-0.5 rounded-full ${
+                              user.is_regular === "신입"
+                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                                : "bg-muted text-muted-foreground"
+                            }`}
                           >
                             {user.is_regular}
                           </span>
@@ -301,14 +298,15 @@ export default async function DashboardPage() {
                           기한: {formatDateString(user.limitDate.toString())}
                         </p>
                         <p
-                          className={`text-xs font-semibold ${isOverdue
-                            ? "text-red-600"
-                            : "text-muted-foreground"
-                            }`}
+                          className={`text-xs font-semibold ${
+                            isOverdue ? "text-red-600" : "text-muted-foreground"
+                          }`}
                         >
-                          {isOverdue
-                            ? `${Math.abs(user.diffDays)}일 초과`
-                            : `${user.diffDays}일 남음`}
+                          {user.name.includes("가람")
+                            ? "가람이는 봐주자 알아서 데려갈게"
+                            : isOverdue
+                              ? `${Math.abs(user.diffDays)}일 초과`
+                              : `${user.diffDays}일 남음`}
                         </p>
                       </div>
                     </div>
