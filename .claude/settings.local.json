@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(find /Users/kysclient/projects/anonymous-board-app/app/dashboard -name \"page.tsx\" -type f | xargs -I {} basename {} | sort | uniq)",
+      "Bash(file /Users/kysclient/projects/anonymous-board-app/public/masters/*.png)",
+      "Bash(wc -l /Users/kysclient/projects/anonymous-board-app/app/**/*.tsx 2>/dev/null | tail -5)",
+      "Bash(npx next:*)"
     ],
     "deny": [],
     "ask": []

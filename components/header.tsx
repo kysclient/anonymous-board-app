@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { MobileMenuButton } from "./mobile-menu-button";
 import { SpicyLogo } from "./spicy-logo";
 import { Button } from "./ui/button";
@@ -34,7 +35,8 @@ export function Header() {
           <div className="items-center gap-4 flex flex-row">
             <MobileMenuButton />
             <div className="flex flex-1 items-center gap-4 md:gap-6">
-              <Link href={"/dashboard"}>
+              <Link href={"/dashboard"} className="flex items-center gap-1">
+                <Image src="/main_logo.png" alt="SPICY" width={32} height={32} className="h-8 w-8 object-contain" />
                 <SpicyLogo />
               </Link>
             </div>
@@ -56,7 +58,8 @@ export function Header() {
         <div className="items-center gap-4 flex flex-row">
           <MobileMenuButton />
           <div className="flex flex-1 items-center gap-4 md:gap-6">
-            <Link href={"/dashboard"}>
+            <Link href={"/dashboard"} className="flex items-center gap-1">
+              <Image src="/main_logo.png" alt="SPICY" width={32} height={32} className="h-8 w-8 object-contain" />
               <SpicyLogo />
             </Link>
           </div>

@@ -17,6 +17,7 @@ import {
   FileText,
   ClipboardList,
   PenSquare,
+  BarChart3,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -61,6 +62,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Heart,
       href: "/dashboard/mating",
       active: pathname.startsWith("/dashboard/mating"),
+    },
+    {
+      label: "통계",
+      icon: BarChart3,
+      href: "/dashboard/stats",
+      active: pathname.startsWith("/dashboard/stats"),
     },
     {
       label: "멤버관리",
