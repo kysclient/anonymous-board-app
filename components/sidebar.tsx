@@ -70,6 +70,12 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname.startsWith("/dashboard/stats"),
     },
     {
+      label: "운세",
+      icon: Sparkles,
+      href: "/dashboard/fortune",
+      active: pathname.startsWith("/dashboard/fortune"),
+    },
+    {
       label: "멤버관리",
       icon: Users,
       href: "/dashboard/users",

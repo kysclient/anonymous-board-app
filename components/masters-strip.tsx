@@ -3,12 +3,13 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 
-const MASTERS = [
+const MASTERS: { id: number; name: string; src: string | null }[] = [
   { id: 1, name: "Master 1", src: "/masters/1.png" },
   { id: 2, name: "Master 2", src: "/masters/2.png" },
   { id: 3, name: "Master 3", src: "/masters/3.png" },
   { id: 4, name: "Master 4", src: "/masters/4.png" },
   { id: 5, name: "Master 5", src: "/masters/5.png" },
+  { id: 6, name: "김우경", src: null },
 ];
 
 function HolographicCard({
@@ -16,7 +17,7 @@ function HolographicCard({
   name,
   index,
 }: {
-  src: string;
+  src: string | null;
   name: string;
   index: number;
 }) {
@@ -97,21 +98,30 @@ function HolographicCard({
 
       {/* Card body */}
       <div className="relative h-full w-full overflow-hidden rounded-xl bg-white/80 dark:bg-zinc-900">
-        {/* Image */}
-        <Image
-          src={src}
-          alt={name}
-          fill
-          sizes="(max-width: 640px) 100px, 140px"
-          className="object-cover"
-          unoptimized
-          style={{
-            filter: isHovered
-              ? "saturate(1.1) contrast(1.05)"
-              : "saturate(0.85) contrast(0.95)",
-            transition: "filter 0.4s ease",
-          }}
-        />
+        {/* Image or placeholder */}
+        {src ? (
+          <Image
+            src={src}
+            alt={name}
+            fill
+            sizes="(max-width: 640px) 100px, 140px"
+            className="object-cover"
+            unoptimized
+            style={{
+              filter: isHovered
+                ? "saturate(1.1) contrast(1.05)"
+                : "saturate(0.85) contrast(0.95)",
+              transition: "filter 0.4s ease",
+            }}
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-2">
+            <span className="text-[13px] font-semibold text-foreground">{name}</span>
+            <span className="text-center text-[9px] leading-tight text-muted-foreground">
+              죄송해요{"\n"}시간나면 사진{"\n"}넣어드릴게요
+            </span>
+          </div>
+        )}
 
         {/* Holographic shimmer overlay */}
         <div

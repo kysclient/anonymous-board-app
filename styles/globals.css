@@ -109,3 +109,53 @@ body {
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
+
+/* Fortune markdown styles */
+.fortune-markdown h1 {
+  @apply text-lg font-bold mt-5 mb-2 text-foreground;
+}
+.fortune-markdown h2 {
+  @apply text-[15px] font-bold mt-4 mb-2 text-foreground;
+}
+.fortune-markdown h3 {
+  @apply text-[14px] font-semibold mt-3 mb-1.5 text-foreground;
+}
+.fortune-markdown h4 {
+  @apply text-[13px] font-semibold mt-2 mb-1 text-foreground;
+}
+.fortune-markdown p {
+  @apply mb-2 leading-relaxed;
+}
+.fortune-markdown ul {
+  @apply list-disc pl-5 mb-2 space-y-1;
+}
+.fortune-markdown ol {
+  @apply list-decimal pl-5 mb-2 space-y-1;
+}
+.fortune-markdown li {
+  @apply leading-relaxed;
+}
+.fortune-markdown strong {
+  @apply font-semibold text-blue-600 dark:text-blue-400;
+}
+.fortune-markdown em {
+  @apply italic text-muted-foreground;
+}
+.fortune-markdown blockquote {
+  @apply border-l-2 border-blue-500/40 pl-3 my-2 text-muted-foreground italic;
+}
+.fortune-markdown hr {
+  @apply my-4 border-border/60;
+}
+.fortune-markdown table {
+  @apply w-full my-3 text-[12px] border-collapse;
+}
+.fortune-markdown th {
+  @apply border border-border/60 bg-muted/40 px-3 py-1.5 text-left font-semibold;
+}
+.fortune-markdown td {
+  @apply border border-border/60 px-3 py-1.5;
+}
+.fortune-markdown code {
+  @apply bg-muted/60 px-1.5 py-0.5 rounded text-[12px];
+}
