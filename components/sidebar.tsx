@@ -18,6 +18,8 @@ import {
   ClipboardList,
   PenSquare,
   BarChart3,
+  Hourglass,
+  Armchair,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -74,6 +76,18 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Sparkles,
       href: "/dashboard/fortune",
       active: pathname.startsWith("/dashboard/fortune"),
+    },
+    {
+      label: "인생 시각화",
+      icon: Hourglass,
+      href: "/dashboard/life",
+      active: pathname.startsWith("/dashboard/life"),
+    },
+    {
+      label: "자리배치 v2",
+      icon: Armchair,
+      href: "/dashboard/seating",
+      active: pathname.startsWith("/dashboard/seating"),
     },
     {
       label: "멤버관리",

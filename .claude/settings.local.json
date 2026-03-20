@@ -5,7 +5,8 @@
       "Bash(find /Users/kysclient/projects/anonymous-board-app/app/dashboard -name \"page.tsx\" -type f | xargs -I {} basename {} | sort | uniq)",
       "Bash(file /Users/kysclient/projects/anonymous-board-app/public/masters/*.png)",
       "Bash(wc -l /Users/kysclient/projects/anonymous-board-app/app/**/*.tsx 2>/dev/null | tail -5)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(grep -r \"mating\\\\|seating\\\\|TableSeat\\\\|Participant\" /Users/kysclient/projects/anonymous-board-app --include=*.tsx --include=*.ts --exclude-dir=node_modules --exclude-dir=.next)"
     ],
     "deny": [],
     "ask": []
