@@ -11,9 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sparkles, Loader2, RotateCcw } from "lucide-react";
+import { Sparkles, Loader2, RotateCcw, MessageCircleHeart } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from "next/link";
 
 const FORTUNE_TYPES = [
   {
@@ -163,6 +164,32 @@ export default function FortunePage() {
           정보를 입력하고 AI가 풀어주는 고품격 운세를 확인하세요
         </p>
       </div>
+
+      {/* Hyungrae Chat Banner */}
+      <Link
+        href="/dashboard/hyungrae-chat"
+        className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 transition-all hover:border-border hover:shadow-lg active:scale-[0.99]"
+      >
+        <div className="flex items-center gap-3">
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-border">
+            <img
+              src="/hyungrae/1.jpeg"
+              alt="형래"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-bold text-foreground">
+              김형래 오빠와 대화하기
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              느끼한 오빠가 기다리고 있어요~
+            </p>
+          </div>
+          <MessageCircleHeart className="h-5 w-5 text-muted-foreground transition-transform group-hover:scale-110" />
+        </div>
+      </Link>
 
       {/* Fortune type selection */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

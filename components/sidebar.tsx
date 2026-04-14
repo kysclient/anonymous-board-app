@@ -20,6 +20,7 @@ import {
   BarChart3,
   Hourglass,
   Armchair,
+  MessageCircleHeart,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -82,6 +83,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Hourglass,
       href: "/dashboard/life",
       active: pathname.startsWith("/dashboard/life"),
+    },
+    {
+      label: "형래오빠 채팅",
+      icon: MessageCircleHeart,
+      href: "/dashboard/hyungrae-chat",
+      active: pathname.startsWith("/dashboard/hyungrae-chat"),
     },
     {
       label: "자리배치 v2",
