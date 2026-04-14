@@ -290,7 +290,7 @@ export default function HyungraeChatPage() {
             onKeyDown={handleKeyDown}
             placeholder="형래오빠에게 메시지 보내기..."
             disabled={isStreaming}
-            className="flex-1 rounded-full bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none ring-1 ring-white/10 focus:ring-white/30 transition-all disabled:opacity-50"
+            className="flex-1 rounded-full bg-white/10 px-4 py-2.5 text-base text-white placeholder-white/40 outline-none ring-1 ring-white/10 focus:ring-white/30 transition-all disabled:opacity-50"
           />
           <button
             onClick={handleSend}
