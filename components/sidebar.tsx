@@ -21,6 +21,7 @@ import {
   Hourglass,
   Armchair,
   MessageCircleHeart,
+  Beer,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -59,6 +60,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Image,
       href: "/dashboard/gallery",
       active: pathname.startsWith("/dashboard/gallery"),
+    },
+    {
+      label: "술게임",
+      icon: Beer,
+      href: "/dashboard/drinking-game",
+      active: pathname.startsWith("/dashboard/drinking-game"),
     },
     {
       label: "자리배치",
