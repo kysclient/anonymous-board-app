@@ -81,6 +81,51 @@ export async function searchTickers(q: string, limit = 20) {
 }
 
 /**
+ * KIS 토큰 영구 캐시 — 분당 1회 한도 회피용.
+ * 모든 Next.js 인스턴스/요청이 이 캐시를 공유.
+ */
+export async function getKisTokenFromDB(): Promise<{
+  token: string;
+  expiresAt: number;
+} | null> {
+  if (!sql) return null;
+  try {
+    const rows = await sql`
+      SELECT access_token, expires_at FROM investment_kis_token WHERE id = 1
+    `;
+    if (rows.length === 0) return null;
+    const r: any = rows[0];
+    const expiresAt = Number(r.expires_at);
+    // 만료 60초 전엔 무효 처리
+    if (!Number.isFinite(expiresAt) || Date.now() >= expiresAt - 60_000) {
+      return null;
+    }
+    return { token: r.access_token, expiresAt };
+  } catch {
+    return null;
+  }
+}
+
+export async function saveKisTokenToDB(
+  token: string,
+  expiresAt: number
+): Promise<void> {
+  if (!sql) return;
+  try {
+    await sql`
+      INSERT INTO investment_kis_token (id, access_token, expires_at, updated_at)
+      VALUES (1, ${token}, ${expiresAt}, NOW())
+      ON CONFLICT (id) DO UPDATE SET
+        access_token = EXCLUDED.access_token,
+        expires_at = EXCLUDED.expires_at,
+        updated_at = NOW()
+    `;
+  } catch {
+    // 무시
+  }
+}
+
+/**
  * 단일 종목을 워치리스트에 추가 (UPSERT).
  */
 export async function addToWatchlist(

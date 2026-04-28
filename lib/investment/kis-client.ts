@@ -6,13 +6,23 @@
  * - LIVE 환경만 지원 (paper는 `KIS_BASE_URL` 직접 변경)
  */
 
-const KIS_BASE_URL = process.env.KIS_BASE_URL || "https://openapi.koreainvestment.com:9443";
+import { getKisTokenFromDB, saveKisTokenToDB } from "./db";
+
+const KIS_BASE_URL =
+  process.env.KIS_BASE_URL || "https://openapi.koreainvestment.com:9443";
 const APP_KEY = process.env.KIS_APP_KEY || "";
 const APP_SECRET = process.env.KIS_APP_SECRET || "";
 const ACCOUNT = process.env.KIS_ACCOUNT || ""; // "12345678-01"
 
-// 메모리 토큰 캐시
-let cachedToken: { value: string; expiresAt: number } | null = null;
+// L1: 메모리 캐시 (같은 Node 프로세스 내)
+let memCache: { value: string; expiresAt: number } | null = null;
+// 동시 요청 중복 방지 (서로 같은 fetch 공유)
+let pendingTokenPromise: Promise<string> | null = null;
+// 1분당 1회 한도 — 직전 발급 시각
+let lastIssueAttempt = 0;
+// 마지막 403 발생 시각 — 백오프
+let last403At = 0;
+const RATE_LIMIT_BACKOFF_MS = 60_000;
 
 function safeNumber(v: unknown): number {
   if (v == null || v === "") return 0;
@@ -20,13 +30,18 @@ function safeNumber(v: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-async function getAccessToken(): Promise<string> {
-  if (!APP_KEY || !APP_SECRET) {
-    throw new Error("KIS_APP_KEY/KIS_APP_SECRET 환경변수가 비어있습니다");
+async function issueNewToken(): Promise<string> {
+  // KIS 한도: 분당 1회. 직전 시도가 60초 이내면 거부
+  const since = Date.now() - lastIssueAttempt;
+  if (since < 60_000) {
+    throw new Error(
+      `KIS 토큰 발급 분당 1회 한도. ${Math.ceil(
+        (60_000 - since) / 1000
+      )}초 후 재시도하세요`
+    );
   }
-  if (cachedToken && Date.now() < cachedToken.expiresAt) {
-    return cachedToken.value;
-  }
+  lastIssueAttempt = Date.now();
+
   const r = await fetch(`${KIS_BASE_URL}/oauth2/tokenP`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -37,15 +52,56 @@ async function getAccessToken(): Promise<string> {
     }),
   });
   if (!r.ok) {
+    if (r.status === 403) last403At = Date.now();
     throw new Error(`KIS 토큰 발급 실패: ${r.status} ${await r.text()}`);
   }
   const data = await r.json();
   const expiresIn = Number(data.expires_in || 86400);
-  cachedToken = {
-    value: data.access_token,
-    expiresAt: Date.now() + (expiresIn - 60) * 1000,
-  };
-  return cachedToken.value;
+  const expiresAt = Date.now() + (expiresIn - 60) * 1000;
+  memCache = { value: data.access_token, expiresAt };
+  // DB 영구 캐시 저장 (다른 인스턴스/요청도 공유)
+  saveKisTokenToDB(data.access_token, expiresAt).catch(() => {});
+  return data.access_token;
+}
+
+async function getAccessToken(): Promise<string> {
+  if (!APP_KEY || !APP_SECRET) {
+    throw new Error("KIS_APP_KEY/KIS_APP_SECRET 환경변수가 비어있습니다");
+  }
+
+  // L1: 메모리
+  if (memCache && Date.now() < memCache.expiresAt) {
+    return memCache.value;
+  }
+
+  // 진행 중인 fetch가 있으면 그걸 공유 (동시요청 dedup)
+  if (pendingTokenPromise) return pendingTokenPromise;
+
+  pendingTokenPromise = (async () => {
+    try {
+      // L2: DB
+      const dbToken = await getKisTokenFromDB();
+      if (dbToken) {
+        memCache = { value: dbToken.token, expiresAt: dbToken.expiresAt };
+        return dbToken.token;
+      }
+      // 403 백오프 — 최근 1분 내 403 받았으면 즉시 시도 안 함
+      if (Date.now() - last403At < RATE_LIMIT_BACKOFF_MS) {
+        const waitSec = Math.ceil(
+          (RATE_LIMIT_BACKOFF_MS - (Date.now() - last403At)) / 1000
+        );
+        throw new Error(
+          `KIS 분당 토큰 한도. ${waitSec}초 후 자동 재시도됩니다`
+        );
+      }
+      // L3: 새로 발급
+      return await issueNewToken();
+    } finally {
+      pendingTokenPromise = null;
+    }
+  })();
+
+  return pendingTokenPromise;
 }
 
 async function commonHeaders(trId: string): Promise<HeadersInit> {
