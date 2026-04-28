@@ -45,11 +45,17 @@ export async function getActiveTickers(): Promise<string[]> {
 
 export async function getCachedRecommendations(maxAgeMin = 60) {
   if (!sql) return [];
+  // 최근 N분 안 가장 최신 배치(generated_at)만 반환 — 누적/중복 방지
   const rows = await sql`
+    WITH latest AS (
+      SELECT MAX(generated_at) AS gat
+      FROM investment_recommendations
+      WHERE generated_at > NOW() - (${maxAgeMin} || ' minutes')::interval
+    )
     SELECT r.*, t.name AS ticker_name, t.market, t.sector
     FROM investment_recommendations r
+    JOIN latest ON r.generated_at = latest.gat
     LEFT JOIN investment_tickers t ON t.ticker = r.ticker
-    WHERE r.generated_at > NOW() - (${maxAgeMin} || ' minutes')::interval
     ORDER BY r.rank ASC
   `;
   return rows;
@@ -164,15 +170,37 @@ export async function saveRecommendations(items: any[]) {
       )
     `;
   }
+  // 7일 이상 된 옛 추천 정리 (DB 비대화 방지)
+  try {
+    await sql`
+      DELETE FROM investment_recommendations
+      WHERE generated_at < NOW() - INTERVAL '7 days'
+    `;
+  } catch {}
 }
 
 /**
- * 추천 종목을 24h NEWS 소스로 워치리스트에 추가.
- * 이미 CORE에 있으면 중복 추가 안 함.
+ * 추천 종목을 NEWS 소스로 워치리스트에 추가.
+ * 같은 ticker의 기존 NEWS 행은 즉시 만료시키고 새 row 1개만 유지.
  */
 export async function pushRecommendationsToWatchlist(items: any[]) {
   if (!sql || !items.length) return;
   const validUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const tickers = items.map((i) => i.ticker).filter(Boolean);
+  if (!tickers.length) return;
+
+  try {
+    // 1) 같은 종목들의 기존 NEWS 행 즉시 만료
+    await sql`
+      UPDATE investment_watchlist
+      SET valid_until = NOW()
+      WHERE source = 'NEWS'
+        AND ticker = ANY(${tickers})
+        AND (valid_until IS NULL OR valid_until > NOW())
+    `;
+  } catch {}
+
+  // 2) 새 NEWS row 추가
   for (const it of items) {
     try {
       await sql`
@@ -180,10 +208,18 @@ export async function pushRecommendationsToWatchlist(items: any[]) {
         VALUES (${it.ticker}, 'NEWS', ${it.score || 0}, NOW(), ${validUntil})
         ON CONFLICT (ticker, source, valid_from) DO NOTHING
       `;
-    } catch {
-      // 중복 등 무시
-    }
+    } catch {}
   }
+
+  // 3) 만료된 옛 NEWS 행 정리 (24h 지난 것)
+  try {
+    await sql`
+      DELETE FROM investment_watchlist
+      WHERE source = 'NEWS'
+        AND valid_until IS NOT NULL
+        AND valid_until < NOW() - INTERVAL '1 day'
+    `;
+  } catch {}
 }
 
 export async function getCachedQuote(ticker: string, maxAgeSec = 10) {
