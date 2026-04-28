@@ -132,6 +132,80 @@ export async function saveKisTokenToDB(
 }
 
 /**
+ * 일봉 OHLCV 캐시 — KIS 호출 실패 시 폴백.
+ */
+export interface DailyCandleRow {
+  date: string;          // YYYYMMDD
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  tradingValue: number;
+}
+
+export async function getOhlcvFromDB(
+  ticker: string,
+  days = 100
+): Promise<DailyCandleRow[]> {
+  if (!sql) return [];
+  try {
+    const rows = await sql`
+      SELECT date, open, high, low, close, volume, trading_value
+      FROM investment_ohlcv_daily
+      WHERE ticker = ${ticker}
+      ORDER BY date DESC
+      LIMIT ${days}
+    `;
+    return rows
+      .map((r: any) => ({
+        date: new Date(r.date).toISOString().slice(0, 10).replace(/-/g, ""),
+        open: Number(r.open),
+        high: Number(r.high),
+        low: Number(r.low),
+        close: Number(r.close),
+        volume: Number(r.volume),
+        tradingValue: Number(r.trading_value),
+      }))
+      .reverse();
+  } catch {
+    return [];
+  }
+}
+
+export async function saveOhlcvToDB(
+  ticker: string,
+  candles: DailyCandleRow[]
+) {
+  if (!sql || !candles.length) return;
+  for (const c of candles) {
+    if (!c.date || c.date.length !== 8) continue;
+    const dateStr = `${c.date.slice(0, 4)}-${c.date.slice(4, 6)}-${c.date.slice(6, 8)}`;
+    try {
+      await sql`
+        INSERT INTO investment_ohlcv_daily
+          (ticker, date, open, high, low, close, volume, trading_value, fetched_at)
+        VALUES (
+          ${ticker}, ${dateStr},
+          ${c.open}, ${c.high}, ${c.low}, ${c.close},
+          ${c.volume}, ${c.tradingValue}, NOW()
+        )
+        ON CONFLICT (ticker, date) DO UPDATE SET
+          open = EXCLUDED.open,
+          high = EXCLUDED.high,
+          low = EXCLUDED.low,
+          close = EXCLUDED.close,
+          volume = EXCLUDED.volume,
+          trading_value = EXCLUDED.trading_value,
+          fetched_at = NOW()
+      `;
+    } catch {
+      // 한 행 실패해도 나머지 진행
+    }
+  }
+}
+
+/**
  * 단일 종목을 워치리스트에 추가 (UPSERT).
  */
 export async function addToWatchlist(
