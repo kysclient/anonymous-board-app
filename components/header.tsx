@@ -5,7 +5,7 @@ import Image from "next/image";
 import { MobileMenuButton } from "./mobile-menu-button";
 import { SpicyLogo } from "./spicy-logo";
 import { Button } from "./ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, TrendingUp } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { getAdminStatus } from "@/lib/actions";
@@ -65,6 +65,20 @@ export function Header() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/investment" className="hidden sm:flex">
+            <Button
+              variant="ghost"
+              className="rounded-xl gap-2 font-semibold text-[#3182f6] hover:bg-[#3182f6]/10 hover:text-[#3182f6]"
+            >
+              <TrendingUp className="h-4 w-4" />
+              투자
+            </Button>
+          </Link>
+          <Link href="/investment" className="sm:hidden">
+            <Button variant="ghost" size="icon" className="rounded-xl text-[#3182f6]">
+              <TrendingUp className="h-5 w-5" />
+            </Button>
+          </Link>
           <Button
             variant="ghost"
             size="icon"
