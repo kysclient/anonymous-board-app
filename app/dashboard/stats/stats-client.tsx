@@ -23,78 +23,143 @@ import {
   Users,
   TrendingUp,
   Clock,
-  Flame,
   Crown,
   Target,
   Activity,
   Zap,
-  Calendar,
   BarChart3,
 } from "lucide-react";
 
-const CHART_COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#6366f1"];
+// Material 3 chart palette — primary blue + tertiary purple + accent siblings
+const CHART_PRIMARY = "#0b57d0";
+const CHART_TERTIARY = "#715573";
+const CHART_TEAL = "#006a6a";
+const CHART_AMBER = "#7c5800";
+const CHART_GREEN = "#386a20";
+const CHART_PINK = "#984065";
+const CHART_PALETTE = [
+  CHART_PRIMARY,
+  CHART_TERTIARY,
+  CHART_TEAL,
+  CHART_AMBER,
+  CHART_PINK,
+  CHART_GREEN,
+];
 
-function StatNumber({
+/* ────────────────────────────────────────────────────────────────── */
+/*  Building blocks                                                    */
+/* ────────────────────────────────────────────────────────────────── */
+
+function KpiCard({
+  tone,
   label,
   value,
   sub,
-  icon: Icon,
-  accent = false,
+  icon,
 }: {
+  tone: "primary" | "tertiary" | "secondary" | "surface";
   label: string;
   value: string | number;
   sub?: string;
-  icon: typeof Users;
-  accent?: boolean;
+  icon: React.ReactNode;
 }) {
-  return (
-    <div className="group relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 transition-all hover:border-blue-500/30 hover:shadow-md">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-[11px] font-medium text-muted-foreground">{label}</p>
-          <p
-            className={`text-2xl font-bold tracking-tight ${
-              accent
-                ? "bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent"
-                : "text-foreground"
-            }`}
-          >
-            {value}
-          </p>
-          {sub && <p className="text-[11px] text-muted-foreground">{sub}</p>}
-        </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10">
-          <Icon className="h-4 w-4 text-blue-500" />
-        </div>
-      </div>
-      <div className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-500/5 transition-transform group-hover:scale-150" />
-    </div>
-  );
-}
+  const surfaceClass =
+    tone === "primary"
+      ? "bg-md-primary-container text-md-on-primary-container"
+      : tone === "tertiary"
+        ? "bg-md-tertiary-container text-md-on-tertiary-container"
+        : tone === "secondary"
+          ? "bg-md-secondary-container text-md-on-secondary-container"
+          : "bg-md-surface-container-low text-md-on-surface";
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+  const iconWrapClass =
+    tone === "primary"
+      ? "bg-md-primary text-md-on-primary"
+      : tone === "tertiary"
+        ? "bg-md-tertiary text-md-on-tertiary"
+        : tone === "secondary"
+          ? "bg-md-secondary text-md-on-secondary"
+          : "bg-md-surface-container-highest text-md-on-surface-variant";
+
   return (
-    <h3 className="text-sm font-semibold tracking-tight text-foreground">
-      {children}
-    </h3>
+    <div className={`rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
+      <div className="flex items-start justify-between">
+        <p className="type-label-large opacity-80">{label}</p>
+        <span
+          className={`flex h-9 w-9 items-center justify-center rounded-full ${iconWrapClass}`}
+        >
+          {icon}
+        </span>
+      </div>
+      <p className="type-headline-large mt-4 truncate">{value}</p>
+      {sub && <p className="type-label-medium mt-1 opacity-80">{sub}</p>}
+    </div>
   );
 }
 
 function ChartCard({
   title,
+  description,
   children,
   className = "",
 }: {
   title: string;
+  description?: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <div
-      className={`overflow-hidden rounded-xl border border-border/60 bg-card/80 p-5 ${className}`}
-    >
-      <h4 className="mb-4 text-[13px] font-semibold text-foreground">{title}</h4>
-      {children}
+    <div className={`m3-card-elevated overflow-hidden p-6 sm:p-7 ${className}`}>
+      <div className="space-y-1">
+        <h4 className="type-title-large text-md-on-surface">{title}</h4>
+        {description && (
+          <p className="type-body-medium text-md-on-surface-variant">
+            {description}
+          </p>
+        )}
+      </div>
+      <div className="mt-5">{children}</div>
+    </div>
+  );
+}
+
+function HighlightCard({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: typeof Clock;
+  label: string;
+  value: string;
+  tone: "primary" | "tertiary" | "secondary" | "amber";
+}) {
+  const styles = {
+    primary: "bg-md-primary-container text-md-on-primary-container",
+    tertiary: "bg-md-tertiary-container text-md-on-tertiary-container",
+    secondary: "bg-md-secondary-container text-md-on-secondary-container",
+    amber: "bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200",
+  };
+  const iconStyles = {
+    primary: "bg-md-primary text-md-on-primary",
+    tertiary: "bg-md-tertiary text-md-on-tertiary",
+    secondary: "bg-md-secondary text-md-on-secondary",
+    amber: "bg-amber-500 text-white",
+  };
+
+  return (
+    <div className={`rounded-2xl p-4 ${styles[tone]}`}>
+      <div className="flex items-start gap-3">
+        <span
+          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full ${iconStyles[tone]}`}
+        >
+          <Icon className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="type-label-medium uppercase opacity-70">{label}</p>
+          <p className="type-title-medium mt-0.5 truncate">{value}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -102,10 +167,16 @@ function ChartCard({
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border/60 bg-background/95 px-3 py-2 text-xs shadow-lg backdrop-blur">
-      <p className="font-medium text-foreground">{label}</p>
+    <div
+      className="rounded-2xl bg-md-inverse-surface px-4 py-2.5 type-body-small text-md-inverse-on-surface elev-2"
+    >
+      {label && <p className="font-semibold">{label}</p>}
       {payload.map((entry: any, i: number) => (
-        <p key={i} style={{ color: entry.color }} className="mt-0.5">
+        <p
+          key={i}
+          style={{ color: entry.color }}
+          className="mt-0.5 font-medium"
+        >
           {entry.name}: {entry.value}
         </p>
       ))}
@@ -113,45 +184,47 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
+/* ────────────────────────────────────────────────────────────────── */
+/*  Page                                                               */
+/* ────────────────────────────────────────────────────────────────── */
+
 export default function StatsClient({ users }: { users: User[] }) {
   const now = new Date();
 
-  // --- Core metrics ---
   const totalUsers = users.length;
   const totalMeetups = users.reduce((s, u) => s + u.total_meetup_count, 0);
   const monthlyMeetups = users.reduce((s, u) => s + u.meetup_count, 0);
-  const avgMeetups = totalUsers > 0 ? (totalMeetups / totalUsers).toFixed(1) : "0";
+  const avgMeetups =
+    totalUsers > 0 ? (totalMeetups / totalUsers).toFixed(1) : "0";
 
   const newbies = users.filter((u) => u.is_regular === "신입").length;
   const regulars = users.filter((u) => u.is_regular === "기존").length;
 
-  // Active in last 14 days
   const twoWeeksAgo = new Date();
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
   const activeRecent = users.filter(
     (u) => u.last_meetup_date && new Date(u.last_meetup_date) >= twoWeeksAgo
   ).length;
-  const activeRate = totalUsers > 0 ? Math.round((activeRecent / totalUsers) * 100) : 0;
+  const activeRate =
+    totalUsers > 0 ? Math.round((activeRecent / totalUsers) * 100) : 0;
 
-  // Organizers
   const totalOrganized = users.reduce((s, u) => s + u.meetup_make_count, 0);
-  const topOrganizer = [...users].sort((a, b) => b.meetup_make_count - a.meetup_make_count)[0];
+  const topOrganizer = [...users].sort(
+    (a, b) => b.meetup_make_count - a.meetup_make_count
+  )[0];
 
-  // --- Gender distribution ---
+  // Gender distribution
   const genderMap: Record<string, number> = {};
   users.forEach((u) => {
     const g = u.gender || "미입력";
     genderMap[g] = (genderMap[g] || 0) + 1;
   });
-  const genderData = Object.entries(genderMap).map(([name, value]) => ({ name, value }));
+  const genderData = Object.entries(genderMap).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
-  // --- Status distribution ---
-  const statusData = [
-    { name: "기존 멤버", value: regulars },
-    { name: "신입 멤버", value: newbies },
-  ];
-
-  // --- Join date timeline (monthly) ---
+  // Join timeline
   const joinTimeline: Record<string, number> = {};
   users.forEach((u) => {
     if (!u.join_date) return;
@@ -163,14 +236,13 @@ export default function StatsClient({ users }: { users: User[] }) {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([month, count]) => ({ month, count }));
 
-  // Cumulative
   let cumulative = 0;
   const cumulativeData = joinTimelineData.map((d) => {
     cumulative += d.count;
     return { ...d, total: cumulative };
   });
 
-  // --- Participation distribution (histogram) ---
+  // Participation distribution
   const participationBuckets = [
     { range: "0", min: 0, max: 0 },
     { range: "1-2", min: 1, max: 2 },
@@ -186,26 +258,29 @@ export default function StatsClient({ users }: { users: User[] }) {
     ).length,
   }));
 
-  // --- Monthly activity top 10 ---
+  // Top 10
   const monthlyTop = [...users]
     .filter((u) => u.meetup_count > 0)
     .sort((a, b) => b.meetup_count - a.meetup_count)
     .slice(0, 10)
     .map((u) => ({ name: u.name, count: u.meetup_count }));
 
-  // --- All-time top 10 ---
   const allTimeTop = [...users]
     .sort((a, b) => b.total_meetup_count - a.total_meetup_count)
     .slice(0, 10)
     .map((u) => ({ name: u.name, count: u.total_meetup_count }));
 
-  // --- Fun facts ---
+  // Highlights
   const longestMember = [...users]
     .filter((u) => u.join_date)
-    .sort((a, b) => new Date(a.join_date!).getTime() - new Date(b.join_date!).getTime())[0];
+    .sort(
+      (a, b) =>
+        new Date(a.join_date!).getTime() - new Date(b.join_date!).getTime()
+    )[0];
   const daysSinceJoin = longestMember?.join_date
     ? Math.floor(
-        (now.getTime() - new Date(longestMember.join_date).getTime()) / (1000 * 60 * 60 * 24)
+        (now.getTime() - new Date(longestMember.join_date).getTime()) /
+          (1000 * 60 * 60 * 24)
       )
     : 0;
 
@@ -213,11 +288,13 @@ export default function StatsClient({ users }: { users: User[] }) {
     .filter((u) => u.is_regular === "신입")
     .sort((a, b) => b.total_meetup_count - a.total_meetup_count)[0];
 
-  const highestMonthly = [...users].sort((a, b) => b.meetup_count - a.meetup_count)[0];
+  const highestMonthly = [...users].sort(
+    (a, b) => b.meetup_count - a.meetup_count
+  )[0];
 
   const neverAttended = users.filter((u) => u.total_meetup_count === 0).length;
 
-  // --- Radar chart: top 5 user comparison ---
+  // Radar
   const radarUsers = [...users]
     .sort((a, b) => b.total_meetup_count - a.total_meetup_count)
     .slice(0, 5);
@@ -230,146 +307,160 @@ export default function StatsClient({ users }: { users: User[] }) {
     {
       metric: "총 참여",
       ...Object.fromEntries(
-        radarUsers.map((u) => [u.name, Math.round((u.total_meetup_count / maxMeetup) * 100)])
+        radarUsers.map((u) => [
+          u.name,
+          Math.round((u.total_meetup_count / maxMeetup) * 100),
+        ])
       ),
     },
     {
       metric: "이달 참여",
       ...Object.fromEntries(
-        radarUsers.map((u) => [u.name, Math.round((u.meetup_count / maxMonthly) * 100)])
+        radarUsers.map((u) => [
+          u.name,
+          Math.round((u.meetup_count / maxMonthly) * 100),
+        ])
       ),
     },
     {
-      metric: "벙주 횟수",
+      metric: "벙주",
       ...Object.fromEntries(
-        radarUsers.map((u) => [u.name, Math.round((u.meetup_make_count / maxMake) * 100)])
+        radarUsers.map((u) => [
+          u.name,
+          Math.round((u.meetup_make_count / maxMake) * 100),
+        ])
       ),
     },
   ];
 
   return (
-    <div className="flex flex-col gap-6 pb-10">
-      {/* Page header */}
-      <div className="space-y-1">
-        <div className="inline-flex items-center gap-2 rounded-full border bg-background px-2.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-          <BarChart3 className="h-3 w-3" />
-          Statistics
+    <div className="flex flex-col gap-8 pb-16">
+      {/* Hero */}
+      <header className="m3-card-feature relative overflow-hidden bg-md-primary-container p-7 sm:p-10">
+        <div className="absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-md-tertiary-container opacity-50" />
+        <div className="absolute right-1/3 -top-12 h-40 w-40 rounded-full bg-md-secondary-container opacity-50" />
+        <div className="relative space-y-4">
+          <span className="m3-pill m3-pill-tertiary">
+            <BarChart3 className="h-3 w-3" />
+            Statistics · Live
+          </span>
+          <div className="space-y-3">
+            <h1 className="type-display-medium text-md-on-primary-container">
+              멤버 통계
+            </h1>
+            <p className="type-body-large max-w-xl text-md-on-primary-container/85">
+              모임의 참여 추이, 활동 비율, 신입과 기존의 비교까지 — 운영에 필요한
+              데이터를 한눈에.
+            </p>
+          </div>
         </div>
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-          멤버 통계
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          우리 모임의 데이터를 한눈에 확인하세요
-        </p>
-      </div>
+      </header>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatNumber
+      {/* KPI tiles */}
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <KpiCard
+          tone="primary"
+          icon={<Users className="h-5 w-5" />}
           label="총 멤버"
           value={totalUsers}
-          sub={`신입 ${newbies} / 기존 ${regulars}`}
-          icon={Users}
-          accent
+          sub={`기존 ${regulars} · 신입 ${newbies}`}
         />
-        <StatNumber
+        <KpiCard
+          tone="surface"
+          icon={<TrendingUp className="h-5 w-5" />}
           label="누적 참여"
           value={`${totalMeetups}회`}
           sub={`인당 평균 ${avgMeetups}회`}
-          icon={TrendingUp}
         />
-        <StatNumber
+        <KpiCard
+          tone="tertiary"
+          icon={<Activity className="h-5 w-5" />}
           label="이달 참여"
           value={`${monthlyMeetups}회`}
           sub={`${activeRate}% 최근 2주 활동`}
-          icon={Flame}
         />
-        <StatNumber
+        <KpiCard
+          tone="secondary"
+          icon={<Crown className="h-5 w-5" />}
           label="벙 개최"
           value={`${totalOrganized}회`}
-          sub={topOrganizer ? `MVP: ${topOrganizer.name}` : "-"}
-          icon={Crown}
+          sub={topOrganizer ? `MVP · ${topOrganizer.name}` : "—"}
         />
-      </div>
+      </section>
 
-      {/* Fun facts */}
-      <div className="rounded-xl border border-border/60 bg-gradient-to-br from-blue-500/5 via-transparent to-violet-500/5 p-5">
-        <SectionTitle>Highlights</SectionTitle>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Highlights */}
+      <section className="m3-card-elevated p-6 sm:p-7">
+        <div className="space-y-1">
+          <p className="type-label-medium uppercase text-md-primary">
+            Highlights
+          </p>
+          <h2 className="type-title-large text-md-on-surface">
+            이번 달의 시그널
+          </h2>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {longestMember && (
-            <div className="flex items-start gap-3 rounded-lg bg-background/60 p-3">
-              <Clock className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
-              <div>
-                <p className="text-[12px] font-medium text-foreground">
-                  최장기 멤버
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  {longestMember.name} -- {daysSinceJoin}일째
-                </p>
-              </div>
-            </div>
+            <HighlightCard
+              icon={Clock}
+              label="최장기 멤버"
+              value={`${longestMember.name} · ${daysSinceJoin}일째`}
+              tone="primary"
+            />
           )}
           {mostActiveNewbie && mostActiveNewbie.total_meetup_count > 0 && (
-            <div className="flex items-start gap-3 rounded-lg bg-background/60 p-3">
-              <Zap className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
-              <div>
-                <p className="text-[12px] font-medium text-foreground">
-                  가장 열정적인 신입
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  {mostActiveNewbie.name} -- {mostActiveNewbie.total_meetup_count}회 참여
-                </p>
-              </div>
-            </div>
+            <HighlightCard
+              icon={Zap}
+              label="가장 열정적인 신입"
+              value={`${mostActiveNewbie.name} · ${mostActiveNewbie.total_meetup_count}회`}
+              tone="amber"
+            />
           )}
           {highestMonthly && highestMonthly.meetup_count > 0 && (
-            <div className="flex items-start gap-3 rounded-lg bg-background/60 p-3">
-              <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-500" />
-              <div>
-                <p className="text-[12px] font-medium text-foreground">
-                  이달의 최다 참여
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  {highestMonthly.name} -- {highestMonthly.meetup_count}회
-                </p>
-              </div>
-            </div>
+            <HighlightCard
+              icon={Target}
+              label="이달의 최다 참여"
+              value={`${highestMonthly.name} · ${highestMonthly.meetup_count}회`}
+              tone="tertiary"
+            />
           )}
-          <div className="flex items-start gap-3 rounded-lg bg-background/60 p-3">
-            <Activity className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
-            <div>
-              <p className="text-[12px] font-medium text-foreground">
-                미참여 멤버
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {neverAttended}명이 아직 벙 미참여
-              </p>
-            </div>
-          </div>
+          <HighlightCard
+            icon={Activity}
+            label="아직 미참여"
+            value={`${neverAttended}명이 0회`}
+            tone="secondary"
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Charts row 1: Growth + Distribution */}
-      <div className="grid gap-4 lg:grid-cols-7">
-        <ChartCard title="멤버 가입 추이" className="lg:col-span-4">
+      {/* Growth + composition */}
+      <section className="grid gap-4 lg:grid-cols-7">
+        <ChartCard
+          title="멤버 가입 추이"
+          description="월별 신규 가입 + 누적 멤버 수"
+          className="lg:col-span-4"
+        >
           {cumulativeData.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={cumulativeData}>
                 <defs>
                   <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                    <stop offset="0%" stopColor={CHART_PRIMARY} stopOpacity={0.22} />
+                    <stop offset="100%" stopColor={CHART_PRIMARY} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgb(var(--md-outline-variant))"
+                />
                 <XAxis
                   dataKey="month"
-                  tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 11, fill: "rgb(var(--md-on-surface-variant))" }}
                   tickLine={false}
-                  axisLine={false}
+                  axisLine={{ stroke: "rgb(var(--md-outline-variant))" }}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 11, fill: "rgb(var(--md-on-surface-variant))" }}
                   tickLine={false}
                   axisLine={false}
                   width={30}
@@ -379,20 +470,28 @@ export default function StatsClient({ users }: { users: User[] }) {
                   type="monotone"
                   dataKey="total"
                   name="누적 멤버"
-                  stroke="#3b82f6"
+                  stroke={CHART_PRIMARY}
                   strokeWidth={2}
                   fill="url(#growthGrad)"
                 />
-                <Bar dataKey="count" name="신규 가입" fill="#8b5cf6" opacity={0.6} radius={[2, 2, 0, 0]} />
+                <Bar
+                  dataKey="count"
+                  name="신규 가입"
+                  fill={CHART_TERTIARY}
+                  opacity={0.7}
+                  radius={[4, 4, 0, 0]}
+                />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-muted-foreground">데이터 없음</p>
+            <p className="py-12 text-center type-body-medium text-md-on-surface-variant">
+              데이터 없음
+            </p>
           )}
         </ChartCard>
 
         <div className="grid gap-4 lg:col-span-3">
-          <ChartCard title="성별 분포">
+          <ChartCard title="성별 분포" description="등록된 정보 기준">
             {genderData.length > 0 ? (
               <ResponsiveContainer width="100%" height={120}>
                 <PieChart>
@@ -402,110 +501,137 @@ export default function StatsClient({ users }: { users: User[] }) {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={30}
-                    outerRadius={50}
+                    innerRadius={32}
+                    outerRadius={52}
                     strokeWidth={2}
-                    stroke="var(--background)"
+                    stroke="rgb(var(--md-surface-container-low))"
                   >
                     {genderData.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      <Cell
+                        key={i}
+                        fill={CHART_PALETTE[i % CHART_PALETTE.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="py-6 text-center text-sm text-muted-foreground">데이터 없음</p>
+              <p className="py-6 text-center type-body-medium text-md-on-surface-variant">
+                데이터 없음
+              </p>
             )}
             <div className="mt-2 flex flex-wrap justify-center gap-3">
               {genderData.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-1.5 text-[11px]">
-                  <div
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                <div key={d.name} className="flex items-center gap-1.5 type-label-small">
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{ backgroundColor: CHART_PALETTE[i % CHART_PALETTE.length] }}
                   />
-                  <span className="text-muted-foreground">
-                    {d.name} {d.value}명
+                  <span className="text-md-on-surface-variant">
+                    {d.name} {d.value}
                   </span>
                 </div>
               ))}
             </div>
           </ChartCard>
 
-          <ChartCard title="멤버 구성">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="mb-2 flex justify-between text-[11px] text-muted-foreground">
-                  <span>기존 {regulars}명</span>
-                  <span>신입 {newbies}명</span>
-                </div>
-                <div className="h-3 overflow-hidden rounded-full bg-muted/60">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all"
-                    style={{
-                      width: `${totalUsers > 0 ? (regulars / totalUsers) * 100 : 0}%`,
-                    }}
-                  />
-                </div>
-                <div className="mt-2 flex justify-between text-[11px]">
-                  <span className="font-medium text-blue-500">
-                    {totalUsers > 0 ? Math.round((regulars / totalUsers) * 100) : 0}%
-                  </span>
-                  <span className="font-medium text-muted-foreground">
-                    {totalUsers > 0 ? Math.round((newbies / totalUsers) * 100) : 0}%
-                  </span>
-                </div>
+          <ChartCard
+            title="멤버 구성"
+            description={`기존 vs 신입 · 총 ${totalUsers}명`}
+          >
+            <div className="space-y-3">
+              <div className="flex items-baseline justify-between type-label-medium text-md-on-surface-variant">
+                <span>기존 {regulars}명</span>
+                <span>신입 {newbies}명</span>
+              </div>
+              <div className="flex h-2 overflow-hidden rounded-full bg-md-surface-container-highest">
+                <div
+                  className="h-full bg-md-primary"
+                  style={{
+                    width: `${totalUsers > 0 ? (regulars / totalUsers) * 100 : 0}%`,
+                  }}
+                />
+                <div
+                  className="h-full bg-md-tertiary"
+                  style={{
+                    width: `${totalUsers > 0 ? (newbies / totalUsers) * 100 : 0}%`,
+                  }}
+                />
+              </div>
+              <div className="flex justify-between type-label-medium">
+                <span className="font-semibold text-md-primary">
+                  {totalUsers > 0
+                    ? Math.round((regulars / totalUsers) * 100)
+                    : 0}
+                  %
+                </span>
+                <span className="font-semibold text-md-tertiary">
+                  {totalUsers > 0
+                    ? Math.round((newbies / totalUsers) * 100)
+                    : 0}
+                  %
+                </span>
               </div>
             </div>
           </ChartCard>
         </div>
-      </div>
+      </section>
 
-      {/* Charts row 2: Participation */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="참여 횟수 분포 (전체)">
+      {/* Distribution + radar */}
+      <section className="grid gap-4 lg:grid-cols-2">
+        <ChartCard
+          title="참여 횟수 분포"
+          description="누적 참여 횟수 구간별 멤버 수"
+        >
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={participationDistData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgb(var(--md-outline-variant))"
+              />
               <XAxis
                 dataKey="range"
-                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                tick={{ fontSize: 11, fill: "rgb(var(--md-on-surface-variant))" }}
                 tickLine={false}
-                axisLine={false}
+                axisLine={{ stroke: "rgb(var(--md-outline-variant))" }}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                tick={{ fontSize: 11, fill: "rgb(var(--md-on-surface-variant))" }}
                 tickLine={false}
                 axisLine={false}
                 width={30}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" name="멤버 수" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="count" name="멤버 수" radius={[8, 8, 0, 0]}>
                 {participationDistData.map((_, i) => (
-                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.8} />
+                  <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Top 5 멤버 비교">
+        <ChartCard
+          title="Top 5 멤버 비교"
+          description="총 참여 · 이달 참여 · 벙주 비율 (상위 5명)"
+        >
           {radarUsers.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="var(--border)" opacity={0.3} />
+                <PolarGrid stroke="rgb(var(--md-outline-variant))" />
                 <PolarAngleAxis
                   dataKey="metric"
-                  tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                  tick={{ fontSize: 11, fill: "rgb(var(--md-on-surface-variant))" }}
                 />
                 {radarUsers.map((u, i) => (
                   <Radar
                     key={u.id}
                     name={u.name}
                     dataKey={u.name}
-                    stroke={CHART_COLORS[i]}
-                    fill={CHART_COLORS[i]}
-                    fillOpacity={0.1}
+                    stroke={CHART_PALETTE[i]}
+                    fill={CHART_PALETTE[i]}
+                    fillOpacity={0.12}
                     strokeWidth={2}
                   />
                 ))}
@@ -513,137 +639,79 @@ export default function StatsClient({ users }: { users: User[] }) {
               </RadarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-muted-foreground">데이터 없음</p>
+            <p className="py-12 text-center type-body-medium text-md-on-surface-variant">
+              데이터 없음
+            </p>
           )}
           <div className="mt-2 flex flex-wrap justify-center gap-3">
             {radarUsers.map((u, i) => (
-              <div key={u.id} className="flex items-center gap-1.5 text-[11px]">
-                <div
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: CHART_COLORS[i] }}
+              <div key={u.id} className="flex items-center gap-1.5 type-label-small">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: CHART_PALETTE[i] }}
                 />
-                <span className="text-muted-foreground">{u.name}</span>
+                <span className="text-md-on-surface-variant">{u.name}</span>
               </div>
             ))}
           </div>
         </ChartCard>
-      </div>
+      </section>
 
-      {/* Rankings side by side */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="이달의 Top 10">
-          {monthlyTop.length > 0 ? (
-            <div className="space-y-2">
-              {monthlyTop.map((u, i) => {
-                const maxCount = monthlyTop[0]?.count || 1;
-                return (
-                  <div key={u.name} className="flex items-center gap-3">
-                    <span
-                      className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md text-[11px] font-bold ${
-                        i < 3
-                          ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-                          : "bg-muted/60 text-muted-foreground"
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex items-baseline justify-between gap-2">
-                        <span className="truncate text-[12px] font-medium text-foreground">
-                          {u.name}
-                        </span>
-                        <span className="flex-shrink-0 text-[12px] font-semibold tabular-nums text-blue-600 dark:text-blue-400">
-                          {u.count}회
-                        </span>
-                      </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-muted/50">
-                        <div
-                          className="h-full rounded-full bg-blue-500 transition-all"
-                          style={{ width: `${(u.count / maxCount) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="py-12 text-center text-sm text-muted-foreground">
-              이달 참여 데이터 없음
-            </p>
-          )}
-        </ChartCard>
-
-        <ChartCard title="역대 Top 10">
-          {allTimeTop.length > 0 ? (
-            <div className="space-y-2">
-              {allTimeTop.map((u, i) => {
-                const maxCount = allTimeTop[0]?.count || 1;
-                return (
-                  <div key={u.name} className="flex items-center gap-3">
-                    <span
-                      className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md text-[11px] font-bold ${
-                        i < 3
-                          ? "bg-violet-500/15 text-violet-600 dark:text-violet-400"
-                          : "bg-muted/60 text-muted-foreground"
-                      }`}
-                    >
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex items-baseline justify-between gap-2">
-                        <span className="truncate text-[12px] font-medium text-foreground">
-                          {u.name}
-                        </span>
-                        <span className="flex-shrink-0 text-[12px] font-semibold tabular-nums text-violet-600 dark:text-violet-400">
-                          {u.count}회
-                        </span>
-                      </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-muted/50">
-                        <div
-                          className="h-full rounded-full bg-violet-500 transition-all"
-                          style={{ width: `${(u.count / maxCount) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="py-12 text-center text-sm text-muted-foreground">데이터 없음</p>
-          )}
-        </ChartCard>
-      </div>
+      {/* Rankings */}
+      <section className="grid gap-4 lg:grid-cols-2">
+        <RankingList
+          title="이달의 Top 10"
+          description="이번 달 참여 횟수 순"
+          items={monthlyTop}
+          unit="회"
+          tone="primary"
+          emptyMessage="이번 달 참여 데이터가 없어요"
+        />
+        <RankingList
+          title="역대 Top 10"
+          description="누적 참여 횟수 순"
+          items={allTimeTop}
+          unit="회"
+          tone="tertiary"
+          emptyMessage="데이터 없음"
+        />
+      </section>
 
       {/* Full member table */}
-      <div className="overflow-hidden rounded-xl border border-border/60 bg-card/80">
-        <div className="p-5">
-          <h4 className="text-[13px] font-semibold text-foreground">전체 멤버 현황</h4>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {totalUsers}명의 멤버 데이터
+      <section className="m3-card-elevated overflow-hidden">
+        <div className="p-6 sm:p-7">
+          <h4 className="type-title-large text-md-on-surface">전체 멤버 현황</h4>
+          <p className="type-body-medium mt-1 text-md-on-surface-variant">
+            {totalUsers}명 · 누적 참여 횟수 내림차순
           </p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-[12px]">
+
+        <div className="overflow-x-auto border-t border-md-outline-variant">
+          <table className="w-full">
             <thead>
-              <tr className="border-t bg-muted/30">
-                <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">#</th>
-                <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">이름</th>
-                <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">구분</th>
-                <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">
+              <tr className="bg-md-surface-container">
+                <th className="w-[60px] px-4 py-3 text-left type-label-medium uppercase text-md-on-surface-variant">
+                  #
+                </th>
+                <th className="px-4 py-3 text-left type-label-medium uppercase text-md-on-surface-variant">
+                  이름
+                </th>
+                <th className="px-4 py-3 text-left type-label-medium uppercase text-md-on-surface-variant">
+                  구분
+                </th>
+                <th className="px-4 py-3 text-right type-label-medium uppercase text-md-on-surface-variant">
                   이달
                 </th>
-                <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-right type-label-medium uppercase text-md-on-surface-variant">
                   누적
                 </th>
-                <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-right type-label-medium uppercase text-md-on-surface-variant">
                   벙주
                 </th>
-                <th className="hidden px-4 py-2.5 text-left font-medium text-muted-foreground sm:table-cell">
+                <th className="hidden px-4 py-3 text-left type-label-medium uppercase text-md-on-surface-variant sm:table-cell">
                   가입일
                 </th>
-                <th className="hidden px-4 py-2.5 text-left font-medium text-muted-foreground sm:table-cell">
+                <th className="hidden px-4 py-3 text-left type-label-medium uppercase text-md-on-surface-variant sm:table-cell">
                   최근 참여
                 </th>
               </tr>
@@ -654,52 +722,138 @@ export default function StatsClient({ users }: { users: User[] }) {
                 .map((u, i) => (
                   <tr
                     key={u.id}
-                    className="border-t border-border/40 transition-colors hover:bg-muted/20"
+                    className="border-t border-md-outline-variant/40 transition-colors hover:bg-md-surface-container"
                   >
-                    <td className="px-4 py-2.5 text-muted-foreground">{i + 1}</td>
-                    <td className="px-4 py-2.5 font-medium text-foreground">{u.name}</td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-3 type-label-medium text-md-on-surface-variant">
+                      {i + 1}
+                    </td>
+                    <td className="px-4 py-3 type-title-small text-md-on-surface">
+                      {u.name}
+                    </td>
+                    <td className="px-4 py-3">
                       <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          u.is_regular === "신입"
-                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                            : "bg-muted text-muted-foreground"
+                        className={`m3-pill ${
+                          u.is_regular === "신입" ? "m3-pill-primary" : ""
                         }`}
                       >
                         {u.is_regular}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">{u.meetup_count}</td>
-                    <td className="px-4 py-2.5 text-right font-medium tabular-nums">
+                    <td className="px-4 py-3 text-right type-body-medium">
+                      {u.meetup_count}
+                    </td>
+                    <td className="px-4 py-3 text-right type-title-small text-md-primary">
                       {u.total_meetup_count}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums">
+                    <td className="px-4 py-3 text-right type-body-medium">
                       {u.meetup_make_count}
                     </td>
-                    <td className="hidden px-4 py-2.5 text-muted-foreground sm:table-cell">
+                    <td className="hidden px-4 py-3 type-body-small text-md-on-surface-variant sm:table-cell">
                       {u.join_date
                         ? new Date(u.join_date).toLocaleDateString("ko-KR", {
                             year: "2-digit",
                             month: "short",
                             day: "numeric",
                           })
-                        : "-"}
+                        : "—"}
                     </td>
-                    <td className="hidden px-4 py-2.5 text-muted-foreground sm:table-cell">
+                    <td className="hidden px-4 py-3 type-body-small text-md-on-surface-variant sm:table-cell">
                       {u.last_meetup_date
-                        ? new Date(u.last_meetup_date).toLocaleDateString("ko-KR", {
-                            year: "2-digit",
-                            month: "short",
-                            day: "numeric",
-                          })
-                        : "-"}
+                        ? new Date(u.last_meetup_date).toLocaleDateString(
+                            "ko-KR",
+                            {
+                              year: "2-digit",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )
+                        : "—"}
                     </td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </div>
+  );
+}
+
+function RankingList({
+  title,
+  description,
+  items,
+  unit,
+  tone,
+  emptyMessage,
+}: {
+  title: string;
+  description?: string;
+  items: { name: string; count: number }[];
+  unit: string;
+  tone: "primary" | "tertiary";
+  emptyMessage: string;
+}) {
+  const accentColor = tone === "primary" ? CHART_PRIMARY : CHART_TERTIARY;
+  const containerClass =
+    tone === "primary"
+      ? "bg-md-primary-container text-md-on-primary-container"
+      : "bg-md-tertiary-container text-md-on-tertiary-container";
+  const accentBgClass =
+    tone === "primary" ? "bg-md-primary text-md-on-primary" : "bg-md-tertiary text-md-on-tertiary";
+
+  return (
+    <ChartCard title={title} description={description}>
+      {items.length > 0 ? (
+        <div className="space-y-2">
+          {items.map((u, i) => {
+            const maxCount = items[0]?.count || 1;
+            return (
+              <div key={u.name} className="flex items-center gap-3">
+                <span
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full type-label-large ${
+                    i === 0
+                      ? accentBgClass
+                      : i < 3
+                        ? containerClass
+                        : "bg-md-surface-container-highest text-md-on-surface-variant"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1.5 flex items-baseline justify-between gap-2">
+                    <span className="type-title-small truncate text-md-on-surface">
+                      {u.name}
+                    </span>
+                    <span
+                      className="flex-shrink-0 type-label-large"
+                      style={{ color: accentColor }}
+                    >
+                      {u.count}
+                      {unit}
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-md-surface-container-highest">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${(u.count / maxCount) * 100}%`,
+                        background: accentColor,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="py-12 text-center type-body-medium text-md-on-surface-variant">
+          {emptyMessage}
+        </p>
+      )}
+    </ChartCard>
   );
 }

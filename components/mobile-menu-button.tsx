@@ -8,9 +8,13 @@ export function MobileMenuButton() {
   const { toggle } = useSidebar();
 
   return (
-    <button className="md:hidden" onClick={toggle}>
-      <Menu className="h-5 w-5 text-foreground" />
-      <span className="sr-only">메뉴 열기</span>
+    <button
+      type="button"
+      className="m3-icon-btn md:hidden"
+      onClick={toggle}
+      aria-label="메뉴 열기"
+    >
+      <Menu className="h-5 w-5" />
     </button>
   );
 }

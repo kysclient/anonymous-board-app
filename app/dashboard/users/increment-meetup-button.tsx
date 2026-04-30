@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { incrementMeetupCount } from "../actions";
 
@@ -29,7 +28,6 @@ export function IncrementMeetupButton({
           title: "벙 참여 추가 성공",
           description: "벙 참여 횟수가 증가되었습니다.",
         });
-        // 데이터 업데이트 후 목록 새로고침
         await onSuccess();
       } else {
         toast({
@@ -48,15 +46,15 @@ export function IncrementMeetupButton({
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
+      type="button"
       onClick={handleIncrement}
       disabled={isLoading}
       title="벙 참여 추가"
+      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-md-primary-container text-md-on-primary-container transition-all hover:elev-1 active:scale-90 disabled:opacity-50"
     >
-      <PlusCircle className="h-4 w-4" />
+      <Plus className="h-4 w-4" />
       <span className="sr-only">벙 참여 추가</span>
-    </Button>
+    </button>
   );
 }

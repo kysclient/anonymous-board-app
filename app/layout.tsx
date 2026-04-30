@@ -1,17 +1,38 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Roboto_Flex, Roboto } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
-import '../styles/globals.css';
-const inter = Inter({ subsets: ["latin"] });
+import "../styles/globals.css";
+
+// Roboto Flex serves as the primary face for body / labels.
+// We expose Google Sans aliases via CSS so headlines can target
+// "Google Sans Display" / "Google Sans" and fall back to Roboto Flex
+// for users without those licensed faces installed locally.
+const robotoFlex = Roboto_Flex({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-app",
+  axes: ["opsz"],
+});
+
+const roboto = Roboto({
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-roboto",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fdfbff" },
+    { media: "(prefers-color-scheme: dark)", color: "#121317" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -23,10 +44,10 @@ export const metadata: Metadata = {
   openGraph: {
     images: [
       {
-        url: "/og-image.jpeg", // OG 이미지 경로
+        url: "/og-image.jpeg",
         width: 1200,
         height: 630,
-        alt: "OG Image", // OG 이미지 설명
+        alt: "OG Image",
       },
     ],
   },
@@ -39,11 +60,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
-      <body className={`${inter.className} `}>
+    <html
+      lang="ko"
+      suppressHydrationWarning
+      className={`${robotoFlex.variable} ${roboto.variable}`}
+    >
+      <body>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

@@ -1,80 +1,82 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { formatDateString } from "@/lib/utils";
-import { Users, Calendar, Trophy, TrendingUp, UserPlus } from "lucide-react";
+import {
+  Users,
+  Calendar,
+  Trophy,
+  TrendingUp,
+  UserPlus,
+  AlertCircle,
+  Sparkles,
+  ArrowUpRight,
+  Quote,
+} from "lucide-react";
 import { getUsers } from "./actions";
 import CopyButton from "@/components/copy-button";
 import MastersStrip from "@/components/masters-strip";
 
 export const revalidate = 0;
 
+function formatLongDate(date: Date) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(date);
+}
+
 export default async function DashboardPage() {
-  // 사용자 데이터 가져오기
   const users = await getUsers();
 
-  // 통계 계산
   const totalUsers = users.length;
   const totalMeetups = users.reduce((sum, user) => sum + user.meetup_count, 0);
   const averageMeetups =
     totalUsers > 0 ? (totalMeetups / totalUsers).toFixed(1) : "0";
 
-  // 신규 사용자 (최근 30일 이내 가입)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const newUsers = users.filter(
-    (user) => user.join_date && new Date(user.join_date) >= thirtyDaysAgo,
+    (user) => user.join_date && new Date(user.join_date) >= thirtyDaysAgo
   ).length;
 
-  // 이달의 벙킹 Top 10 (이번 달 벙 참여 횟수 기준)
   const now = new Date();
   const topUsers = [...users]
     .filter((user) => user.meetup_count > 0)
     .sort((a, b) => b.meetup_count - a.meetup_count)
     .slice(0, 10);
 
-  // 최근 벙 참여 활동 (최근 벙 참석일 기준)
   const recentActivities = [...users]
     .filter((user) => user.last_meetup_date)
     .sort(
       (a, b) =>
         new Date(b.last_meetup_date || "").getTime() -
-        new Date(a.last_meetup_date || "").getTime(),
+        new Date(a.last_meetup_date || "").getTime()
     )
-    .slice(0, 10);
+    .slice(0, 8);
 
-  // 참여 기한 임박 + 초과 사용자
   const deadlineUsers = users
     .filter((user) => {
       if (user.is_regular === "신입") {
-        // 신입: join_date 기준 1개월
         if (!user.join_date) return false;
         const joinDate = new Date(user.join_date);
         const limitDate = new Date(joinDate);
         limitDate.setMonth(limitDate.getMonth() + 1);
         const diffDays = Math.floor(
-          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         );
         return diffDays <= 7;
       } else if (user.is_regular === "기존") {
-        // 기존: last_meetup_date 기준 2개월
         if (!user.last_meetup_date) return false;
         const lastMeetupDate = new Date(user.last_meetup_date);
         const limitDate = new Date(lastMeetupDate);
         limitDate.setMonth(limitDate.getMonth() + 2);
         const diffDays = Math.floor(
-          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         );
         return diffDays <= 7;
       }
       return false;
     })
     .map((user) => {
-      // 각 사용자의 기한 날짜 계산
       let limitDate: Date;
       if (user.is_regular === "신입") {
         const joinDate = new Date(user.join_date!);
@@ -86,237 +88,369 @@ export default async function DashboardPage() {
         limitDate.setMonth(limitDate.getMonth() + 2);
       }
       const diffDays = Math.floor(
-        (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+        (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
       );
       return { ...user, limitDate, diffDays };
     })
-    .sort((a, b) => a.diffDays - b.diffDays); // 남은 기한이 적은 순으로 정렬
-  return (
-    <div className="flex flex-col gap-6 pb-10">
-      <MastersStrip />
+    .sort((a, b) => a.diffDays - b.diffDays);
 
-      <section className="rounded-2xl border bg-card/60 shadow-sm">
-        <div className="flex flex-col gap-5 p-5 sm:p-6">
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background px-2.5 py-0.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
-            운영 대시보드
+  const overdueCount = deadlineUsers.filter((u) => u.diffDays < 0).length;
+
+  return (
+    <div className="flex flex-col gap-8 pb-16">
+      {/* Hero */}
+      <header className="m3-card-feature relative overflow-hidden bg-md-primary-container p-7 sm:p-12">
+        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-md-primary opacity-10" />
+        <div className="absolute right-8 bottom-12 h-32 w-32 rounded-full bg-md-tertiary-container opacity-70" />
+        <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-md-secondary-container opacity-50" />
+
+        <div className="relative space-y-7">
+          <span className="m3-pill m3-pill-tertiary">
+            <Sparkles className="h-3 w-3" />
+            오늘 · {formatLongDate(now)}
+          </span>
+
+          <div className="space-y-5">
+            <Quote
+              className="h-9 w-9 text-md-on-primary-container/30"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+            <p className="type-headline-large text-balance max-w-3xl text-md-on-primary-container">
+              기쁨뒤에 슬픔이 오는건 아름다운 마음이야
+            </p>
           </div>
-          <div className="space-y-1">
-            <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-              26년도 솔로일 사람들 모임
-            </h1>
-            <p className="text-xs text-muted-foreground">ㅋ</p>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <a href="/dashboard/seating" className="m3-btn m3-btn-filled">
+              <Sparkles className="h-4 w-4" />
+              자리 배치 시작
+            </a>
+            <a href="/dashboard/stats" className="m3-btn m3-btn-tonal">
+              <TrendingUp className="h-4 w-4" />
+              통계 보기
+            </a>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-lg border bg-background/80 px-3 py-2">
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>총 사용자</span>
-                <Users className="h-3.5 w-3.5" />
-              </div>
-              <p className="mt-2 text-xl font-semibold text-blue-600 dark:text-blue-400">
-                {totalUsers}
-              </p>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                최근 30일 +{newUsers}명
-              </p>
-            </div>
-            <div className="rounded-lg border bg-background/80 px-3 py-2">
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>이번 달 참여</span>
-                <TrendingUp className="h-3.5 w-3.5" />
-              </div>
-              <p className="mt-2 text-xl font-semibold text-blue-600 dark:text-blue-400">
-                {totalMeetups}
-              </p>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                인당 평균 {averageMeetups}회
-              </p>
-            </div>
-            <div className="rounded-lg border bg-background/80 px-3 py-2">
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>최다 참여자</span>
-                <Trophy className="h-3.5 w-3.5" />
-              </div>
-              <p className="mt-2 text-xl font-semibold text-blue-600 dark:text-blue-400">
-                {topUsers.length > 0 ? topUsers[0].name : "-"}
-              </p>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                {topUsers.length > 0 ? topUsers[0].meetup_count : 0}회 참여
-              </p>
-            </div>
-            <div className="rounded-lg border bg-background/80 px-3 py-2">
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>신규 사용자</span>
-                <UserPlus className="h-3.5 w-3.5" />
-              </div>
-              <p className="mt-2 text-xl font-semibold text-blue-600 dark:text-blue-400">
-                {newUsers}
-              </p>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                {totalUsers > 0 ? Math.round((newUsers / totalUsers) * 100) : 0}
-                % 비중
-              </p>
-            </div>
+        </div>
+      </header>
+
+      {/* KPI cards */}
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <KpiCard
+          tone="primary"
+          icon={<Users className="h-5 w-5" />}
+          label="총 멤버"
+          value={totalUsers}
+          delta={
+            newUsers > 0 ? (
+              <span className="inline-flex items-center gap-1 text-md-primary">
+                <ArrowUpRight className="h-3.5 w-3.5" />+{newUsers} 30일
+              </span>
+            ) : (
+              <span className="text-md-on-surface-variant">증감 없음</span>
+            )
+          }
+        />
+        <KpiCard
+          tone="surface"
+          icon={<TrendingUp className="h-5 w-5" />}
+          label="이번 달 참여"
+          value={`${totalMeetups}회`}
+          delta={
+            <span className="text-md-on-surface-variant">
+              인당 평균 {averageMeetups}회
+            </span>
+          }
+        />
+        <KpiCard
+          tone="tertiary"
+          icon={<Trophy className="h-5 w-5" />}
+          label="이달의 MVP"
+          value={topUsers.length > 0 ? topUsers[0].name : "—"}
+          delta={
+            topUsers.length > 0 ? (
+              <span className="text-md-on-tertiary-container/80">
+                {topUsers[0].meetup_count}회 참여 중
+              </span>
+            ) : (
+              <span className="text-md-on-tertiary-container/70">집계 전</span>
+            )
+          }
+        />
+        <KpiCard
+          tone="surface"
+          icon={<UserPlus className="h-5 w-5" />}
+          label="신규 합류"
+          value={newUsers}
+          delta={
+            <span className="text-md-on-surface-variant">
+              총원 대비{" "}
+              {totalUsers > 0
+                ? Math.round((newUsers / totalUsers) * 100)
+                : 0}
+              %
+            </span>
+          }
+        />
+      </section>
+
+      {/* Masters strip */}
+      <section>
+        <MastersStrip />
+      </section>
+
+      {/* Top 10 + recent activity */}
+      <section className="grid gap-4 lg:grid-cols-7">
+        {/* Leaderboard */}
+        <div className="m3-card-elevated lg:col-span-4 p-6 sm:p-7">
+          <CardHeader
+            eyebrow="Leaderboard"
+            title="이달의 벙킹 Top 10"
+            subtitle="이번 달 벙 참여 횟수 기준 상위 10명"
+            icon={<Trophy className="h-4 w-4" />}
+          />
+
+          <div className="mt-6">
+            {topUsers.length === 0 ? (
+              <EmptyState message="이번 달 데이터가 아직 없어요" />
+            ) : (
+              <ol className="space-y-1">
+                {topUsers.map((user, index) => {
+                  const max = topUsers[0].meetup_count || 1;
+                  const ratio = (user.meetup_count / max) * 100;
+                  return (
+                    <li
+                      key={user.id}
+                      className="m3-list-item gap-4 px-3"
+                    >
+                      <span
+                        className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full type-label-large ${
+                          index === 0
+                            ? "bg-md-primary text-md-on-primary"
+                            : index < 3
+                              ? "bg-md-primary-container text-md-on-primary-container"
+                              : "bg-md-surface-container-highest text-md-on-surface-variant"
+                        }`}
+                      >
+                        {index + 1}
+                      </span>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="type-title-medium truncate text-md-on-surface">
+                            {user.name}
+                          </span>
+                          <span className="type-label-large flex-shrink-0 text-md-primary">
+                            {user.meetup_count}회
+                          </span>
+                        </div>
+                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-md-surface-container-highest">
+                          <div
+                            className="h-full rounded-full bg-md-primary transition-all"
+                            style={{ width: `${ratio}%` }}
+                          />
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </div>
+        </div>
+
+        {/* Recent activity */}
+        <div className="m3-card-elevated lg:col-span-3 p-6 sm:p-7">
+          <CardHeader
+            eyebrow="Activity"
+            title="최근 벙 참여"
+            subtitle="가장 최근에 활동한 멤버"
+            icon={<Calendar className="h-4 w-4" />}
+          />
+
+          <div className="mt-6">
+            {recentActivities.length === 0 ? (
+              <EmptyState message="아직 활동 기록이 없어요" />
+            ) : (
+              <ul className="space-y-0">
+                {recentActivities.map((user, idx) => (
+                  <li key={user.id} className="relative flex gap-4">
+                    {idx !== recentActivities.length - 1 && (
+                      <span className="absolute left-[7px] top-5 h-full w-px bg-md-outline-variant" />
+                    )}
+                    <span className="relative mt-1.5 h-3 w-3 flex-shrink-0 rounded-full border-2 border-md-surface-container-low bg-md-primary" />
+                    <div className="flex-1 pb-5">
+                      <p className="type-body-medium leading-snug text-md-on-surface">
+                        <span className="font-semibold">{user.name}</span>
+                        <span className="text-md-on-surface-variant">
+                          {" "}
+                          님이 벙에 참여
+                        </span>
+                      </p>
+                      <p className="type-label-small mt-1 text-md-on-surface-variant">
+                        {user.last_meetup_date
+                          ? formatDateString(user.last_meetup_date)
+                          : "—"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-7">
-        <Card className="lg:col-span-4 border-border/60 shadow-sm">
-          <CardHeader className="space-y-1">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Trophy className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              이달의 벙킹 Top 10
-            </CardTitle>
-            <CardDescription className="text-xs">
-              이번 달 벙 참여 횟수 기준 상위 10명
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {topUsers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                데이터가 없습니다
-              </p>
-            ) : (
-              topUsers.map((user, index) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between rounded-lg border bg-background/60 px-3 py-2"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
-                        index < 3
-                          ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-                    <div>
-                      <p className="text-[13px] font-semibold leading-none">
-                        {user.name}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-1">
-                        이번 달 {user.meetup_count}회 참여
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <TrendingUp className="h-3.5 w-3.5" />
-                    <span>{user.meetup_count}회</span>
-                  </div>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3 border-border/60 shadow-sm">
-          <CardHeader className="space-y-1">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              최근 벙 참여 활동
-            </CardTitle>
-            <CardDescription className="text-xs">
-              최근 벙에 참여한 사용자 목록
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {recentActivities.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                데이터가 없습니다
-              </p>
-            ) : (
-              recentActivities.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-start gap-3 rounded-lg border bg-background/60 px-3 py-2"
-                >
-                  <div className="mt-2 h-2 w-2 rounded-full bg-blue-500/60" />
-                  <div className="flex-1 space-y-1">
-                    <p className="text-[13px] font-medium leading-none">
-                      <span className="text-blue-600 dark:text-blue-400 font-semibold">
-                        {user.name}
-                      </span>
-                      님이 벙에 참여했습니다
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {user.last_meetup_date
-                        ? formatDateString(user.last_meetup_date)
-                        : "-"}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </section>
+      {/* Deadline section */}
+      <section className="m3-card-filled p-6 sm:p-7">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <CardHeader
+            eyebrow="Action required"
+            title="참여 기한 임박자"
+            subtitle={
+              deadlineUsers.length === 0
+                ? "현재 임박한 기한이 없습니다"
+                : `총 ${deadlineUsers.length}명이 일주일 내 기한 도래${
+                    overdueCount > 0 ? ` · ${overdueCount}명 초과` : ""
+                  }`
+            }
+            icon={<AlertCircle className="h-4 w-4" />}
+          />
 
-      <Card className="w-full border-border/60 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-sm">참여 기한 임박자</CardTitle>
-            <CardDescription className="text-xs">
-              마지막 기한이 일주일 남은 사용자
-            </CardDescription>
-          </div>
-          <CopyButton deadlineUsers={deadlineUsers} />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {deadlineUsers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                데이터가 없습니다
-              </p>
-            ) : (
-              <div className="flex flex-row items-center gap-4 flex-wrap">
-                {deadlineUsers.map((user) => {
-                  const isOverdue = user.diffDays < 0;
-                  return (
-                    <div
-                      key={user.id}
-                      className={`flex items-center gap-4 rounded-lg border p-3 ${
-                        isOverdue
-                          ? "bg-red-500/10 border-red-500/30"
-                          : "bg-muted/40 border-border/60"
-                      }`}
-                    >
+          {deadlineUsers.length > 0 && <CopyButton deadlineUsers={deadlineUsers} />}
+        </div>
+
+        <div className="mt-6">
+          {deadlineUsers.length === 0 ? (
+            <EmptyState message="모두 안전권 ✓" />
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {deadlineUsers.map((user) => {
+                const isOverdue = user.diffDays < 0;
+                return (
+                  <div
+                    key={user.id}
+                    className={`rounded-2xl p-4 ${
+                      isOverdue
+                        ? "bg-md-error-container text-md-on-error-container"
+                        : "bg-md-surface-container-low text-md-on-surface"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
                       <div className="space-y-1">
-                        <p className="text-sm font-medium leading-none flex items-center gap-2">
-                          {user.name}
-                          <span
-                            className={`text-[11px] px-2 py-0.5 rounded-full ${
-                              user.is_regular === "신입"
-                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {user.is_regular}
-                          </span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          기한: {formatDateString(user.limitDate.toString())}
-                        </p>
-                        <p
-                          className={`text-xs font-semibold ${
-                            isOverdue ? "text-red-600" : "text-muted-foreground"
-                          }`}
-                        >
-                          {user.name.includes("가람")
-                            ? "가람이는 봐주자 알아서 데려갈게"
-                            : isOverdue
-                              ? `${Math.abs(user.diffDays)}일 초과`
-                              : `${user.diffDays}일 남음`}
+                        <p className="type-title-medium">{user.name}</p>
+                        <p className="type-label-small opacity-70">
+                          기한 {formatDateString(user.limitDate.toString())}
                         </p>
                       </div>
+                      <span
+                        className={`m3-pill ${
+                          user.is_regular === "신입"
+                            ? "m3-pill-primary"
+                            : "bg-md-surface-container-high text-md-on-surface-variant"
+                        }`}
+                      >
+                        {user.is_regular}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+                    <p
+                      className={`mt-4 type-label-large ${
+                        isOverdue
+                          ? "text-md-on-error-container"
+                          : user.diffDays <= 3
+                            ? "text-md-error"
+                            : "text-md-on-surface-variant"
+                      }`}
+                    >
+                      {user.name.includes("가람")
+                        ? "가람이는 봐주자 · 알아서 데려갈게"
+                        : isOverdue
+                          ? `${Math.abs(user.diffDays)}일 초과`
+                          : `${user.diffDays}일 남음`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────── */
+
+function KpiCard({
+  tone,
+  label,
+  value,
+  delta,
+  icon,
+}: {
+  tone: "primary" | "tertiary" | "surface";
+  label: string;
+  value: string | number;
+  delta: React.ReactNode;
+  icon: React.ReactNode;
+}) {
+  const surfaceClass =
+    tone === "primary"
+      ? "bg-md-primary-container text-md-on-primary-container"
+      : tone === "tertiary"
+        ? "bg-md-tertiary-container text-md-on-tertiary-container"
+        : "bg-md-surface-container-low text-md-on-surface";
+
+  const iconWrapClass =
+    tone === "primary"
+      ? "bg-md-primary text-md-on-primary"
+      : tone === "tertiary"
+        ? "bg-md-tertiary text-md-on-tertiary"
+        : "bg-md-secondary-container text-md-on-secondary-container";
+
+  return (
+    <div className={`rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
+      <div className="flex items-start justify-between">
+        <p className="type-label-large opacity-80">{label}</p>
+        <span
+          className={`flex h-9 w-9 items-center justify-center rounded-full ${iconWrapClass}`}
+        >
+          {icon}
+        </span>
+      </div>
+      <p className="type-headline-large mt-4 truncate">{value}</p>
+      <p className="type-label-medium mt-1 opacity-80">{delta}</p>
+    </div>
+  );
+}
+
+function CardHeader({
+  eyebrow,
+  title,
+  subtitle,
+  icon,
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-1.5 text-md-primary">
+        {icon}
+        <span className="type-label-medium uppercase">{eyebrow}</span>
+      </div>
+      <h2 className="type-title-large text-md-on-surface">{title}</h2>
+      <p className="type-body-medium text-md-on-surface-variant">{subtitle}</p>
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex h-32 items-center justify-center rounded-2xl bg-md-surface-container-low">
+      <p className="type-body-medium text-md-on-surface-variant">{message}</p>
     </div>
   );
 }

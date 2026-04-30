@@ -3,8 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MobileMenuButton } from "./mobile-menu-button";
-import { SpicyLogo } from "./spicy-logo";
-import { Button } from "./ui/button";
 import { Moon, Sun, TrendingUp } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -14,7 +12,7 @@ import { AdminLoginDialog } from "@/components/admin-login-dialog";
 export function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const cookieStore = async () => {
@@ -28,70 +26,61 @@ export function Header() {
     };
   }, []);
 
-  if (!mounted) {
-    return (
-      <header className="sticky top-0 z-50 flex h-16 border-b px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
-        <div className="flex flex-row justify-between w-full items-center">
-          <div className="items-center gap-4 flex flex-row">
-            <MobileMenuButton />
-            <div className="flex flex-1 items-center gap-4 md:gap-6">
-              <Link href={"/dashboard"} className="flex items-center gap-1">
-                <Image src="/main_logo.png" alt="SPICY" width={32} height={32} className="h-8 w-8 object-contain" />
-                <SpicyLogo />
-              </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-xl">
-              <Sun className="h-5 w-5" />
-            </Button>
-            <AdminLoginDialog />
-          </div>
-        </div>
-      </header>
-    );
-  }
-
   return (
-    <header className="sticky top-0 z-50 flex h-16 border-b px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
-      <div className="flex flex-row justify-between w-full items-center">
-        <div className="items-center gap-4 flex flex-row">
-          <MobileMenuButton />
-          <div className="flex flex-1 items-center gap-4 md:gap-6">
-            <Link href={"/dashboard"} className="flex items-center gap-1">
-              <Image src="/main_logo.png" alt="SPICY" width={32} height={32} className="h-8 w-8 object-contain" />
-              <SpicyLogo />
-            </Link>
-          </div>
-        </div>
+    <header className="m3-top-app-bar sticky top-0 z-50 w-full px-2 sm:px-4">
+      <div className="flex w-full items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Link href="/investment" className="hidden sm:flex">
-            <Button
-              variant="ghost"
-              className="rounded-xl gap-2 font-semibold text-[#3182f6] hover:bg-[#3182f6]/10 hover:text-[#3182f6]"
-            >
+          <MobileMenuButton />
+          <Link
+            href={"/dashboard"}
+            className="flex items-center rounded-full px-2 py-1 transition-colors hover:bg-md-surface-container-high"
+            aria-label="SPICY"
+          >
+            <Image
+              src="/logo_v2/main_logo.png"
+              alt="SPICY"
+              width={172}
+              height={40}
+              priority
+              sizes="172px"
+              className="h-7 w-auto object-contain"
+            />
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <Link href="/investment" className="hidden sm:block">
+            <button className="m3-btn m3-btn-text gap-2">
               <TrendingUp className="h-4 w-4" />
-              투자
-            </Button>
+              <span>투자</span>
+            </button>
           </Link>
           <Link href="/investment" className="sm:hidden">
-            <Button variant="ghost" size="icon" className="rounded-xl text-[#3182f6]">
-              <TrendingUp className="h-5 w-5" />
-            </Button>
+            <button
+              className="m3-icon-btn"
+              aria-label="투자 페이지"
+              type="button"
+            >
+              <TrendingUp className="h-5 w-5 text-md-primary" />
+            </button>
           </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-xl"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+
+          <button
+            type="button"
+            className="m3-icon-btn"
+            aria-label="테마 변경"
+            onClick={() =>
+              mounted && setTheme(theme === "dark" ? "light" : "dark")
+            }
           >
-            {theme === "dark" ? (
+            {mounted && theme === "dark" ? (
               <Sun className="h-5 w-5" />
             ) : (
               <Moon className="h-5 w-5" />
             )}
-          </Button>
-          {!isAdmin && <AdminLoginDialog />}
+          </button>
+
+          {mounted && !isAdmin && <AdminLoginDialog />}
         </div>
       </div>
     </header>

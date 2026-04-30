@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,18 +26,23 @@ export function UserActions({ user, onUpdate }: UserActionsProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">메뉴 열기</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <button type="button" className="m3-icon-btn" aria-label="메뉴 열기">
+            <MoreHorizontal className="h-5 w-5" />
+          </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+        <DropdownMenuContent align="end" className="w-40 rounded-2xl">
+          <DropdownMenuItem
+            onClick={() => setShowEditDialog(true)}
+            className="rounded-full type-label-large"
+          >
             <Edit className="mr-2 h-4 w-4" />
             편집
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
+          <DropdownMenuItem
+            onClick={() => setShowDeleteDialog(true)}
+            className="rounded-full type-label-large text-md-error focus:text-md-error"
+          >
             <Trash className="mr-2 h-4 w-4" />
             삭제
           </DropdownMenuItem>

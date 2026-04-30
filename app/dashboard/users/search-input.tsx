@@ -3,26 +3,18 @@
 import type React from "react";
 import { memo, useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useUsers } from "./users-context";
 
 export const SearchInput = memo(function SearchInput() {
   const [inputValue, setInputValue] = useState("");
   const { setSearchTerm, searchTerm } = useUsers();
 
-  // 실시간 검색 (디바운싱)
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchTerm(inputValue);
-    }, 300); // 300ms 디바운스
-
+    }, 300);
     return () => clearTimeout(timer);
   }, [inputValue, setSearchTerm]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
 
   const handleReset = () => {
     setInputValue("");
@@ -30,31 +22,29 @@ export const SearchInput = memo(function SearchInput() {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-      <div className="relative flex-1 w-full">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
+    <div className="relative">
+      <div className="m3-search">
+        <Search className="h-5 w-5 flex-shrink-0 text-md-on-surface-variant" />
+        <input
           type="search"
-          placeholder="사용자 이름으로 검색..."
+          placeholder="이름으로 멤버 검색"
           value={inputValue}
-          onChange={handleInputChange}
-          className="bg-background pl-8 pr-10 rounded-lg"
+          onChange={(e) => setInputValue(e.target.value)}
         />
         {inputValue && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-1 top-1 h-7 w-7"
+          <button
+            type="button"
             onClick={handleReset}
+            className="m3-icon-btn h-9 w-9"
+            aria-label="검색어 지우기"
           >
             <X className="h-4 w-4" />
-            <span className="sr-only">검색어 지우기</span>
-          </Button>
+          </button>
         )}
       </div>
       {searchTerm && (
-        <p className="text-sm text-muted-foreground">
-          &quot;{searchTerm}&quot; 검색 결과
+        <p className="absolute -bottom-5 left-5 type-label-small text-md-on-surface-variant">
+          “{searchTerm}” 검색 결과
         </p>
       )}
     </div>

@@ -45,9 +45,9 @@ export function AdminLoginDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-xl" variant="secondary">
+        <button type="button" className="m3-btn m3-btn-tonal h-10 px-4 text-[13px]">
           관리자 로그인
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[420px]">
         <form onSubmit={handleSubmit}>

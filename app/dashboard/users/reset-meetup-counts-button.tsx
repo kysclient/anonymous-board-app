@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,8 +35,6 @@ export function ResetMeetupCountsButton() {
           description: "모든 사용자의 이번 달 벙 참여 횟수가 초기화되었습니다.",
         });
         setOpen(false);
-        
-        // 데이터 새로고침
         await refreshUsers();
       } else {
         toast({
@@ -58,13 +55,13 @@ export function ResetMeetupCountsButton() {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" className="w-full sm:w-auto">
-          <RefreshCw className="mr-2 h-4 w-4" />
+        <button type="button" className="m3-btn m3-btn-outlined">
+          <RefreshCw className="h-4 w-4" />
           <span className="hidden sm:inline">월별 초기화</span>
           <span className="sm:hidden">초기화</span>
-        </Button>
+        </button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="mx-4 max-w-md">
+      <AlertDialogContent className="mx-4 max-w-md rounded-3xl">
         <AlertDialogHeader>
           <AlertDialogTitle>월별 벙 참여 횟수 초기화</AlertDialogTitle>
           <AlertDialogDescription>
@@ -72,14 +69,14 @@ export function ResetMeetupCountsButton() {
             되돌릴 수 없습니다.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-          <AlertDialogCancel disabled={isLoading} className="w-full sm:w-auto">
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+          <AlertDialogCancel disabled={isLoading} className="w-full sm:w-auto rounded-full">
             취소
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleReset}
             disabled={isLoading}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto rounded-full"
           >
             {isLoading ? "초기화 중..." : "초기화"}
           </AlertDialogAction>

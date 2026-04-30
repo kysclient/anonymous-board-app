@@ -75,8 +75,6 @@ export function CreateUserDialog() {
           meetup_count: 0,
           total_meetup_count: 0,
         });
-
-        // 데이터 새로고침
         await refreshUsers();
       } else {
         toast({
@@ -97,13 +95,13 @@ export function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full sm:w-auto">
-          <Plus className="mr-2 h-4 w-4" />
+        <button type="button" className="m3-btn m3-btn-filled">
+          <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">멤버 추가</span>
           <span className="sm:hidden">추가</span>
-        </Button>
+        </button>
       </DialogTrigger>
-      <DialogContent className="mx-4 max-w-md sm:max-w-[480px]">
+      <DialogContent className="mx-4 max-w-md rounded-3xl sm:max-w-[480px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>새 멤버 추가</DialogTitle>
@@ -186,13 +184,13 @@ export function CreateUserDialog() {
             </div>
           </div>
           <DialogFooter>
-            <Button
+            <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-auto"
+              className="m3-btn m3-btn-filled w-full sm:w-auto"
             >
               {isLoading ? "저장 중..." : "저장"}
-            </Button>
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>

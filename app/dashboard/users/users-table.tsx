@@ -1,17 +1,16 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import { Table } from "@/components/ui/table";
 import { UserTableHeader } from "./user-table-header";
 import { UserTableBody } from "./user-table-body";
 import { UserCardList } from "./user-card-list";
 import { UsersTableSkeleton } from "./users-table-skeleton";
 import { useUsers } from "./users-context";
+import { Search } from "lucide-react";
 
 export const UsersTable = memo(function UsersTable() {
   const { users, searchTerm, isLoading } = useUsers();
-
-  // 서버에서 이미 검색된 결과를 받아오므로 클라이언트 필터링 불필요
   const filteredUsers = users;
 
   if (isLoading) {
@@ -20,30 +19,43 @@ export const UsersTable = memo(function UsersTable() {
 
   if (filteredUsers.length === 0) {
     return (
-      <div className="text-center py-12 border rounded-xl bg-muted/50">
-        <p className="text-muted-foreground">
-          {searchTerm
-            ? `"${searchTerm}"에 대한 검색 결과가 없습니다.`
-            : "표시할 사용자가 없습니다."}
-        </p>
+      <div className="m3-card-filled flex flex-col items-center justify-center gap-3 py-16">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-md-primary-container">
+          <Search className="h-6 w-6 text-md-on-primary-container" />
+        </div>
+        <div className="space-y-1 text-center">
+          <p className="type-title-medium text-md-on-surface">
+            {searchTerm ? `"${searchTerm}" 검색 결과 없음` : "표시할 멤버가 없어요"}
+          </p>
+          <p className="type-body-medium text-md-on-surface-variant">
+            {searchTerm
+              ? "다른 키워드로 다시 시도해보세요"
+              : "오른쪽 위의 ‘멤버 추가’로 새 멤버를 등록하세요"}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <>
-      {/* 모바일 카드 뷰 */}
-      <div className="block sm:hidden">
+      {/* Mobile cards */}
+      <div className="block sm:hidden space-y-3">
         <UserCardList users={filteredUsers} />
       </div>
 
-      {/* 데스크톱 테이블 뷰 */}
-      <div className="hidden sm:block rounded-xl border bg-card shadow-sm overflow-hidden">
-        <Table className="text-xs">
+      {/* Desktop table */}
+      <div className="hidden overflow-hidden rounded-3xl bg-md-surface-container-low sm:block">
+        <Table className="border-collapse">
           <UserTableHeader />
           <UserTableBody users={filteredUsers} />
         </Table>
       </div>
+
+      <p className="type-label-small text-md-on-surface-variant">
+        {filteredUsers.length}명 표시중
+        {searchTerm ? ` · "${searchTerm}" 검색 결과` : ""}
+      </p>
     </>
   );
 });

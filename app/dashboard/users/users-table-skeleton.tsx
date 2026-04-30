@@ -10,50 +10,74 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function UsersTableSkeleton() {
   return (
-    <div className="rounded-xl border w-full">
+    <div className="hidden overflow-hidden rounded-3xl bg-md-surface-container-low sm:block">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-[80px]">ID</TableHead>
-            <TableHead>이름</TableHead>
-            <TableHead>가입일</TableHead>
-            <TableHead>최근 벙 참석일</TableHead>
-            <TableHead>구분</TableHead>
-            <TableHead className="text-center">이번 달 벙 참여</TableHead>
-            <TableHead className="text-center">누적 벙 참여</TableHead>
-            <TableHead className="text-center">벙 참여 추가</TableHead>
-            <TableHead className="text-right">관리</TableHead>
+          <TableRow className="border-b border-md-outline-variant bg-md-surface-container hover:bg-md-surface-container">
+            <TableHead className="w-[60px] py-3 type-label-medium uppercase text-md-on-surface-variant">
+              #
+            </TableHead>
+            <TableHead className="py-3 type-label-medium uppercase text-md-on-surface-variant">
+              이름
+            </TableHead>
+            <TableHead className="hidden py-3 type-label-medium uppercase text-md-on-surface-variant md:table-cell">
+              가입일
+            </TableHead>
+            <TableHead className="hidden py-3 type-label-medium uppercase text-md-on-surface-variant lg:table-cell">
+              최근 벙
+            </TableHead>
+            <TableHead className="py-3 type-label-medium uppercase text-md-on-surface-variant">
+              구분
+            </TableHead>
+            <TableHead className="py-3 text-center type-label-medium uppercase text-md-on-surface-variant">
+              이달 참여
+            </TableHead>
+            <TableHead className="py-3 text-center type-label-medium uppercase text-md-on-surface-variant">
+              이달 벙주
+            </TableHead>
+            <TableHead className="hidden py-3 text-center type-label-medium uppercase text-md-on-surface-variant md:table-cell">
+              누적
+            </TableHead>
+            <TableHead className="py-3 text-right type-label-medium uppercase text-md-on-surface-variant">
+              관리
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Skeleton className="h-4 w-8" />
+          {Array.from({ length: 6 }).map((_, index) => (
+            <TableRow
+              key={index}
+              className="border-b border-md-outline-variant/40"
+            >
+              <TableCell className="py-3">
+                <Skeleton className="h-3.5 w-6 rounded-full" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24" />
+              <TableCell className="py-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-4 w-24 rounded-full" />
+                </div>
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24" />
+              <TableCell className="hidden py-3 md:table-cell">
+                <Skeleton className="h-3.5 w-24 rounded-full" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24" />
+              <TableCell className="hidden py-3 lg:table-cell">
+                <Skeleton className="h-3.5 w-24 rounded-full" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-12" />
+              <TableCell className="py-3">
+                <Skeleton className="h-6 w-12 rounded-full" />
               </TableCell>
-              <TableCell className="text-center">
-                <Skeleton className="h-4 w-8 mx-auto" />
+              <TableCell className="py-3 text-center">
+                <Skeleton className="mx-auto h-3.5 w-6 rounded-full" />
               </TableCell>
-              <TableCell className="text-center">
-                <Skeleton className="h-4 w-8 mx-auto" />
+              <TableCell className="py-3 text-center">
+                <Skeleton className="mx-auto h-3.5 w-6 rounded-full" />
               </TableCell>
-              <TableCell className="text-center">
-                <Skeleton className="h-8 w-8 mx-auto" />
+              <TableCell className="hidden py-3 text-center md:table-cell">
+                <Skeleton className="mx-auto h-3.5 w-6 rounded-full" />
               </TableCell>
-              <TableCell className="text-right">
-                <Skeleton className="h-8 w-8 ml-auto" />
+              <TableCell className="py-3 text-right">
+                <Skeleton className="ml-auto h-10 w-10 rounded-full" />
               </TableCell>
             </TableRow>
           ))}
