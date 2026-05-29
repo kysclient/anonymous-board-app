@@ -15,7 +15,15 @@
       "Bash(gh api *)",
       "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(d['name'], d['type']\\) for d in data]\")",
       "Bash(xargs curl *)",
-      "Bash(pnpm build *)"
+      "Bash(pnpm build *)",
+      "Bash(echo \"=== tsc done \\($?\\) ===\")",
+      "Bash(curl -s -m 2 http://localhost:3000/api/somoim-schedule)",
+      "Bash(curl -s -m 30 http://localhost:3000/api/somoim-schedule)",
+      "Bash(curl -s -m 40 -H \"Accept: application/json\" http://localhost:3000/api/somoim-schedule)",
+      "Bash(curl -s -m 30 -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/api/somoim-schedule)",
+      "Bash(curl -s -m 30 -o /dev/null -w \"%{http_code}\\\\n\" \"http://localhost:3000/api/somoim?gid=e03ab496-0dd3-11ee-8cf5-0a16fe5c82071\")",
+      "Read(//private/tmp/**)",
+      "Bash(rm -f /tmp/sched-test.mjs /tmp/somoim-dev.log; echo cleaned)"
     ],
     "deny": [],
     "ask": []

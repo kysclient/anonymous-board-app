@@ -99,34 +99,43 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-8 pb-16">
       {/* Hero */}
-      <header className="m3-card-feature relative overflow-hidden bg-md-primary-container p-7 sm:p-12">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-md-primary opacity-10" />
-        <div className="absolute right-8 bottom-12 h-32 w-32 rounded-full bg-md-tertiary-container opacity-70" />
-        <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-md-secondary-container opacity-50" />
+      <header className="hero-aurora hero-sheen m3-card-feature relative overflow-hidden p-7 shadow-2xl sm:p-12">
+        {/* 일렁이는 빛 덩어리 */}
+        <div className="hero-blob absolute -right-16 -top-20 h-72 w-72 rounded-full bg-white/25" />
+        <div className="hero-blob hero-blob-slow absolute right-10 bottom-8 h-40 w-40 rounded-full bg-amber-200/30" />
+        <div className="hero-blob absolute -left-16 -bottom-16 h-56 w-56 rounded-full bg-fuchsia-300/25" />
+        {/* 가독성용 어두운 베일 */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-black/35 via-black/10 to-transparent" />
 
         <div className="relative space-y-7">
-          <span className="m3-pill m3-pill-tertiary">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm">
             <Sparkles className="h-3 w-3" />
             오늘 · {formatLongDate(now)}
           </span>
 
           <div className="space-y-5">
             <Quote
-              className="h-9 w-9 text-md-on-primary-container/30"
+              className="h-9 w-9 text-white/40"
               strokeWidth={1.5}
               aria-hidden="true"
             />
-            <p className="type-headline-large text-balance max-w-3xl text-md-on-primary-container">
-              기쁨뒤에 슬픔이 오는건 아름다운 마음이야
+            <p className="text-shimmer type-display-medium text-balance max-w-3xl font-extrabold tracking-tight">
+              DONT FORGET ME (김유신/97/논현)
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2 pt-1">
-            <a href="/dashboard/seating" className="m3-btn m3-btn-filled">
+            <a
+              href="/dashboard/seating"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 type-label-large font-semibold text-md-primary shadow-lg transition-transform hover:scale-[1.03]"
+            >
               <Sparkles className="h-4 w-4" />
               자리 배치 시작
             </a>
-            <a href="/dashboard/stats" className="m3-btn m3-btn-tonal">
+            <a
+              href="/dashboard/stats"
+              className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 type-label-large font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+            >
               <TrendingUp className="h-4 w-4" />
               통계 보기
             </a>

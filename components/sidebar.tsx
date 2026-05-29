@@ -12,6 +12,7 @@ import {
   BarChart3,
   Armchair,
   Beer,
+  CalendarDays,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -44,6 +45,13 @@ export function Sidebar({ className }: SidebarProps) {
       icon: LayoutDashboard,
       href: "/dashboard",
       active: pathname === "/dashboard",
+    },
+    {
+      label: "모임일정",
+      icon: CalendarDays,
+      href: "/dashboard/schedule",
+      active: pathname.startsWith("/dashboard/schedule"),
+      badge: "NEW",
     },
     {
       label: "갤러리",
