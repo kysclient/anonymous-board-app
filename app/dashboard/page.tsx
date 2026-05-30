@@ -8,11 +8,11 @@ import {
   AlertCircle,
   Sparkles,
   ArrowUpRight,
-  Quote,
 } from "lucide-react";
 import { getUsers } from "./actions";
 import CopyButton from "@/components/copy-button";
 import MastersStrip from "@/components/masters-strip";
+import MarketMiniTicker from "@/components/investment/market-mini-ticker";
 
 export const revalidate = 0;
 
@@ -113,16 +113,7 @@ export default async function DashboardPage() {
             오늘 · {formatLongDate(now)}
           </span>
 
-          <div className="space-y-5">
-            <Quote
-              className="h-9 w-9 text-white/40"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
-            <p className="text-shimmer type-display-medium text-balance max-w-3xl font-extrabold tracking-tight">
-              DONT FORGET ME (김유신/97/논현)
-            </p>
-          </div>
+          <MarketMiniTicker />
 
           <div className="flex flex-wrap gap-2 pt-1">
             <a

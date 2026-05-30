@@ -112,6 +112,32 @@ export async function getKisTokenFromDB(): Promise<{
   }
 }
 
+/**
+ * KIS 토큰 + 메타데이터 조회 (만료 버퍼 무시).
+ * "하루 1회" 하드 가드용 — updated_at 으로 마지막 발급 시각을 판별.
+ */
+export async function getKisTokenWithMeta(): Promise<{
+  token: string;
+  expiresAt: number;
+  updatedAtMs: number;
+} | null> {
+  if (!sql) return null;
+  try {
+    const rows = await sql`
+      SELECT access_token, expires_at, updated_at
+      FROM investment_kis_token WHERE id = 1
+    `;
+    if (rows.length === 0) return null;
+    const r: any = rows[0];
+    const expiresAt = Number(r.expires_at);
+    if (!Number.isFinite(expiresAt) || !r.access_token) return null;
+    const updatedAtMs = r.updated_at ? new Date(r.updated_at).getTime() : 0;
+    return { token: r.access_token, expiresAt, updatedAtMs };
+  } catch {
+    return null;
+  }
+}
+
 export async function saveKisTokenToDB(
   token: string,
   expiresAt: number

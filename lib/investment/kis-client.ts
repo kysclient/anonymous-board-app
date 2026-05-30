@@ -6,7 +6,11 @@
  * - LIVE 환경만 지원 (paper는 `KIS_BASE_URL` 직접 변경)
  */
 
-import { getKisTokenFromDB, saveKisTokenToDB } from "./db";
+import {
+  getKisTokenFromDB,
+  getKisTokenWithMeta,
+  saveKisTokenToDB,
+} from "./db";
 
 const KIS_BASE_URL =
   process.env.KIS_BASE_URL || "https://openapi.koreainvestment.com:9443";
@@ -23,6 +27,9 @@ let lastIssueAttempt = 0;
 // 마지막 403 발생 시각 — 백오프
 let last403At = 0;
 const RATE_LIMIT_BACKOFF_MS = 60_000;
+// 하루 1회 하드 가드: 마지막 발급 후 이 시간이 지나기 전에는 (토큰이 유효하면) 재발급 금지.
+// KIS 토큰 수명은 24h. 20h 으로 잡아 "하루 1번"을 보장하면서 만료 직전 갱신 여유를 둔다.
+const DAILY_REISSUE_GUARD_MS = 20 * 60 * 60 * 1000;
 
 function safeNumber(v: unknown): number {
   if (v == null || v === "") return 0;
@@ -31,6 +38,22 @@ function safeNumber(v: unknown): number {
 }
 
 async function issueNewToken(): Promise<string> {
+  // ── 하드 가드: "하루 1회만 발급" ──
+  // getKisTokenFromDB 가 (만료 버퍼/일시적 DB 미스 등으로) null 을 반환해
+  // 이 경로로 들어왔더라도, DB 에 최근 20h 이내 발급된 유효 토큰이 있으면
+  // 절대 재발급하지 않고 그대로 재사용한다. (한투 카톡 알림 폭주 방지)
+  const existing = await getKisTokenWithMeta();
+  if (existing) {
+    const stillValid = Date.now() < existing.expiresAt - 60_000;
+    const recentlyIssued =
+      existing.updatedAtMs > 0 &&
+      Date.now() - existing.updatedAtMs < DAILY_REISSUE_GUARD_MS;
+    if (stillValid && recentlyIssued) {
+      memCache = { value: existing.token, expiresAt: existing.expiresAt };
+      return existing.token;
+    }
+  }
+
   // KIS 한도: 분당 1회. 직전 시도가 60초 이내면 거부
   const since = Date.now() - lastIssueAttempt;
   if (since < 60_000) {
