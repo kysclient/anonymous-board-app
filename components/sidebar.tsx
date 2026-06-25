@@ -143,31 +143,40 @@ export function Sidebar({ className }: SidebarProps) {
   }, []);
 
   const renderRoutes = (routes: RouteItem[]) => (
-    <nav className="space-y-1">
+    <nav className="space-y-0.5">
       {routes.map((route) => {
         if (route.adminOnly && !isAdmin) return null;
+        const active = route.active;
         return (
           <Link
             key={route.href}
             href={route.href}
             onClick={close}
-            data-selected={route.active}
+            aria-current={active ? "page" : undefined}
             className={cn(
-              "m3-nav-item group flex w-full justify-between gap-3",
-              "h-12 px-4"
+              "group flex h-9 w-full items-center justify-between gap-2.5 rounded-lg px-2.5 text-[14px] tracking-[-0.01em] transition-colors",
+              active
+                ? "bg-black/[0.06] font-semibold text-md-on-surface dark:bg-white/[0.08]"
+                : "font-medium text-md-on-surface-variant hover:bg-black/[0.035] hover:text-md-on-surface dark:hover:bg-white/[0.05]"
             )}
           >
-            <div className="flex items-center gap-3 min-w-0">
-              <route.icon className="h-5 w-5 flex-shrink-0" />
-              <span className="truncate type-label-large">{route.label}</span>
+            <div className="flex min-w-0 items-center gap-2.5">
+              <route.icon
+                className={cn(
+                  "h-[18px] w-[18px] flex-shrink-0",
+                  active ? "text-spicy" : "text-current"
+                )}
+                strokeWidth={active ? 2.25 : 2}
+              />
+              <span className="truncate">{route.label}</span>
             </div>
             {route.badge && (
               <span
                 className={cn(
-                  "flex h-5 items-center rounded-full px-2 text-[10px] font-semibold tracking-wider",
+                  "text-[10px] font-semibold uppercase tracking-wide",
                   route.badge === "NEW"
-                    ? "bg-md-tertiary-container text-md-on-tertiary-container"
-                    : "bg-md-surface-container-highest text-md-on-surface-variant"
+                    ? "text-spicy"
+                    : "text-md-on-surface-variant/50"
                 )}
               >
                 {route.badge}
@@ -179,28 +188,30 @@ export function Sidebar({ className }: SidebarProps) {
     </nav>
   );
 
+  const sectionLabel = (text: string) => (
+    <p className="px-2.5 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-md-on-surface-variant/55">
+      {text}
+    </p>
+  );
+
   const sidebarContent = (
-    <div className="flex h-full flex-col bg-md-surface-container">
-      <div className="flex-1 overflow-y-auto px-3 pb-4 pt-6">
-        <div className="space-y-1">
-          <p className="px-4 pb-2 type-label-medium uppercase text-md-on-surface-variant">
-            Workspace
-          </p>
+    <div className="flex h-full flex-col bg-md-surface">
+      <div className="flex-1 overflow-y-auto px-3 pb-4 pt-5">
+        <div>
+          {sectionLabel("Workspace")}
           {renderRoutes(mainRoutes)}
         </div>
 
         {isAdmin && (
-          <div className="mt-6 space-y-1">
-            <p className="px-4 pb-2 type-label-medium uppercase text-md-on-surface-variant">
-              Archive
-            </p>
+          <div className="mt-7">
+            {sectionLabel("Archive")}
             {renderRoutes(deactivatedRoutes)}
           </div>
         )}
       </div>
 
-      <div className="border-t border-md-outline-variant px-5 py-4">
-        <p className="type-label-small text-md-on-surface-variant">
+      <div className="px-4 py-3.5">
+        <p className="text-[11px] tracking-tight text-md-on-surface-variant/50">
           SPICY · v2026.04
         </p>
       </div>
@@ -213,7 +224,7 @@ export function Sidebar({ className }: SidebarProps) {
       <Sheet open={isOpen} onOpenChange={close}>
         <SheetContent
           side="left"
-          className="w-[300px] border-none bg-md-surface-container p-0 md:hidden"
+          className="w-[280px] border-none bg-md-surface p-0 md:hidden"
         >
           {sidebarContent}
         </SheetContent>
@@ -222,7 +233,7 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Desktop drawer */}
       <aside
         className={cn(
-          "fixed left-0 top-16 z-40 hidden h-[calc(100vh-4rem)] w-[280px] flex-col bg-md-surface-container md:flex",
+          "fixed left-0 top-16 z-40 hidden h-[calc(100vh-4rem)] w-[280px] flex-col border-r border-md-outline-variant/70 bg-md-surface md:flex",
           className
         )}
       >

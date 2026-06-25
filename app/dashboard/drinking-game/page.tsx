@@ -630,30 +630,30 @@ export default function DrinkingGamePage() {
       `}</style>
 
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 p-6 sm:p-8 text-white shadow-xl">
-        <div className="absolute -top-16 -right-8 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-12 -left-8 h-40 w-40 rounded-full bg-indigo-400/20 blur-2xl" />
+      <section className="relative overflow-hidden rounded-[22px] p-6 text-white sm:p-8" style={{ background: "linear-gradient(135deg, #0a84ff 0%, #0071e3 55%, #0a5bd0 100%)" }}>
+        <div className="absolute -top-16 -right-8 h-48 w-48 rounded-full bg-white/12 blur-3xl" />
+        <div className="absolute -bottom-12 -left-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
 
         <div className="relative flex items-start justify-between gap-4">
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 backdrop-blur-sm">
               <Sparkles className="h-3 w-3" />
-              <span className="text-[11px] font-semibold tracking-wide">
+              <span className="font-mono text-[11px] font-medium tracking-[0.08em]">
                 SPICY LAB · 술게임
               </span>
             </div>
-            <h1 className="text-[26px] sm:text-[30px] font-black leading-tight tracking-tight">
+            <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] sm:text-[34px]">
               누가 걸릴까요? 🍻
             </h1>
-            <p className="text-sm text-white/80 leading-relaxed">
+            <p className="text-[15px] leading-relaxed text-white/80">
               이름을 넣고 구슬 레이스로 술 당첨자를 정해보세요
             </p>
           </div>
           <div
-            className="shrink-0 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur shadow-lg"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur sm:h-16 sm:w-16"
             style={{ animation: "tsfloat 3s ease-in-out infinite" }}
           >
-            <Beer className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+            <Beer className="h-7 w-7 text-white sm:h-8 sm:w-8" />
           </div>
         </div>
       </section>
@@ -662,11 +662,11 @@ export default function DrinkingGamePage() {
         {/* ────── LEFT: controls ────── */}
         <div className="flex flex-col gap-4">
           {/* Step 1 — participants */}
-          <section className="rounded-3xl bg-card border border-border/60 shadow-sm">
+          <section className="rounded-2xl bg-card border border-border/60 shadow-sm">
             <div className="p-5 sm:p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white text-[13px] font-black">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white text-[13px] font-bold">
                     1
                   </div>
                   <div>
@@ -729,7 +729,7 @@ export default function DrinkingGamePage() {
                       style={{ animation: "tsspring-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
                     >
                       <span
-                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
                         style={{ background: COLORS[i % COLORS.length] }}
                       >
                         {i + 1}
@@ -767,10 +767,10 @@ export default function DrinkingGamePage() {
           </section>
 
           {/* Step 2 — loser count */}
-          <section className="rounded-3xl bg-card border border-border/60 shadow-sm">
+          <section className="rounded-2xl bg-card border border-border/60 shadow-sm">
             <div className="p-5 sm:p-6 space-y-5">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white text-[13px] font-black">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white text-[13px] font-bold">
                   2
                 </div>
                 <div>
@@ -796,7 +796,7 @@ export default function DrinkingGamePage() {
                 <div className="flex items-baseline gap-1 min-w-[88px] justify-center">
                   <span
                     key={loserCount}
-                    className="text-[56px] font-black bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent leading-none tabular-nums"
+                    className="text-[56px] font-bold bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent leading-none tabular-nums"
                     style={{ animation: "tsspring-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
                   >
                     {loserCount}
@@ -835,7 +835,7 @@ export default function DrinkingGamePage() {
               onClick={startGame}
               disabled={!canStart}
               className={cn(
-                "relative group overflow-hidden rounded-3xl h-[64px] font-black text-[17px] text-white shadow-lg transition-all active:scale-[0.98]",
+                "relative group overflow-hidden rounded-2xl h-[64px] font-bold text-[17px] text-white shadow-lg transition-all active:scale-[0.98]",
                 canStart
                   ? "bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 hover:shadow-xl hover:shadow-blue-500/30"
                   : "bg-muted text-muted-foreground cursor-not-allowed shadow-none",
@@ -861,7 +861,7 @@ export default function DrinkingGamePage() {
           ) : (
             <button
               onClick={resetRace}
-              className="rounded-3xl h-[64px] font-bold text-[15px] bg-muted hover:bg-muted/80 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              className="rounded-2xl h-[64px] font-bold text-[15px] bg-muted hover:bg-muted/80 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <RotateCcw className="h-4 w-4" />
               다시 하기
@@ -870,7 +870,7 @@ export default function DrinkingGamePage() {
 
           {/* Live leaderboard */}
           {(phase === "racing" || phase === "finished") && (
-            <section className="rounded-3xl bg-card border border-border/60 shadow-sm">
+            <section className="rounded-2xl bg-card border border-border/60 shadow-sm">
               <div className="p-5 sm:p-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
@@ -908,7 +908,7 @@ export default function DrinkingGamePage() {
                       >
                         <div
                           className={cn(
-                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black",
+                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
                             i === 0
                               ? "bg-amber-500 text-white"
                               : i === 1
@@ -940,7 +940,7 @@ export default function DrinkingGamePage() {
               ref={canvasRef}
               width={CANVAS_W}
               height={CANVAS_H}
-              className="rounded-[28px] border border-border/40 shadow-2xl max-w-full"
+              className="rounded-[28px] border border-border/40 shadow-lg max-w-full"
               style={{
                 width: "min(100%, 480px)",
                 height: "auto",
@@ -954,18 +954,18 @@ export default function DrinkingGamePage() {
                 <div className="flex flex-col items-center gap-4 text-center p-6 max-w-[280px]">
                   <div className="relative">
                     <div
-                      className="absolute inset-0 rounded-3xl bg-blue-400/30 blur-2xl"
+                      className="absolute inset-0 rounded-2xl bg-blue-400/30 blur-2xl"
                       style={{ animation: "tsfloat 3s ease-in-out infinite" }}
                     />
                     <div
-                      className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl"
+                      className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl"
                       style={{ animation: "tsfloat 3s ease-in-out infinite" }}
                     >
                       <Beer className="h-10 w-10 text-white" />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <h3 className="text-[17px] font-black text-foreground">
+                    <h3 className="text-[17px] font-bold text-foreground">
                       준비되면 시작해요
                     </h3>
                     <p className="text-[12px] text-muted-foreground leading-relaxed">
@@ -994,7 +994,7 @@ export default function DrinkingGamePage() {
                   />
                   <div
                     key={countdown}
-                    className="relative text-[140px] sm:text-[160px] font-black leading-none"
+                    className="relative text-[140px] sm:text-[160px] font-bold leading-none"
                     style={{
                       animation:
                         "tscount 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -1035,7 +1035,7 @@ export default function DrinkingGamePage() {
                 >
                   {/* floating icon — sibling outside the overflow-hidden card */}
                   <div
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 z-20 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-2xl border-4 border-white"
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 z-20 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-lg border-4 border-white"
                     style={{
                       animation: "tsbounce 1.2s ease-in-out infinite",
                     }}
@@ -1044,13 +1044,13 @@ export default function DrinkingGamePage() {
                   </div>
 
                   {/* modal card */}
-                  <div className="rounded-3xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
+                  <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg overflow-hidden">
                     {/* header */}
                     <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 pt-14 pb-5 px-5 text-center text-white">
                       <p className="text-[10px] uppercase tracking-[0.25em] text-white/80 font-semibold">
                         오늘의 당첨자
                       </p>
-                      <h2 className="text-xl font-black mt-1">
+                      <h2 className="text-xl font-bold mt-1">
                         {losers.length === 1
                           ? "한 명이 걸렸어요"
                           : `${losers.length}명이 걸렸어요`}
@@ -1068,7 +1068,7 @@ export default function DrinkingGamePage() {
                               "tsspring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
                           }}
                         >
-                          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-base shadow-lg">
+                          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-base shadow-lg">
                             {name.charAt(0)}
                             <div
                               className="absolute inset-0 rounded-full bg-blue-400/50"
@@ -1078,7 +1078,7 @@ export default function DrinkingGamePage() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-base font-black text-foreground leading-tight truncate">
+                            <p className="text-base font-bold text-foreground leading-tight truncate">
                               {name}
                             </p>
                             <p className="text-[11px] text-muted-foreground mt-0.5">

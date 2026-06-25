@@ -1,76 +1,141 @@
 import { formatDateString } from "@/lib/utils";
 import {
   Users,
-  Calendar,
   Trophy,
   TrendingUp,
   UserPlus,
   AlertCircle,
-  Sparkles,
-  ArrowUpRight,
+  Crown,
+  Activity,
+  Flame,
 } from "lucide-react";
 import { getUsers } from "./actions";
 import CopyButton from "@/components/copy-button";
 import MastersStrip from "@/components/masters-strip";
-import MarketMiniTicker from "@/components/investment/market-mini-ticker";
+import LiveActivityFeed, {
+  type FeedItem,
+} from "@/components/dashboard/live-activity-feed";
+import ActivityHeatmap from "@/components/dashboard/activity-heatmap";
+import FeatureCards from "@/components/dashboard/feature-cards";
+import HqArt from "@/components/dashboard/hq-art";
 
 export const revalidate = 0;
 
-function formatLongDate(date: Date) {
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-  }).format(date);
+const DAY_MS = 86_400_000;
+
+/** Local calendar key YYYY-MM-DD (avoids UTC off-by-one for heatmap). */
+function toKey(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
 }
 
 export default async function DashboardPage() {
   const users = await getUsers();
 
+  const now = new Date();
+  const kstHour = (now.getUTCHours() + 9) % 24;
+  const greeting =
+    kstHour < 6
+      ? "Good night"
+      : kstHour < 12
+        ? "Good morning"
+        : kstHour < 18
+          ? "Good afternoon"
+          : "Good evening";
+
+  /* ── KPIs ──────────────────────────────────────────────── */
   const totalUsers = users.length;
-  const totalMeetups = users.reduce((sum, user) => sum + user.meetup_count, 0);
+  const totalMeetups = users.reduce((sum, u) => sum + u.meetup_count, 0);
   const averageMeetups =
     totalUsers > 0 ? (totalMeetups / totalUsers).toFixed(1) : "0";
+  const activeMembers = users.filter((u) => u.meetup_count > 0).length;
+  const activeRate =
+    totalUsers > 0 ? Math.round((activeMembers / totalUsers) * 100) : 0;
 
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
   const newUsers = users.filter(
-    (user) => user.join_date && new Date(user.join_date) >= thirtyDaysAgo
+    (u) => u.join_date && new Date(u.join_date) >= thirtyDaysAgo
   ).length;
 
-  const now = new Date();
+  /* ── MVP leaderboard ───────────────────────────────────── */
   const topUsers = [...users]
-    .filter((user) => user.meetup_count > 0)
+    .filter((u) => u.meetup_count > 0)
     .sort((a, b) => b.meetup_count - a.meetup_count)
-    .slice(0, 10);
-
-  const recentActivities = [...users]
-    .filter((user) => user.last_meetup_date)
-    .sort(
-      (a, b) =>
-        new Date(b.last_meetup_date || "").getTime() -
-        new Date(a.last_meetup_date || "").getTime()
-    )
     .slice(0, 8);
 
+  /* ── Live activity feed (merge joins + meetups) ────────── */
+  const feed: FeedItem[] = [];
+  users.forEach((u) => {
+    if (u.last_meetup_date)
+      feed.push({
+        id: `m-${u.id}`,
+        name: u.name,
+        date: u.last_meetup_date,
+        type: "meetup",
+      });
+    if (u.join_date && new Date(u.join_date) >= thirtyDaysAgo)
+      feed.push({
+        id: `j-${u.id}`,
+        name: u.name,
+        date: u.join_date,
+        type: "join",
+      });
+  });
+  feed.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const feedItems = feed.slice(0, 9);
+  // Lead with this month's MVP for a bit of brand flavour.
+  if (topUsers.length > 0) {
+    feedItems.unshift({
+      id: `mvp-${topUsers[0].id}`,
+      name: topUsers[0].name,
+      date: topUsers[0].last_meetup_date ?? toKey(now),
+      type: "mvp",
+    });
+  }
+
+  /* ── Heatmap: 18 weeks of 마지막 참여일 density ─────────── */
+  const meetupByDay = new Map<string, number>();
+  users.forEach((u) => {
+    if (!u.last_meetup_date) return;
+    const k = toKey(new Date(u.last_meetup_date));
+    meetupByDay.set(k, (meetupByDay.get(k) ?? 0) + 1);
+  });
+
+  const WEEKS = 18;
+  const todayMid = new Date(now);
+  todayMid.setHours(0, 0, 0, 0);
+  const gridEnd = new Date(
+    todayMid.getTime() + (6 - todayMid.getDay()) * DAY_MS
+  ); // Saturday of current week
+  const totalDays = WEEKS * 7;
+  const gridStart = new Date(gridEnd.getTime() - (totalDays - 1) * DAY_MS); // a Sunday
+
+  const heatmapDays = Array.from({ length: totalDays }, (_, i) => {
+    const d = new Date(gridStart.getTime() + i * DAY_MS);
+    const key = toKey(d);
+    return { date: key, count: d > todayMid ? 0 : meetupByDay.get(key) ?? 0 };
+  });
+  const heatmapMax = Math.max(1, ...heatmapDays.map((d) => d.count));
+  const heatmapTotal = heatmapDays.reduce((s, d) => s + d.count, 0);
+
+  /* ── Deadline tracking ─────────────────────────────────── */
   const deadlineUsers = users
     .filter((user) => {
       if (user.is_regular === "신입") {
         if (!user.join_date) return false;
-        const joinDate = new Date(user.join_date);
-        const limitDate = new Date(joinDate);
+        const limitDate = new Date(user.join_date);
         limitDate.setMonth(limitDate.getMonth() + 1);
         const diffDays = Math.floor(
-          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          (limitDate.getTime() - now.getTime()) / DAY_MS
         );
         return diffDays <= 7;
       } else if (user.is_regular === "기존") {
         if (!user.last_meetup_date) return false;
-        const lastMeetupDate = new Date(user.last_meetup_date);
-        const limitDate = new Date(lastMeetupDate);
+        const limitDate = new Date(user.last_meetup_date);
         limitDate.setMonth(limitDate.getMonth() + 2);
         const diffDays = Math.floor(
-          (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          (limitDate.getTime() - now.getTime()) / DAY_MS
         );
         return diffDays <= 7;
       }
@@ -79,53 +144,80 @@ export default async function DashboardPage() {
     .map((user) => {
       let limitDate: Date;
       if (user.is_regular === "신입") {
-        const joinDate = new Date(user.join_date!);
-        limitDate = new Date(joinDate);
+        limitDate = new Date(user.join_date!);
         limitDate.setMonth(limitDate.getMonth() + 1);
       } else {
-        const lastMeetupDate = new Date(user.last_meetup_date!);
-        limitDate = new Date(lastMeetupDate);
+        limitDate = new Date(user.last_meetup_date!);
         limitDate.setMonth(limitDate.getMonth() + 2);
       }
-      const diffDays = Math.floor(
-        (limitDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-      );
+      const diffDays = Math.floor((limitDate.getTime() - now.getTime()) / DAY_MS);
       return { ...user, limitDate, diffDays };
     })
     .sort((a, b) => a.diffDays - b.diffDays);
 
   const overdueCount = deadlineUsers.filter((u) => u.diffDays < 0).length;
+  const todayLabel = new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }).format(now);
 
   return (
-    <div className="flex flex-col gap-8 pb-16">
-      {/* Hero */}
-      <header className="hero-aurora hero-sheen m3-card-feature relative overflow-hidden p-7 shadow-2xl sm:p-12">
-        {/* 일렁이는 빛 덩어리 */}
-        <div className="hero-blob absolute -right-16 -top-20 h-72 w-72 rounded-full bg-white/25" />
-        <div className="hero-blob hero-blob-slow absolute right-10 bottom-8 h-40 w-40 rounded-full bg-amber-200/30" />
-        <div className="hero-blob absolute -left-16 -bottom-16 h-56 w-56 rounded-full bg-fuchsia-300/25" />
-        {/* 가독성용 어두운 베일 */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-black/35 via-black/10 to-transparent" />
+    <div className="flex flex-col gap-5 pb-16">
+      {/* ── HQ command bar ─────────────────────────────────── */}
+      <header className="hq-command px-6 py-7 sm:px-9 sm:py-9">
+        <HqArt />
+        <div className="relative flex flex-col gap-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="leading-none">
+                <p className="text-[15px] font-bold tracking-tight text-[rgb(var(--hq-on-surface))]">
+                  SPICY <span className="text-spicy">HQ</span>
+                </p>
+                <p className="mt-1 type-label-small text-[rgb(var(--hq-on-surface))]/55">
+                  오늘의 운영 현황
+                </p>
+              </div>
+            </div>
 
-        <div className="relative space-y-7">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm">
-            <Sparkles className="h-3 w-3" />
-            오늘 · {formatLongDate(now)}
-          </span>
+            <div className="flex items-center gap-3">
+              <span className="hidden type-label-medium text-[rgb(var(--hq-on-surface))]/55 sm:inline">
+                {todayLabel}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 type-label-small font-semibold text-[rgb(var(--hq-on-surface))]">
+                <span className="live-dot h-1.5 w-1.5 rounded-full bg-spicy-bright" />
+                LIVE
+              </span>
+            </div>
+          </div>
 
-          <MarketMiniTicker />
+          <div>
+            <h1 className="text-[32px] font-semibold leading-[1.1] tracking-[-0.02em] text-[rgb(var(--hq-on-surface))] sm:text-[40px]">
+              {greeting}
+            </h1>
+            <p className="mt-3 text-[15px] leading-relaxed text-[rgb(var(--hq-on-surface))]/60 sm:text-base">
+              오늘 신규 합류{" "}
+              <span className="font-medium text-[rgb(var(--hq-on-surface))]">
+                {newUsers}명
+              </span>
+              {" · "}이번 달 누적 참여{" "}
+              <span className="font-medium text-[rgb(var(--hq-on-surface))]">
+                {totalMeetups}회
+              </span>
+            </p>
+          </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2.5">
             <a
               href="/dashboard/seating"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 type-label-large font-semibold text-md-primary shadow-lg transition-transform hover:scale-[1.03]"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold tracking-tight text-[#1d1d1f] transition-all hover:bg-white/90"
             >
-              <Sparkles className="h-4 w-4" />
+              <Flame className="h-4 w-4 text-spicy" />
               자리 배치 시작
             </a>
             <a
               href="/dashboard/stats"
-              className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 type-label-large font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-[14px] font-medium tracking-tight text-[rgb(var(--hq-on-surface))]/90 transition-colors hover:bg-white/[0.06]"
             >
               <TrendingUp className="h-4 w-4" />
               통계 보기
@@ -134,316 +226,272 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {/* KPI cards */}
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <KpiCard
-          tone="primary"
-          icon={<Users className="h-5 w-5" />}
+      {/* ── KPI bar (single row, hairline dividers) ────────── */}
+      <section className="kpi-bar hq-panel grid grid-cols-2 overflow-hidden md:grid-cols-5">
+        <KpiCell
+          icon={<Users className="h-4 w-4" />}
           label="총 멤버"
           value={totalUsers}
-          delta={
-            newUsers > 0 ? (
-              <span className="inline-flex items-center gap-1 text-md-primary">
-                <ArrowUpRight className="h-3.5 w-3.5" />+{newUsers} 30일
-              </span>
-            ) : (
-              <span className="text-md-on-surface-variant">증감 없음</span>
-            )
-          }
+          sub="전체 등록 인원"
         />
-        <KpiCard
-          tone="surface"
-          icon={<TrendingUp className="h-5 w-5" />}
+        <KpiCell
+          icon={<TrendingUp className="h-4 w-4" />}
           label="이번 달 참여"
           value={`${totalMeetups}회`}
-          delta={
-            <span className="text-md-on-surface-variant">
-              인당 평균 {averageMeetups}회
-            </span>
-          }
+          sub={`인당 평균 ${averageMeetups}회`}
         />
-        <KpiCard
-          tone="tertiary"
-          icon={<Trophy className="h-5 w-5" />}
-          label="이달의 MVP"
-          value={topUsers.length > 0 ? topUsers[0].name : "—"}
-          delta={
-            topUsers.length > 0 ? (
-              <span className="text-md-on-tertiary-container/80">
-                {topUsers[0].meetup_count}회 참여 중
-              </span>
-            ) : (
-              <span className="text-md-on-tertiary-container/70">집계 전</span>
-            )
-          }
-        />
-        <KpiCard
-          tone="surface"
-          icon={<UserPlus className="h-5 w-5" />}
+        <KpiCell
+          icon={<UserPlus className="h-4 w-4" />}
           label="신규 합류"
           value={newUsers}
-          delta={
-            <span className="text-md-on-surface-variant">
-              총원 대비{" "}
-              {totalUsers > 0
-                ? Math.round((newUsers / totalUsers) * 100)
-                : 0}
-              %
-            </span>
+          sub="최근 30일"
+        />
+        <KpiCell
+          icon={<Activity className="h-4 w-4" />}
+          label="참여율"
+          value={`${activeRate}%`}
+          sub={`활동 ${activeMembers}명`}
+        />
+        <KpiCell
+          icon={<Crown className="h-4 w-4" />}
+          label="이달의 MVP"
+          value={topUsers.length > 0 ? topUsers[0].name : "—"}
+          sub={
+            topUsers.length > 0 ? `${topUsers[0].meetup_count}회 참여` : "집계 전"
           }
         />
       </section>
 
-      {/* Masters strip */}
-      <section>
-        <MastersStrip />
-      </section>
+      {/* ── Feature shortcuts — generative art cards ───────── */}
+      <FeatureCards />
 
-      {/* Top 10 + recent activity */}
-      <section className="grid gap-4 lg:grid-cols-7">
+      {/* ── Main grid: live feed + leaderboard ─────────────── */}
+      <section className="grid gap-5 lg:grid-cols-3">
+        {/* Live activity feed */}
+        <Panel
+          className="lg:col-span-2"
+          eyebrow="Live feed"
+          title="실시간 활동"
+          subtitle="멤버들의 최근 움직임"
+          icon={<Activity className="h-4 w-4" />}
+          live
+        >
+          <LiveActivityFeed items={feedItems} />
+        </Panel>
+
         {/* Leaderboard */}
-        <div className="m3-card-elevated lg:col-span-4 p-6 sm:p-7">
-          <CardHeader
-            eyebrow="Leaderboard"
-            title="이달의 벙킹 Top 10"
-            subtitle="이번 달 벙 참여 횟수 기준 상위 10명"
-            icon={<Trophy className="h-4 w-4" />}
-          />
-
-          <div className="mt-6">
-            {topUsers.length === 0 ? (
-              <EmptyState message="이번 달 데이터가 아직 없어요" />
-            ) : (
-              <ol className="space-y-1">
-                {topUsers.map((user, index) => {
-                  const max = topUsers[0].meetup_count || 1;
-                  const ratio = (user.meetup_count / max) * 100;
-                  return (
-                    <li
-                      key={user.id}
-                      className="m3-list-item gap-4 px-3"
-                    >
-                      <span
-                        className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full type-label-large ${
-                          index === 0
-                            ? "bg-md-primary text-md-on-primary"
-                            : index < 3
-                              ? "bg-md-primary-container text-md-on-primary-container"
-                              : "bg-md-surface-container-highest text-md-on-surface-variant"
-                        }`}
-                      >
-                        {index + 1}
-                      </span>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <span className="type-title-medium truncate text-md-on-surface">
-                            {user.name}
-                          </span>
-                          <span className="type-label-large flex-shrink-0 text-md-primary">
-                            {user.meetup_count}회
-                          </span>
-                        </div>
-                        <div className="mt-2 h-1 overflow-hidden rounded-full bg-md-surface-container-highest">
-                          <div
-                            className="h-full rounded-full bg-md-primary transition-all"
-                            style={{ width: `${ratio}%` }}
-                          />
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </div>
-        </div>
-
-        {/* Recent activity */}
-        <div className="m3-card-elevated lg:col-span-3 p-6 sm:p-7">
-          <CardHeader
-            eyebrow="Activity"
-            title="최근 벙 참여"
-            subtitle="가장 최근에 활동한 멤버"
-            icon={<Calendar className="h-4 w-4" />}
-          />
-
-          <div className="mt-6">
-            {recentActivities.length === 0 ? (
-              <EmptyState message="아직 활동 기록이 없어요" />
-            ) : (
-              <ul className="space-y-0">
-                {recentActivities.map((user, idx) => (
-                  <li key={user.id} className="relative flex gap-4">
-                    {idx !== recentActivities.length - 1 && (
-                      <span className="absolute left-[7px] top-5 h-full w-px bg-md-outline-variant" />
-                    )}
-                    <span className="relative mt-1.5 h-3 w-3 flex-shrink-0 rounded-full border-2 border-md-surface-container-low bg-md-primary" />
-                    <div className="flex-1 pb-5">
-                      <p className="type-body-medium leading-snug text-md-on-surface">
-                        <span className="font-semibold">{user.name}</span>
-                        <span className="text-md-on-surface-variant">
-                          {" "}
-                          님이 벙에 참여
-                        </span>
-                      </p>
-                      <p className="type-label-small mt-1 text-md-on-surface-variant">
-                        {user.last_meetup_date
-                          ? formatDateString(user.last_meetup_date)
-                          : "—"}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Deadline section */}
-      <section className="m3-card-filled p-6 sm:p-7">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <CardHeader
-            eyebrow="Action required"
-            title="참여 기한 임박자"
-            subtitle={
-              deadlineUsers.length === 0
-                ? "현재 임박한 기한이 없습니다"
-                : `총 ${deadlineUsers.length}명이 일주일 내 기한 도래${
-                    overdueCount > 0 ? ` · ${overdueCount}명 초과` : ""
-                  }`
-            }
-            icon={<AlertCircle className="h-4 w-4" />}
-          />
-
-          {deadlineUsers.length > 0 && <CopyButton deadlineUsers={deadlineUsers} />}
-        </div>
-
-        <div className="mt-6">
-          {deadlineUsers.length === 0 ? (
-            <EmptyState message="모두 안전권 ✓" />
+        <Panel
+          eyebrow="Ranking"
+          title="이달의 MVP"
+          subtitle="벙 참여 Top 8"
+          icon={<Trophy className="h-4 w-4" />}
+        >
+          {topUsers.length === 0 ? (
+            <EmptyState message="이번 달 데이터가 아직 없어요" />
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {deadlineUsers.map((user) => {
-                const isOverdue = user.diffDays < 0;
+            <ol className="space-y-0.5">
+              {topUsers.map((user, index) => {
+                const max = topUsers[0].meetup_count || 1;
+                const ratio = (user.meetup_count / max) * 100;
+                const isTop = index === 0;
                 return (
-                  <div
+                  <li
                     key={user.id}
-                    className={`rounded-2xl p-4 ${
-                      isOverdue
-                        ? "bg-md-error-container text-md-on-error-container"
-                        : "bg-md-surface-container-low text-md-on-surface"
-                    }`}
+                    className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-md-surface-container"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="space-y-1">
-                        <p className="type-title-medium">{user.name}</p>
-                        <p className="type-label-small opacity-70">
-                          기한 {formatDateString(user.limitDate.toString())}
-                        </p>
-                      </div>
-                      <span
-                        className={`m3-pill ${
-                          user.is_regular === "신입"
-                            ? "m3-pill-primary"
-                            : "bg-md-surface-container-high text-md-on-surface-variant"
-                        }`}
-                      >
-                        {user.is_regular}
-                      </span>
-                    </div>
-                    <p
-                      className={`mt-4 type-label-large ${
-                        isOverdue
-                          ? "text-md-on-error-container"
-                          : user.diffDays <= 3
-                            ? "text-md-error"
-                            : "text-md-on-surface-variant"
+                    <span
+                      className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[13px] font-semibold tabular-nums ${
+                        isTop
+                          ? "bg-spicy text-white"
+                          : "bg-md-surface-container-high text-md-on-surface-variant"
                       }`}
                     >
-                      {user.name.includes("가람")
-                        ? "가람이는 봐주자 · 알아서 데려갈게"
-                        : isOverdue
-                          ? `${Math.abs(user.diffDays)}일 초과`
-                          : `${user.diffDays}일 남음`}
-                    </p>
-                  </div>
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="truncate text-[14px] font-medium text-md-on-surface">
+                          {user.name}
+                        </span>
+                        <span className="flex-shrink-0 text-[13px] tabular-nums text-md-on-surface-variant">
+                          {user.meetup_count}회
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-md-surface-container-high">
+                        <div
+                          className={`h-full rounded-full ${isTop ? "bg-spicy" : "bg-md-outline/50"}`}
+                          style={{ width: `${ratio}%` }}
+                        />
+                      </div>
+                    </div>
+                  </li>
                 );
               })}
-            </div>
+            </ol>
           )}
-        </div>
+        </Panel>
       </section>
+
+      {/* ── Activity heatmap ───────────────────────────────── */}
+      <Panel
+        eyebrow="Engagement"
+        title="활동 히트맵"
+        subtitle={`최근 18주 · 마지막 참여일 기준 ${heatmapTotal}건`}
+        icon={<Flame className="h-4 w-4" />}
+      >
+        <div className="mt-1">
+          <ActivityHeatmap days={heatmapDays} max={heatmapMax} />
+        </div>
+      </Panel>
+
+      {/* ── Deadline tracking ──────────────────────────────── */}
+      <Panel
+        eyebrow="Action required"
+        title="참여 기한 임박자"
+        subtitle={
+          deadlineUsers.length === 0
+            ? "현재 임박한 기한이 없습니다"
+            : `총 ${deadlineUsers.length}명이 일주일 내 기한 도래${
+                overdueCount > 0 ? ` · ${overdueCount}명 초과` : ""
+              }`
+        }
+        icon={<AlertCircle className="h-4 w-4" />}
+        action={
+          deadlineUsers.length > 0 ? (
+            <CopyButton deadlineUsers={deadlineUsers} />
+          ) : undefined
+        }
+      >
+        {deadlineUsers.length === 0 ? (
+          <EmptyState message="모두 안전권 ✓" />
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {deadlineUsers.map((user) => {
+              const isOverdue = user.diffDays < 0;
+              return (
+                <div
+                  key={user.id}
+                  className={`rounded-xl border p-4 ${
+                    isOverdue
+                      ? "border-transparent bg-md-error-container text-md-on-error-container"
+                      : "border-md-outline-variant bg-md-surface-container-lowest text-md-on-surface"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="space-y-1">
+                      <p className="type-title-medium">{user.name}</p>
+                      <p className="type-label-small opacity-70">
+                        기한 {formatDateString(user.limitDate.toString())}
+                      </p>
+                    </div>
+                    <span
+                      className={`m3-pill ${
+                        user.is_regular === "신입"
+                          ? "m3-pill-primary"
+                          : "bg-md-surface-container-high text-md-on-surface-variant"
+                      }`}
+                    >
+                      {user.is_regular}
+                    </span>
+                  </div>
+                  <p
+                    className={`mt-4 type-label-large ${
+                      isOverdue
+                        ? "text-md-on-error-container"
+                        : user.diffDays <= 3
+                          ? "text-md-error"
+                          : "text-md-on-surface-variant"
+                    }`}
+                  >
+                    {user.name.includes("가람")
+                      ? "가람이는 봐주자 · 알아서 데려갈게"
+                      : isOverdue
+                        ? `${Math.abs(user.diffDays)}일 초과`
+                        : `${user.diffDays}일 남음`}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Panel>
+
+      {/* ── Operations team ────────────────────────────────── */}
+      <MastersStrip />
     </div>
   );
 }
 
 /* ────────────────────────────────────────────────────────────────── */
 
-function KpiCard({
-  tone,
+function KpiCell({
+  icon,
   label,
   value,
-  delta,
-  icon,
+  sub,
 }: {
-  tone: "primary" | "tertiary" | "surface";
+  icon: React.ReactNode;
   label: string;
   value: string | number;
-  delta: React.ReactNode;
-  icon: React.ReactNode;
+  sub: string;
 }) {
-  const surfaceClass =
-    tone === "primary"
-      ? "bg-md-primary-container text-md-on-primary-container"
-      : tone === "tertiary"
-        ? "bg-md-tertiary-container text-md-on-tertiary-container"
-        : "bg-md-surface-container-low text-md-on-surface";
-
-  const iconWrapClass =
-    tone === "primary"
-      ? "bg-md-primary text-md-on-primary"
-      : tone === "tertiary"
-        ? "bg-md-tertiary text-md-on-tertiary"
-        : "bg-md-secondary-container text-md-on-secondary-container";
-
   return (
-    <div className={`rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
-      <div className="flex items-start justify-between">
-        <p className="type-label-large opacity-80">{label}</p>
-        <span
-          className={`flex h-9 w-9 items-center justify-center rounded-full ${iconWrapClass}`}
-        >
-          {icon}
-        </span>
+    <div className="bg-md-surface-container-lowest px-5 py-6">
+      <div className="flex items-center gap-1.5 text-md-on-surface-variant/70">
+        <span className="[&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</span>
+        <span className="text-[12px] font-medium tracking-tight">{label}</span>
       </div>
-      <p className="type-headline-large mt-4 truncate">{value}</p>
-      <p className="type-label-medium mt-1 opacity-80">{delta}</p>
+      <p className="mt-3.5 truncate text-[30px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-md-on-surface">
+        {value}
+      </p>
+      <p className="mt-2.5 text-[12px] tracking-tight text-md-on-surface-variant/70">
+        {sub}
+      </p>
     </div>
   );
 }
 
-function CardHeader({
+function Panel({
   eyebrow,
   title,
   subtitle,
   icon,
+  action,
+  live = false,
+  className = "",
+  children,
 }: {
   eyebrow: string;
   title: string;
   subtitle: string;
   icon?: React.ReactNode;
+  action?: React.ReactNode;
+  live?: boolean;
+  className?: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-1.5 text-md-primary">
-        {icon}
-        <span className="type-label-medium uppercase">{eyebrow}</span>
+    <section className={`hq-panel p-5 sm:p-6 ${className}`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-md-on-surface-variant/60">
+            <span className="[&>svg]:h-3.5 [&>svg]:w-3.5">{icon}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">
+              {eyebrow}
+            </span>
+            {live && (
+              <span className="live-dot ml-0.5 h-1.5 w-1.5 rounded-full bg-spicy" />
+            )}
+          </div>
+          <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-md-on-surface">
+            {title}
+          </h2>
+          <p className="text-[13px] text-md-on-surface-variant/80">{subtitle}</p>
+        </div>
+        {action}
       </div>
-      <h2 className="type-title-large text-md-on-surface">{title}</h2>
-      <p className="type-body-medium text-md-on-surface-variant">{subtitle}</p>
-    </div>
+      <div className="mt-5">{children}</div>
+    </section>
   );
 }
 

@@ -39,8 +39,8 @@ export const UserTableRow = memo(function UserTableRow({
   const initial = user.name.charAt(0);
 
   return (
-    <TableRow className="border-b border-md-outline-variant/40 transition-colors hover:bg-md-surface-container">
-      <TableCell className="py-3 type-label-medium text-md-on-surface-variant">
+    <TableRow className="border-b border-md-outline-variant/45 transition-colors last:border-0 hover:bg-black/[0.025] dark:hover:bg-white/[0.04]">
+      <TableCell className="py-3 text-[12px] tabular-nums text-md-on-surface-variant/60">
         {user.id}
       </TableCell>
       <TableCell className="py-3">
@@ -50,31 +50,33 @@ export const UserTableRow = memo(function UserTableRow({
           >
             {initial}
           </span>
-          <span className="type-title-small text-md-on-surface">{user.name}</span>
+          <span className="text-[14px] font-medium text-md-on-surface">{user.name}</span>
         </div>
       </TableCell>
-      <TableCell className="hidden py-3 type-body-small text-md-on-surface-variant md:table-cell">
+      <TableCell className="hidden py-3 text-[13px] tabular-nums text-md-on-surface-variant md:table-cell">
         {user.join_date ? formatDateString(user.join_date) : "—"}
       </TableCell>
-      <TableCell className="hidden py-3 type-body-small text-md-on-surface-variant lg:table-cell">
+      <TableCell className="hidden py-3 text-[13px] tabular-nums text-md-on-surface-variant lg:table-cell">
         {user.last_meetup_date ? formatDateString(user.last_meetup_date) : "—"}
       </TableCell>
       <TableCell className="py-3">
         <span
-          className={`m3-pill ${
-            isNewbie ? "m3-pill-primary" : ""
+          className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+            isNewbie
+              ? "bg-spicy-container text-spicy-on-container"
+              : "bg-md-surface-container-high text-md-on-surface-variant"
           }`}
         >
           {user.is_regular}
         </span>
       </TableCell>
-      <TableCell className="py-3 text-center type-title-small text-md-on-surface">
+      <TableCell className="py-3 text-center text-[14px] font-semibold tabular-nums text-md-on-surface">
         {user.meetup_count}
       </TableCell>
-      <TableCell className="py-3 text-center type-title-small text-md-on-surface">
+      <TableCell className="py-3 text-center text-[14px] font-semibold tabular-nums text-md-on-surface">
         {user.meetup_make_count}
       </TableCell>
-      <TableCell className="hidden py-3 text-center type-title-small text-md-primary md:table-cell">
+      <TableCell className="hidden py-3 text-center text-[14px] font-semibold tabular-nums text-spicy md:table-cell">
         {user.total_meetup_count}
       </TableCell>
       <TableCell className="py-3 text-center">

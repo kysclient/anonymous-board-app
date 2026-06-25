@@ -24,7 +24,9 @@
       "Bash(curl -s -m 30 -o /dev/null -w \"%{http_code}\\\\n\" \"http://localhost:3000/api/somoim?gid=e03ab496-0dd3-11ee-8cf5-0a16fe5c82071\")",
       "Read(//private/tmp/**)",
       "Bash(rm -f /tmp/sched-test.mjs /tmp/somoim-dev.log; echo cleaned)",
-      "Bash(node --env-file=.env -e ' *)"
+      "Bash(node --env-file=.env -e ' *)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python3 -)"
     ],
     "deny": [],
     "ask": []

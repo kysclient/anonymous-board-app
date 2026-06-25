@@ -30,8 +30,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fdfbff" },
-    { media: "(prefers-color-scheme: dark)", color: "#121317" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f5f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#121214" },
   ],
 };
 
@@ -65,6 +65,14 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${robotoFlex.variable} ${roboto.variable}`}
     >
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
       <body>
         <ThemeProvider
           attribute="class"

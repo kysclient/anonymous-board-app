@@ -9,15 +9,15 @@
 @layer base {
   :root {
     /* ── Material 3 color tokens · light ───────────────────── */
-    --md-primary: 11 87 208;                         /* #0b57d0 */
+    --md-primary: 0 113 227;                         /* #0071e3 Apple blue */
     --md-on-primary: 255 255 255;
-    --md-primary-container: 211 227 253;             /* #d3e3fd */
-    --md-on-primary-container: 0 27 63;
-    --md-inverse-primary: 168 199 250;
-    --md-secondary: 86 95 113;
+    --md-primary-container: 224 240 255;             /* #e0f0ff */
+    --md-on-primary-container: 0 47 95;
+    --md-inverse-primary: 102 178 255;
+    --md-secondary: 110 110 115;                      /* #6e6e73 */
     --md-on-secondary: 255 255 255;
-    --md-secondary-container: 218 226 249;
-    --md-on-secondary-container: 19 28 43;
+    --md-secondary-container: 238 238 240;
+    --md-on-secondary-container: 29 29 31;
     --md-tertiary: 113 85 115;
     --md-on-tertiary: 255 255 255;
     --md-tertiary-container: 251 215 252;
@@ -27,29 +27,40 @@
     --md-error-container: 255 218 214;
     --md-on-error-container: 65 0 2;
 
-    --md-surface: 253 251 255;
-    --md-surface-dim: 218 217 224;
-    --md-surface-bright: 253 251 255;
-    --md-surface-container-lowest: 255 255 255;
-    --md-surface-container-low: 247 245 252;
-    --md-surface-container: 241 239 247;
-    --md-surface-container-high: 235 233 241;
-    --md-surface-container-highest: 230 228 236;
+    /* ── Brand accent · Apple Blue · light ─────────────────── */
+    --spicy: 0 113 227;                              /* #0071e3 */
+    --spicy-bright: 0 122 255;                       /* #007aff */
+    --spicy-container: 224 240 255;                  /* #e0f0ff */
+    --on-spicy-container: 0 45 92;                   /* #002d5c */
 
-    --md-on-surface: 26 27 33;
-    --md-on-surface-variant: 68 70 79;
-    --md-outline: 116 119 127;
-    --md-outline-variant: 196 198 208;
-    --md-inverse-surface: 47 48 54;
-    --md-inverse-on-surface: 241 239 247;
+    /* HQ command-bar surface (Apple near-black) */
+    --hq-surface: 29 29 31;                          /* #1d1d1f */
+    --hq-on-surface: 245 245 247;
+
+    /* Apple neutral grays — no purple/blue tint */
+    --md-surface: 255 255 255;
+    --md-surface-dim: 240 240 242;
+    --md-surface-bright: 255 255 255;
+    --md-surface-container-lowest: 255 255 255;      /* cards = white */
+    --md-surface-container-low: 250 250 252;
+    --md-surface-container: 245 245 247;             /* page bg #f5f5f7 */
+    --md-surface-container-high: 238 238 240;
+    --md-surface-container-highest: 232 232 234;
+
+    --md-on-surface: 29 29 31;                       /* #1d1d1f */
+    --md-on-surface-variant: 110 110 115;            /* #6e6e73 */
+    --md-outline: 174 174 178;                       /* #aeaeb2 */
+    --md-outline-variant: 209 209 214;               /* #d1d1d6 hairline */
+    --md-inverse-surface: 29 29 31;
+    --md-inverse-on-surface: 245 245 247;
     --md-scrim: 0 0 0;
 
     /* ── M3 elevation shadows ──────────────────────────────── */
-    --md-elev-1: 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 1px 3px 1px rgba(0, 0, 0, 0.05);
-    --md-elev-2: 0 1px 2px 0 rgba(0, 0, 0, 0.10), 0 2px 6px 2px rgba(0, 0, 0, 0.07);
-    --md-elev-3: 0 1px 3px 0 rgba(0, 0, 0, 0.10), 0 4px 8px 3px rgba(0, 0, 0, 0.07);
-    --md-elev-4: 0 2px 3px 0 rgba(0, 0, 0, 0.10), 0 6px 10px 4px rgba(0, 0, 0, 0.08);
-    --md-elev-5: 0 4px 4px 0 rgba(0, 0, 0, 0.10), 0 8px 12px 6px rgba(0, 0, 0, 0.10);
+    --md-elev-1: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 1px 0 rgba(0, 0, 0, 0.03);
+    --md-elev-2: 0 2px 8px -2px rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    --md-elev-3: 0 6px 20px -4px rgba(0, 0, 0, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+    --md-elev-4: 0 12px 32px -6px rgba(0, 0, 0, 0.10), 0 3px 8px 0 rgba(0, 0, 0, 0.05);
+    --md-elev-5: 0 20px 48px -8px rgba(0, 0, 0, 0.14), 0 4px 12px 0 rgba(0, 0, 0, 0.06);
 
     /* ── shape scale ───────────────────────────────────────── */
     --md-rounded-xs: 4px;
@@ -60,53 +71,61 @@
     --md-rounded-2xl: 32px;
     --md-rounded-full: 9999px;
 
+    /* ── Type families · Apple SF Pro + Pretendard(KR) ─────── */
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+      "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", system-ui,
+      sans-serif;
+    --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", system-ui,
+      "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+
     /* ── shadcn legacy tokens, mapped to M3 surfaces ───────── */
-    --background: 0 0% 100%;
-    --foreground: 230 11% 12%;
+    --background: 240 9% 96%;        /* #f5f5f7 */
+    --foreground: 240 6% 12%;        /* #1d1d1f */
     --card: 0 0% 100%;
-    --card-foreground: 230 11% 12%;
+    --card-foreground: 240 6% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 230 11% 12%;
-    --primary: 217 90% 43%;
+    --popover-foreground: 240 6% 12%;
+    --primary: 211 100% 45%;         /* #0071e3 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 18% 92%;
-    --secondary-foreground: 220 30% 12%;
-    --muted: 240 24% 96%;
-    --muted-foreground: 230 9% 38%;
-    --accent: 217 86% 91%;
-    --accent-foreground: 217 100% 12%;
+    --secondary: 240 6% 94%;
+    --secondary-foreground: 240 6% 12%;
+    --muted: 240 9% 96%;
+    --muted-foreground: 240 3% 45%;  /* #6e6e73 */
+    --accent: 240 6% 94%;
+    --accent-foreground: 240 6% 12%;
     --destructive: 0 76% 42%;
     --destructive-foreground: 0 0% 100%;
-    --border: 230 13% 86%;
-    --input: 230 13% 86%;
-    --ring: 217 90% 43%;
-    --chart-1: 217 90% 43%;
+    --border: 240 9% 87%;            /* #d1d1d6 */
+    --input: 240 9% 87%;
+    --ring: 211 100% 45%;
+    --chart-1: 211 100% 45%;
     --chart-2: 184 53% 38%;
     --chart-3: 282 24% 41%;
     --chart-4: 24 78% 49%;
     --chart-5: 142 60% 39%;
     --radius: 12px;
-    --sidebar-background: 240 24% 96%;
-    --sidebar-foreground: 230 11% 12%;
-    --sidebar-primary: 217 90% 43%;
+    --sidebar-background: 240 9% 96%;
+    --sidebar-foreground: 240 6% 12%;
+    --sidebar-primary: 211 100% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 86% 91%;
-    --sidebar-accent-foreground: 217 100% 12%;
-    --sidebar-border: 230 13% 86%;
-    --sidebar-ring: 217 90% 43%;
+    --sidebar-accent: 240 6% 94%;
+    --sidebar-accent-foreground: 240 6% 12%;
+    --sidebar-border: 240 9% 87%;
+    --sidebar-ring: 211 100% 45%;
   }
 
   .dark {
     /* ── Material 3 color tokens · dark ────────────────────── */
-    --md-primary: 168 199 250;
-    --md-on-primary: 0 42 94;
-    --md-primary-container: 0 62 138;
-    --md-on-primary-container: 211 227 253;
-    --md-inverse-primary: 11 87 208;
-    --md-secondary: 190 198 220;
-    --md-on-secondary: 40 49 65;
-    --md-secondary-container: 62 71 89;
-    --md-on-secondary-container: 218 226 249;
+    --md-primary: 10 132 255;                        /* #0a84ff Apple blue dark */
+    --md-on-primary: 255 255 255;
+    --md-primary-container: 0 60 120;
+    --md-on-primary-container: 209 233 255;
+    --md-inverse-primary: 0 113 227;
+    --md-secondary: 152 152 157;                      /* #98989d */
+    --md-on-secondary: 255 255 255;
+    --md-secondary-container: 58 58 60;
+    --md-on-secondary-container: 245 245 247;
     --md-tertiary: 222 191 223;
     --md-on-tertiary: 64 41 67;
     --md-tertiary-container: 88 63 91;
@@ -116,21 +135,31 @@
     --md-error-container: 147 0 10;
     --md-on-error-container: 255 218 214;
 
-    --md-surface: 18 19 23;
-    --md-surface-dim: 18 19 23;
-    --md-surface-bright: 56 57 63;
-    --md-surface-container-lowest: 13 14 17;
-    --md-surface-container-low: 26 27 33;
-    --md-surface-container: 30 31 37;
-    --md-surface-container-high: 41 42 48;
-    --md-surface-container-highest: 52 53 59;
+    /* ── Brand accent · Apple Blue · dark ──────────────────── */
+    --spicy: 10 132 255;                             /* #0a84ff */
+    --spicy-bright: 10 132 255;
+    --spicy-container: 0 60 120;                     /* #003c78 */
+    --on-spicy-container: 209 233 255;               /* #d1e9ff */
 
-    --md-on-surface: 227 226 233;
-    --md-on-surface-variant: 196 198 208;
-    --md-outline: 142 144 153;
-    --md-outline-variant: 68 70 79;
-    --md-inverse-surface: 227 226 233;
-    --md-inverse-on-surface: 47 48 54;
+    --hq-surface: 12 12 14;                          /* #0c0c0e */
+    --hq-on-surface: 245 245 247;
+
+    /* Apple dark neutrals */
+    --md-surface: 28 28 30;                           /* #1c1c1e */
+    --md-surface-dim: 0 0 0;
+    --md-surface-bright: 44 44 46;
+    --md-surface-container-lowest: 28 28 30;          /* cards #1c1c1e */
+    --md-surface-container-low: 32 32 34;
+    --md-surface-container: 18 18 20;                 /* page bg #121214 */
+    --md-surface-container-high: 44 44 46;            /* #2c2c2e */
+    --md-surface-container-highest: 58 58 60;         /* #3a3a3c */
+
+    --md-on-surface: 245 245 247;
+    --md-on-surface-variant: 152 152 157;            /* #98989d */
+    --md-outline: 99 99 102;                          /* #636366 */
+    --md-outline-variant: 58 58 60;                   /* #3a3a3c hairline */
+    --md-inverse-surface: 245 245 247;
+    --md-inverse-on-surface: 29 29 31;
 
     --md-elev-1: 0 1px 2px 0 rgba(0, 0, 0, 0.30), 0 1px 3px 1px rgba(0, 0, 0, 0.18);
     --md-elev-2: 0 1px 2px 0 rgba(0, 0, 0, 0.32), 0 2px 6px 2px rgba(0, 0, 0, 0.22);
@@ -138,33 +167,33 @@
     --md-elev-4: 0 2px 3px 0 rgba(0, 0, 0, 0.36), 0 6px 10px 4px rgba(0, 0, 0, 0.26);
     --md-elev-5: 0 4px 4px 0 rgba(0, 0, 0, 0.40), 0 8px 12px 6px rgba(0, 0, 0, 0.30);
 
-    --background: 230 13% 8%;
-    --foreground: 240 14% 90%;
-    --card: 230 13% 11%;
-    --card-foreground: 240 14% 90%;
-    --popover: 230 13% 11%;
-    --popover-foreground: 240 14% 90%;
-    --primary: 217 90% 82%;
-    --primary-foreground: 217 100% 18%;
-    --secondary: 230 16% 22%;
-    --secondary-foreground: 240 14% 90%;
-    --muted: 230 13% 13%;
-    --muted-foreground: 240 8% 70%;
-    --accent: 217 60% 32%;
-    --accent-foreground: 217 86% 91%;
+    --background: 240 6% 7%;         /* #121214 */
+    --foreground: 240 9% 96%;
+    --card: 240 5% 11%;              /* #1c1c1e */
+    --card-foreground: 240 9% 96%;
+    --popover: 240 5% 11%;
+    --popover-foreground: 240 9% 96%;
+    --primary: 211 100% 52%;         /* #0a84ff */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 17%;
+    --secondary-foreground: 240 9% 96%;
+    --muted: 240 5% 11%;
+    --muted-foreground: 240 3% 62%;  /* #98989d */
+    --accent: 240 4% 17%;
+    --accent-foreground: 240 9% 96%;
     --destructive: 4 83% 65%;
     --destructive-foreground: 0 0% 100%;
-    --border: 230 8% 25%;
-    --input: 230 8% 25%;
-    --ring: 217 90% 82%;
-    --sidebar-background: 230 13% 11%;
-    --sidebar-foreground: 240 14% 90%;
-    --sidebar-primary: 217 90% 82%;
-    --sidebar-primary-foreground: 217 100% 18%;
-    --sidebar-accent: 217 40% 22%;
-    --sidebar-accent-foreground: 217 86% 91%;
-    --sidebar-border: 230 8% 22%;
-    --sidebar-ring: 217 90% 82%;
+    --border: 240 4% 20%;
+    --input: 240 4% 20%;
+    --ring: 211 100% 52%;
+    --sidebar-background: 240 6% 9%;
+    --sidebar-foreground: 240 9% 96%;
+    --sidebar-primary: 211 100% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4% 17%;
+    --sidebar-accent-foreground: 240 9% 96%;
+    --sidebar-border: 240 4% 18%;
+    --sidebar-ring: 211 100% 52%;
   }
 }
 
@@ -179,20 +208,17 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family:
-      "Google Sans Text", "Google Sans", "Roboto Flex", "Roboto",
-      var(--font-app, "Inter"), system-ui, -apple-system, "Segoe UI", "Apple Color Emoji",
-      Arial, sans-serif;
-    font-feature-settings: "ss01", "cv11", "lnum";
+    font-family: var(--font-text);
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  /* Headlines + display use Google Sans Display */
+  /* Headlines + display use SF Pro Display */
   h1, h2, h3 {
-    font-family:
-      "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto",
-      var(--font-app, "Inter"), system-ui, sans-serif;
+    font-family: var(--font-display);
+    letter-spacing: -0.022em;
   }
 }
 
@@ -251,63 +277,63 @@
 
   /* Type scale */
   .type-display-large {
-    font-family: "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 57px; line-height: 64px; font-weight: 400; letter-spacing: -0.25px;
   }
   .type-display-medium {
-    font-family: "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 45px; line-height: 52px; font-weight: 400; letter-spacing: 0;
   }
   .type-display-small {
-    font-family: "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 36px; line-height: 44px; font-weight: 400; letter-spacing: 0;
   }
   .type-headline-large {
-    font-family: "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 32px; line-height: 40px; font-weight: 500; letter-spacing: 0;
   }
   .type-headline-medium {
-    font-family: "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px; line-height: 36px; font-weight: 500; letter-spacing: 0;
   }
   .type-headline-small {
-    font-family: "Google Sans Display", "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 24px; line-height: 32px; font-weight: 500; letter-spacing: 0;
   }
   .type-title-large {
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 22px; line-height: 28px; font-weight: 500; letter-spacing: 0;
   }
   .type-title-medium {
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: 0.15px;
   }
   .type-title-small {
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px;
   }
   .type-body-large {
-    font-family: "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0.5px;
   }
   .type-body-medium {
-    font-family: "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0.25px;
   }
   .type-body-small {
-    font-family: "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 12px; line-height: 16px; font-weight: 400; letter-spacing: 0.4px;
   }
   .type-label-large {
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px;
   }
   .type-label-medium {
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.5px;
   }
   .type-label-small {
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.5px;
   }
 }
@@ -328,7 +354,7 @@
     height: 40px;
     padding: 0 24px;
     border-radius: 9999px;
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.1px;
@@ -460,30 +486,32 @@
   /* ── Cards ───────────────────────────────────────────────── */
 
   .m3-card-filled {
-    background: rgb(var(--md-surface-container-highest));
+    background: rgb(var(--md-surface-container-high));
     color: rgb(var(--md-on-surface));
-    border-radius: 12px;
+    border-radius: 16px;
   }
 
   .m3-card-elevated {
-    background: rgb(var(--md-surface-container-low));
+    background: rgb(var(--md-surface-container-lowest));
     color: rgb(var(--md-on-surface));
-    border-radius: 12px;
-    box-shadow: var(--md-elev-1);
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, rgb(var(--md-outline-variant)) 65%, transparent);
+    box-shadow: var(--md-elev-2);
   }
 
   .m3-card-outlined {
-    background: rgb(var(--md-surface));
+    background: rgb(var(--md-surface-container-lowest));
     color: rgb(var(--md-on-surface));
-    border-radius: 12px;
-    border: 1px solid rgb(var(--md-outline-variant));
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, rgb(var(--md-outline-variant)) 70%, transparent);
   }
 
   .m3-card-feature {
-    background: rgb(var(--md-surface-container-low));
+    background: rgb(var(--md-surface-container-lowest));
     color: rgb(var(--md-on-surface));
-    border-radius: 28px;
-    box-shadow: var(--md-elev-1);
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, rgb(var(--md-outline-variant)) 65%, transparent);
+    box-shadow: var(--md-elev-2);
   }
 
   /* ── Chips ───────────────────────────────────────────────── */
@@ -495,7 +523,7 @@
     height: 32px;
     padding: 0 16px;
     border-radius: 9999px;
-    font-family: "Google Sans", "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.1px;
@@ -531,7 +559,7 @@
     height: 24px;
     padding: 0 10px;
     border-radius: 9999px;
-    font-family: "Google Sans", "Roboto Flex", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -573,7 +601,7 @@
     background: transparent;
     border: none;
     outline: none;
-    font-family: "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 16px;
     line-height: 24px;
     letter-spacing: 0.5px;
@@ -613,7 +641,7 @@
     border: none;
     outline: none;
     padding: 24px 16px 8px 16px;
-    font-family: "Roboto Flex", "Roboto", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 16px;
     line-height: 24px;
     color: rgb(var(--md-on-surface));
@@ -622,7 +650,7 @@
     position: absolute;
     left: 16px;
     top: 8px;
-    font-family: "Google Sans", "Roboto Flex", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -649,7 +677,7 @@
     gap: 8px;
     height: 40px;
     padding: 0 16px;
-    font-family: "Google Sans", "Roboto Flex", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.1px;
@@ -681,7 +709,7 @@
     border-radius: 9999px;
     color: rgb(var(--md-on-surface-variant));
     transition: background-color 0.18s ease, color 0.18s ease;
-    font-family: "Google Sans", "Roboto Flex", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.1px;
@@ -721,7 +749,7 @@
     height: 36px;
     border-radius: 9999px;
     color: #ffffff;
-    font-family: "Google Sans", "Roboto Flex", system-ui, sans-serif;
+    font-family: var(--font-text);
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.1px;
@@ -744,6 +772,109 @@
   .m3-list-item:hover {
     background: color-mix(in srgb, rgb(var(--md-on-surface)) 6%, transparent);
   }
+
+  /* ── Operations HQ redesign primitives ──────────────────── */
+
+  /* Hairline panel — Linear/Notion/Stripe style: flat, bordered */
+  .hq-panel {
+    background: rgb(var(--md-surface-container-lowest));
+    border: 1px solid color-mix(in srgb, rgb(var(--md-outline-variant)) 65%, transparent);
+    border-radius: 18px;
+  }
+
+  /* Command bar — the single bold focal element (Apple near-black) */
+  .hq-command {
+    position: relative;
+    overflow: hidden;
+    background: rgb(var(--hq-surface));
+    color: rgb(var(--hq-on-surface));
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  /* soft top spotlight — "lit from above", clean & neutral (no muddy glow) */
+  .hq-command::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(90% 130% at 50% -30%, rgba(255, 255, 255, 0.10) 0%, transparent 55%),
+      radial-gradient(60% 80% at 100% 0%, rgba(10, 132, 255, 0.10) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* KPI bar cell separators */
+  .kpi-bar > * + * {
+    border-left: 1px solid color-mix(in srgb, rgb(var(--md-outline-variant)) 60%, transparent);
+  }
+  @media (max-width: 768px) {
+    .kpi-bar > * { border-top: 1px solid color-mix(in srgb, rgb(var(--md-outline-variant)) 60%, transparent); }
+    .kpi-bar > *:nth-child(odd) { border-left: none; }
+    .kpi-bar > *:nth-child(1),
+    .kpi-bar > *:nth-child(2) { border-top: none; }
+  }
+}
+
+/* ── Live pulse + activity entrance ──────────────────────────── */
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 90, 61, 0.55); }
+  70%  { box-shadow: 0 0 0 6px rgba(255, 90, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 90, 61, 0); }
+}
+.live-dot {
+  animation: live-pulse 2s ease-out infinite;
+}
+
+@keyframes feed-in {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.feed-item {
+  animation: feed-in 0.45s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot, .feed-item { animation: none; }
+}
+
+/* ── Generative feature-card art ─────────────────────────────── */
+@keyframes art-sq {
+  0%, 100% { opacity: 0.22; }
+  50%      { opacity: 1; }
+}
+@keyframes art-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes art-drift {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@keyframes art-float {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(4px, -6px); }
+}
+@keyframes art-ping {
+  0%   { transform: scale(0.55); opacity: 0.6; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+.art-sq   { animation: art-sq 3.2s ease-in-out infinite; }
+.art-spin { animation: art-spin 40s linear infinite; transform-box: fill-box; transform-origin: center; }
+.art-drift{ animation: art-drift 6s ease-in-out infinite; }
+.art-float{ animation: art-float 7s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.art-ping { animation: art-ping 3.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+
+.feature-card {
+  transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--md-elev-3);
+  border-color: color-mix(in srgb, rgb(var(--md-outline-variant)) 100%, transparent);
+}
+.feature-card:hover .feature-art { transform: scale(1.04); }
+.feature-art { transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .art-sq, .art-spin, .art-drift, .art-float, .art-ping { animation: none; }
 }
 
 /* ============================================================

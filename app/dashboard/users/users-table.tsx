@@ -19,15 +19,15 @@ export const UsersTable = memo(function UsersTable() {
 
   if (filteredUsers.length === 0) {
     return (
-      <div className="m3-card-filled flex flex-col items-center justify-center gap-3 py-16">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-md-primary-container">
-          <Search className="h-6 w-6 text-md-on-primary-container" />
+      <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-md-outline-variant/65 bg-md-surface-container-lowest py-16">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-md-surface-container-high">
+          <Search className="h-5 w-5 text-md-on-surface-variant" />
         </div>
         <div className="space-y-1 text-center">
-          <p className="type-title-medium text-md-on-surface">
+          <p className="text-[15px] font-semibold text-md-on-surface">
             {searchTerm ? `"${searchTerm}" 검색 결과 없음` : "표시할 멤버가 없어요"}
           </p>
-          <p className="type-body-medium text-md-on-surface-variant">
+          <p className="text-[13px] text-md-on-surface-variant">
             {searchTerm
               ? "다른 키워드로 다시 시도해보세요"
               : "오른쪽 위의 ‘멤버 추가’로 새 멤버를 등록하세요"}
@@ -40,19 +40,19 @@ export const UsersTable = memo(function UsersTable() {
   return (
     <>
       {/* Mobile cards */}
-      <div className="block sm:hidden space-y-3">
+      <div className="block space-y-2.5 sm:hidden">
         <UserCardList users={filteredUsers} />
       </div>
 
       {/* Desktop table */}
-      <div className="hidden overflow-hidden rounded-3xl bg-md-surface-container-low sm:block">
+      <div className="hidden overflow-hidden rounded-2xl border border-md-outline-variant/65 bg-md-surface-container-lowest sm:block">
         <Table className="border-collapse">
           <UserTableHeader />
           <UserTableBody users={filteredUsers} />
         </Table>
       </div>
 
-      <p className="type-label-small text-md-on-surface-variant">
+      <p className="px-1 text-[12px] tracking-tight text-md-on-surface-variant/70">
         {filteredUsers.length}명 표시중
         {searchTerm ? ` · "${searchTerm}" 검색 결과` : ""}
       </p>

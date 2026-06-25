@@ -9,7 +9,6 @@ import {
   Download,
   Loader2,
   ZoomIn,
-  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,12 +30,15 @@ export default function GalleryPage() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const inFlight = useRef(false);
   const gid = url.match(/\/([a-f0-9-]+)$/)?.[1] || null;
 
   /* ── pagination (preserved) ──────────────────────────────────── */
   const fetchNextPage = useCallback(async () => {
-    if (!gid || !hasMore || loading || s_t === null) return;
+    if (!gid || !hasMore || s_t === null) return;
+    if (inFlight.current) return; // ref guard: prevents duplicate fetches
 
+    inFlight.current = true;
     setLoading(true);
     setError(null);
 
@@ -62,8 +64,16 @@ export default function GalleryPage() {
       setError(err instanceof Error ? err.message : "알 수 없는 오류");
     } finally {
       setLoading(false);
+      inFlight.current = false;
     }
-  }, [gid, hasMore, loading, s_t]);
+  }, [gid, hasMore, s_t]);
+
+  /* Initial load — don't wait for the scroll sentinel to intersect.
+     (On mobile the sentinel can sit below the fold, so first page never loaded.) */
+  useEffect(() => {
+    fetchNextPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!loaderRef.current) return;
@@ -73,7 +83,7 @@ export default function GalleryPage() {
           fetchNextPage();
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "400px" }
     );
 
     observer.observe(loaderRef.current);
@@ -104,33 +114,25 @@ export default function GalleryPage() {
 
   return (
     <div className="flex flex-col gap-8 pb-16">
-      {/* Hero */}
-      <header className="m3-card-feature relative overflow-hidden bg-md-tertiary-container p-7 sm:p-10">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-md-primary-container opacity-50" />
-        <div className="absolute -left-16 bottom-0 h-44 w-44 rounded-full bg-md-secondary-container opacity-60" />
-
-        <div className="relative space-y-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="m3-pill m3-pill-primary">
-              <ImageIcon className="h-3 w-3" />
-              Gallery · Photos
+      {/* Page header — Apple clean */}
+      <header className="pt-1">
+        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+          <ImageIcon className="h-3.5 w-3.5" />
+          Gallery
+        </p>
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+            모임 갤러리
+          </h1>
+          {images.length > 0 && (
+            <span className="text-[14px] font-medium tabular-nums text-md-on-surface-variant/70">
+              {images.length}장
             </span>
-            {images.length > 0 && (
-              <span className="m3-pill">
-                <Sparkles className="h-3 w-3" />총 {images.length}장
-              </span>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <h1 className="type-display-medium text-md-on-tertiary-container">
-              모임 갤러리
-            </h1>
-            <p className="type-body-large max-w-xl text-md-on-tertiary-container/85">
-              SPICY가 함께한 순간들. 사진을 누르면 크게 볼 수 있어요.
-            </p>
-          </div>
+          )}
         </div>
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
+          SPICY가 함께한 순간들. 사진을 누르면 크게 볼 수 있어요.
+        </p>
       </header>
 
       {/* Error */}
@@ -198,12 +200,15 @@ export default function GalleryPage() {
 
 function PhotoTile({
   src,
+  index,
   onClick,
 }: {
   src: string;
   index: number;
   onClick: () => void;
 }) {
+  // First screenful loads eagerly so photos appear without scrolling.
+  const eager = index < 8;
   const [aspect, setAspect] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -227,7 +232,9 @@ function PhotoTile({
         <img
           src={src}
           alt=""
-          loading="lazy"
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : "auto"}
+          decoding="async"
           onLoad={(e) => {
             const img = e.currentTarget;
             if (img.naturalWidth && img.naturalHeight) {

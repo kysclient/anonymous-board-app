@@ -10,7 +10,6 @@ import {
   Users,
   Circle,
   Armchair,
-  Sparkles,
   RectangleHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -336,30 +335,19 @@ export default function SeatingV2Page() {
 
   return (
     <div className="flex flex-col gap-8 pb-16">
-      {/* Hero */}
-      <header className="m3-card-feature relative overflow-hidden bg-md-secondary-container p-7 sm:p-10">
-        <div className="absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-md-tertiary-container opacity-50" />
-        <div className="relative space-y-5">
-          <div className="flex flex-wrap gap-2">
-            <span className="m3-pill m3-pill-primary">
-              <Armchair className="h-3 w-3" />
-              Seating · v2
-            </span>
-            <span className="m3-pill">
-              <Sparkles className="h-3 w-3" />
-              Auto balance
-            </span>
-          </div>
-          <div className="space-y-3">
-            <h1 className="type-display-medium text-md-on-secondary-container">
-              자리 배치
-            </h1>
-            <p className="type-body-large max-w-xl text-md-on-secondary-container/85">
-              이름과 성별을 입력하면 같은 성별이 3명 이상 연속되지 않게 알아서
-              섞어 줍니다. 일자형·원형으로 미리보고 이미지로 저장하세요.
-            </p>
-          </div>
-        </div>
+      {/* Page header — Apple clean */}
+      <header className="pt-1">
+        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+          <Armchair className="h-3.5 w-3.5" />
+          Seating · v2
+        </p>
+        <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+          자리 배치
+        </h1>
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
+          이름과 성별을 입력하면 같은 성별이 3명 이상 연속되지 않게 알아서 섞어
+          줍니다. 일자형·원형으로 미리보고 이미지로 저장하세요.
+        </p>
       </header>
 
       {/* Input section */}

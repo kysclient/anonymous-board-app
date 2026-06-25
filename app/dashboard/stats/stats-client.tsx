@@ -51,48 +51,31 @@ const CHART_PALETTE = [
 /* ────────────────────────────────────────────────────────────────── */
 
 function KpiCard({
-  tone,
   label,
   value,
   sub,
   icon,
 }: {
-  tone: "primary" | "tertiary" | "secondary" | "surface";
+  tone?: "primary" | "tertiary" | "secondary" | "surface";
   label: string;
   value: string | number;
   sub?: string;
   icon: React.ReactNode;
 }) {
-  const surfaceClass =
-    tone === "primary"
-      ? "bg-md-primary-container text-md-on-primary-container"
-      : tone === "tertiary"
-        ? "bg-md-tertiary-container text-md-on-tertiary-container"
-        : tone === "secondary"
-          ? "bg-md-secondary-container text-md-on-secondary-container"
-          : "bg-md-surface-container-low text-md-on-surface";
-
-  const iconWrapClass =
-    tone === "primary"
-      ? "bg-md-primary text-md-on-primary"
-      : tone === "tertiary"
-        ? "bg-md-tertiary text-md-on-tertiary"
-        : tone === "secondary"
-          ? "bg-md-secondary text-md-on-secondary"
-          : "bg-md-surface-container-highest text-md-on-surface-variant";
-
   return (
-    <div className={`rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
-      <div className="flex items-start justify-between">
-        <p className="type-label-large opacity-80">{label}</p>
-        <span
-          className={`flex h-9 w-9 items-center justify-center rounded-full ${iconWrapClass}`}
-        >
-          {icon}
-        </span>
+    <div className="rounded-2xl border border-md-outline-variant/65 bg-md-surface-container-lowest p-5">
+      <div className="flex items-center gap-1.5 text-md-on-surface-variant/70">
+        <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+        <span className="text-[12px] font-medium tracking-tight">{label}</span>
       </div>
-      <p className="type-headline-large mt-4 truncate">{value}</p>
-      {sub && <p className="type-label-medium mt-1 opacity-80">{sub}</p>}
+      <p className="mt-3.5 truncate text-[28px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-md-on-surface">
+        {value}
+      </p>
+      {sub && (
+        <p className="mt-2.5 truncate text-[12px] tracking-tight text-md-on-surface-variant/70">
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
@@ -127,37 +110,25 @@ function HighlightCard({
   icon: Icon,
   label,
   value,
-  tone,
 }: {
   icon: typeof Clock;
   label: string;
   value: string;
-  tone: "primary" | "tertiary" | "secondary" | "amber";
+  tone?: "primary" | "tertiary" | "secondary" | "amber";
 }) {
-  const styles = {
-    primary: "bg-md-primary-container text-md-on-primary-container",
-    tertiary: "bg-md-tertiary-container text-md-on-tertiary-container",
-    secondary: "bg-md-secondary-container text-md-on-secondary-container",
-    amber: "bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200",
-  };
-  const iconStyles = {
-    primary: "bg-md-primary text-md-on-primary",
-    tertiary: "bg-md-tertiary text-md-on-tertiary",
-    secondary: "bg-md-secondary text-md-on-secondary",
-    amber: "bg-amber-500 text-white",
-  };
-
   return (
-    <div className={`rounded-2xl p-4 ${styles[tone]}`}>
+    <div className="rounded-2xl border border-md-outline-variant/65 bg-md-surface-container-lowest p-4">
       <div className="flex items-start gap-3">
-        <span
-          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full ${iconStyles[tone]}`}
-        >
+        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-spicy-container text-spicy">
           <Icon className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="type-label-medium uppercase opacity-70">{label}</p>
-          <p className="type-title-medium mt-0.5 truncate">{value}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wide text-md-on-surface-variant/70">
+            {label}
+          </p>
+          <p className="mt-0.5 truncate text-[15px] font-semibold tracking-tight text-md-on-surface">
+            {value}
+          </p>
         </div>
       </div>
     </div>
@@ -335,25 +306,19 @@ export default function StatsClient({ users }: { users: User[] }) {
 
   return (
     <div className="flex flex-col gap-8 pb-16">
-      {/* Hero */}
-      <header className="m3-card-feature relative overflow-hidden bg-md-primary-container p-7 sm:p-10">
-        <div className="absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-md-tertiary-container opacity-50" />
-        <div className="absolute right-1/3 -top-12 h-40 w-40 rounded-full bg-md-secondary-container opacity-50" />
-        <div className="relative space-y-4">
-          <span className="m3-pill m3-pill-tertiary">
-            <BarChart3 className="h-3 w-3" />
-            Statistics · Live
-          </span>
-          <div className="space-y-3">
-            <h1 className="type-display-medium text-md-on-primary-container">
-              멤버 통계
-            </h1>
-            <p className="type-body-large max-w-xl text-md-on-primary-container/85">
-              모임의 참여 추이, 활동 비율, 신입과 기존의 비교까지 — 운영에 필요한
-              데이터를 한눈에.
-            </p>
-          </div>
-        </div>
+      {/* Page header — Apple clean text header */}
+      <header className="pt-1">
+        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+          <BarChart3 className="h-3.5 w-3.5" />
+          Statistics
+        </p>
+        <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+          멤버 통계
+        </h1>
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
+          모임의 참여 추이, 활동 비율, 신입과 기존의 비교까지 — 운영에 필요한
+          데이터를 한눈에.
+        </p>
       </header>
 
       {/* KPI tiles */}

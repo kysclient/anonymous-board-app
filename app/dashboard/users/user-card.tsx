@@ -48,7 +48,13 @@ export function UserCard({ user }: UserCardProps) {
               <h3 className="type-title-medium text-md-on-surface truncate">
                 {user.name}
               </h3>
-              <span className={`m3-pill ${isNewbie ? "m3-pill-primary" : ""}`}>
+              <span
+                className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                  isNewbie
+                    ? "bg-spicy-container text-spicy-on-container"
+                    : "bg-md-surface-container-high text-md-on-surface-variant"
+                }`}
+              >
                 {user.is_regular}
               </span>
             </div>
@@ -120,13 +126,13 @@ function Stat({
   return (
     <div className="text-center">
       <p
-        className={`type-headline-small ${
-          accent ? "text-md-primary" : "text-md-on-surface"
+        className={`text-[22px] font-semibold tabular-nums tracking-tight ${
+          accent ? "text-spicy" : "text-md-on-surface"
         }`}
       >
         {value}
       </p>
-      <p className="type-label-small uppercase text-md-on-surface-variant">
+      <p className="mt-0.5 text-[11px] uppercase tracking-wide text-md-on-surface-variant/70">
         {label}
       </p>
     </div>

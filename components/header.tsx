@@ -27,56 +27,55 @@ export function Header() {
   }, []);
 
   return (
-    <header className="m3-top-app-bar sticky top-0 z-50 w-full px-2 sm:px-4">
+    <header className="sticky top-0 z-50 flex h-16 w-full items-center border-b border-md-outline-variant/70 bg-md-surface/75 px-3 backdrop-blur-xl backdrop-saturate-150 sm:px-5">
       <div className="flex w-full items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <MobileMenuButton />
           <Link
             href={"/dashboard"}
-            className="flex items-center rounded-full px-2 py-1 transition-colors hover:bg-md-surface-container-high"
+            className="flex items-center rounded-lg"
             aria-label="SPICY"
           >
             <Image
-              src="/logo_v2/main_logo.png"
+              src={theme === 'dark' ? '/logo_v3/logo_light.png' : '/logo_v3/logo_dark.png'}
               alt="SPICY"
-              width={172}
-              height={40}
+              width={230}
+              height={74}
               priority
-              sizes="172px"
+              sizes="230px"
               className="h-7 w-auto object-contain"
             />
           </Link>
         </div>
 
-        <div className="flex items-center gap-1">
-          <Link href="/investment" className="hidden sm:block">
-            <button className="m3-btn m3-btn-text gap-2">
-              <TrendingUp className="h-4 w-4" />
-              <span>투자</span>
-            </button>
+        <div className="flex items-center gap-0.5">
+          <Link
+            href="/investment"
+            className="hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium text-md-on-surface-variant transition-colors hover:bg-black/[0.04] hover:text-md-on-surface dark:hover:bg-white/[0.06] sm:inline-flex"
+          >
+            <TrendingUp className="h-4 w-4" />
+            투자
           </Link>
-          <Link href="/investment" className="sm:hidden">
-            <button
-              className="m3-icon-btn"
-              aria-label="투자 페이지"
-              type="button"
-            >
-              <TrendingUp className="h-5 w-5 text-md-primary" />
-            </button>
+          <Link
+            href="/investment"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-md-on-surface-variant transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06] sm:hidden"
+            aria-label="투자 페이지"
+          >
+            <TrendingUp className="h-[18px] w-[18px]" />
           </Link>
 
           <button
             type="button"
-            className="m3-icon-btn"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-md-on-surface-variant transition-colors hover:bg-black/[0.04] hover:text-md-on-surface dark:hover:bg-white/[0.06]"
             aria-label="테마 변경"
             onClick={() =>
               mounted && setTheme(theme === "dark" ? "light" : "dark")
             }
           >
             {mounted && theme === "dark" ? (
-              <Sun className="h-5 w-5" />
+              <Sun className="h-[18px] w-[18px]" />
             ) : (
-              <Moon className="h-5 w-5" />
+              <Moon className="h-[18px] w-[18px]" />
             )}
           </button>
 

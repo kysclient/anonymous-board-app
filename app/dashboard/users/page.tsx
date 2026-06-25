@@ -50,26 +50,18 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       initialSortOrder={sortOrder}
     >
       <div className="flex flex-col gap-8 pb-16">
-        {/* Hero */}
-        <header className="m3-card-feature relative overflow-hidden bg-md-secondary-container p-7 sm:p-10">
-          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-md-primary-container opacity-60" />
-          <div className="relative space-y-5">
-            <div className="flex flex-wrap gap-2">
-              <span className="m3-pill m3-pill-primary">
-                <ShieldCheck className="h-3 w-3" />
-                Admin · Members
-              </span>
-              <span className="m3-pill">운영자 전용</span>
-            </div>
-            <div className="space-y-3">
-              <h1 className="type-display-medium text-md-on-secondary-container">
-                멤버 관리
-              </h1>
-              <p className="type-body-large max-w-xl text-md-on-secondary-container/85">
-                가입 정보, 벙 참여, 벙주 횟수까지 한 화면에서.
-              </p>
-            </div>
-          </div>
+        {/* Page header — Apple clean */}
+        <header className="pt-1">
+          <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Members · Admin
+          </p>
+          <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+            멤버 관리
+          </h1>
+          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
+            가입 정보, 벙 참여, 벙주 횟수까지 한 화면에서.
+          </p>
         </header>
 
         {/* Summary tiles */}
@@ -131,44 +123,29 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
 }
 
 function SummaryTile({
-  tone,
   icon,
   label,
   value,
   sub,
 }: {
-  tone: "primary" | "tertiary" | "surface";
+  tone?: "primary" | "tertiary" | "surface";
   icon: React.ReactNode;
   label: string;
   value: string | number;
   sub: string;
 }) {
-  const surfaceClass =
-    tone === "primary"
-      ? "bg-md-primary-container text-md-on-primary-container"
-      : tone === "tertiary"
-        ? "bg-md-tertiary-container text-md-on-tertiary-container"
-        : "bg-md-surface-container-low text-md-on-surface";
-
-  const iconWrapClass =
-    tone === "primary"
-      ? "bg-md-primary text-md-on-primary"
-      : tone === "tertiary"
-        ? "bg-md-tertiary text-md-on-tertiary"
-        : "bg-md-secondary-container text-md-on-secondary-container";
-
   return (
-    <div className={`rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
-      <div className="flex items-start justify-between">
-        <p className="type-label-large opacity-80">{label}</p>
-        <span
-          className={`flex h-9 w-9 items-center justify-center rounded-full ${iconWrapClass}`}
-        >
-          {icon}
-        </span>
+    <div className="rounded-2xl border border-md-outline-variant/65 bg-md-surface-container-lowest p-5">
+      <div className="flex items-center gap-1.5 text-md-on-surface-variant/70">
+        <span className="[&>svg]:h-4 [&>svg]:w-4">{icon}</span>
+        <span className="text-[12px] font-medium tracking-tight">{label}</span>
       </div>
-      <p className="type-headline-large mt-4 truncate">{value}</p>
-      <p className="type-label-medium mt-1 opacity-80">{sub}</p>
+      <p className="mt-3.5 truncate text-[28px] font-semibold leading-none tracking-[-0.03em] tabular-nums text-md-on-surface">
+        {value}
+      </p>
+      <p className="mt-2.5 truncate text-[12px] tracking-tight text-md-on-surface-variant/70">
+        {sub}
+      </p>
     </div>
   );
 }

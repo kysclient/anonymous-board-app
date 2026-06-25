@@ -109,55 +109,47 @@ export default function SchedulePage() {
 
   return (
     <div className="flex flex-col gap-6 pb-16">
-      {/* Hero */}
-      <header className="m3-card-feature relative overflow-hidden bg-md-tertiary-container p-7 sm:p-10">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-md-primary-container opacity-50" />
-        <div className="absolute -left-16 bottom-0 h-44 w-44 rounded-full bg-md-secondary-container opacity-60" />
-
-        <div className="relative space-y-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="m3-pill m3-pill-primary">
-              <CalendarDays className="h-3 w-3" />
-              Schedule · 정모
-            </span>
-            {events.length > 0 && (
-              <span className="m3-pill">
-                <Clock className="h-3 w-3" />
-                예정 {events.length}건
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-start gap-4">
-            {group?.imageUrl && (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={group.imageUrl}
-                alt=""
-                className="hidden h-16 w-16 shrink-0 rounded-2xl object-cover elev-2 sm:block"
-              />
-            )}
-            <div className="space-y-2">
-              <h1 className="type-display-medium text-md-on-tertiary-container">
-                모임 일정
-              </h1>
-              <p className="type-body-large max-w-xl text-md-on-tertiary-container/85 font-bold">
-                {group?.name || "SPICY"}
-              </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 type-label-large text-md-on-tertiary-container/75">
-                {group?.region && (
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5" />
-                    {group.region}
-                  </span>
-                )}
-                {group?.memberCount != null && (
-                  <span className="inline-flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" />
-                    멤버 {group.memberCount.toLocaleString()}명
-                  </span>
-                )}
-              </div>
+      {/* Page header — Apple clean */}
+      <header className="pt-1">
+        <div className="flex items-start gap-4">
+          {group?.imageUrl && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={group.imageUrl}
+              alt=""
+              className="h-14 w-14 shrink-0 rounded-2xl object-cover sm:h-16 sm:w-16"
+            />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Schedule
+            </p>
+            <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+              모임 일정
+            </h1>
+            <p className="mt-1.5 text-[15px] font-medium text-md-on-surface-variant">
+              {group?.name || "SPICY"}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-md-on-surface-variant/80">
+              {group?.region && (
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {group.region}
+                </span>
+              )}
+              {group?.memberCount != null && (
+                <span className="inline-flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5" />
+                  멤버 {group.memberCount.toLocaleString()}명
+                </span>
+              )}
+              {events.length > 0 && (
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  예정 {events.length}건
+                </span>
+              )}
             </div>
           </div>
 
@@ -165,14 +157,18 @@ export default function SchedulePage() {
             type="button"
             onClick={fetchSchedule}
             disabled={loading}
-            className="m3-pill inline-flex items-center gap-1.5 transition-opacity hover:opacity-80 disabled:opacity-50"
+            aria-label="새로고침"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-md-on-surface-variant transition-colors hover:bg-black/[0.04] disabled:opacity-50 dark:hover:bg-white/[0.06]"
           >
-            <RefreshCw className={cn("h-3 w-3", loading && "animate-spin")} />
-            새로고침
+            <RefreshCw className={cn("h-[18px] w-[18px]", loading && "animate-spin")} />
           </button>
-
-          {members.length > 0 && <MemberList members={members} />}
         </div>
+
+        {members.length > 0 && (
+          <div className="mt-5">
+            <MemberList members={members} />
+          </div>
+        )}
       </header>
 
       {/* Error */}

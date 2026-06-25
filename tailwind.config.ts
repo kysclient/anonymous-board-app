@@ -137,6 +137,13 @@ const config: Config = {
           "inverse-on-surface":
             "rgb(var(--md-inverse-on-surface) / <alpha-value>)",
         },
+        // ── SPICY brand accent ──────────────────────────────
+        spicy: {
+          DEFAULT: "rgb(var(--spicy) / <alpha-value>)",
+          bright: "rgb(var(--spicy-bright) / <alpha-value>)",
+          container: "rgb(var(--spicy-container) / <alpha-value>)",
+          "on-container": "rgb(var(--on-spicy-container) / <alpha-value>)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

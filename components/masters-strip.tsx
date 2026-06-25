@@ -52,24 +52,23 @@ const HUE: Record<Master["hue"], { ring: string; gradient: string }> = {
 
 export default function MastersStrip() {
   return (
-    <section className="m3-card-elevated relative overflow-hidden p-6 sm:p-8">
-      {/* Soft decorative blobs */}
-      <div className="pointer-events-none absolute -right-24 -top-20 h-48 w-48 rounded-full bg-md-primary-container opacity-40 blur-2xl" />
-      <div className="pointer-events-none absolute -left-20 bottom-0 h-40 w-40 rounded-full bg-md-tertiary-container opacity-30 blur-2xl" />
-
+    <section className="hq-panel p-5 sm:p-6">
       {/* Minimal section header */}
-      <div className="relative mb-7 flex items-center justify-between gap-3 sm:mb-8">
-        <p className="type-label-medium uppercase text-md-primary">
-          Operations · Team
-        </p>
-        <span className="m3-chip m3-chip-assist gap-2">
-          <Users className="h-4 w-4" />
-          운영진 {MASTERS.length}명
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <div className="space-y-1">
+          <p className="type-label-small uppercase tracking-wide text-spicy">
+            Team
+          </p>
+          <h2 className="type-title-large text-md-on-surface">운영진</h2>
+        </div>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-md-outline-variant px-3 py-1 type-label-small text-md-on-surface-variant">
+          <Users className="h-3.5 w-3.5" />
+          {MASTERS.length}명
         </span>
       </div>
 
       {/* People grid */}
-      <div className="relative grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-7">
+      <div className="grid grid-cols-4 gap-3 sm:grid-cols-7 sm:gap-4">
         {MASTERS.map((master, i) => (
           <MasterTile key={master.id} master={master} index={i} />
         ))}
@@ -95,7 +94,7 @@ function MasterTile({ master, index }: { master: Master; index: number }) {
 
         {/* Avatar */}
         <div
-          className={`relative h-20 w-20 overflow-hidden rounded-full bg-md-surface-container-highest ring-4 ${palette.ring} transition-transform duration-300 group-hover:scale-[1.04] sm:h-24 sm:w-24`}
+          className={`relative h-16 w-16 overflow-hidden rounded-full bg-md-surface-container-highest ring-4 ${palette.ring} transition-transform duration-300 group-hover:scale-[1.04] sm:h-[72px] sm:w-[72px]`}
         >
           {master.src ? (
             <Image
