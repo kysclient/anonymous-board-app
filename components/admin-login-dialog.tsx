@@ -45,7 +45,10 @@ export function AdminLoginDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button type="button" className="m3-btn m3-btn-tonal h-10 px-4 text-[13px]">
+        <button
+          type="button"
+          className="m3-btn m3-btn-filled h-9 px-4 text-[13px] font-medium"
+        >
           관리자 로그인
         </button>
       </DialogTrigger>

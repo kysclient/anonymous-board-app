@@ -30,13 +30,13 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// Material 3 chart palette — primary blue + tertiary purple + accent siblings
-const CHART_PRIMARY = "#0b57d0";
-const CHART_TERTIARY = "#715573";
-const CHART_TEAL = "#006a6a";
-const CHART_AMBER = "#7c5800";
-const CHART_GREEN = "#386a20";
-const CHART_PINK = "#984065";
+// xAI chart palette — brand orange lead, mid-tones readable on both themes
+const CHART_PRIMARY = "#f4590d";
+const CHART_TERTIARY = "#8b5cf6";
+const CHART_TEAL = "#14b8a6";
+const CHART_AMBER = "#eab308";
+const CHART_GREEN = "#84cc16";
+const CHART_PINK = "#ec4899";
 const CHART_PALETTE = [
   CHART_PRIMARY,
   CHART_TERTIARY,
@@ -308,11 +308,11 @@ export default function StatsClient({ users }: { users: User[] }) {
     <div className="flex flex-col gap-8 pb-16">
       {/* Page header — Apple clean text header */}
       <header className="pt-1">
-        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+        <p className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-spicy">
           <BarChart3 className="h-3.5 w-3.5" />
           Statistics
         </p>
-        <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+        <h1 className="mt-2 text-[30px] font-medium tracking-[-0.025em] text-md-on-surface sm:text-[36px]">
           멤버 통계
         </h1>
         <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">

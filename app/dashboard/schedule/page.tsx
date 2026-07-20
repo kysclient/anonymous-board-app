@@ -121,11 +121,11 @@ export default function SchedulePage() {
             />
           )}
           <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+            <p className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-spicy">
               <CalendarDays className="h-3.5 w-3.5" />
               Schedule
             </p>
-            <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+            <h1 className="mt-2 text-[30px] font-medium tracking-[-0.025em] text-md-on-surface sm:text-[36px]">
               모임 일정
             </h1>
             <p className="mt-1.5 text-[15px] font-medium text-md-on-surface-variant">

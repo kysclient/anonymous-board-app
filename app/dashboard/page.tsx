@@ -8,6 +8,7 @@ import {
   Crown,
   Activity,
   Flame,
+  ArrowRight,
 } from "lucide-react";
 import { getUsers } from "./actions";
 import CopyButton from "@/components/copy-button";
@@ -17,7 +18,6 @@ import LiveActivityFeed, {
 } from "@/components/dashboard/live-activity-feed";
 import ActivityHeatmap from "@/components/dashboard/activity-heatmap";
 import FeatureCards from "@/components/dashboard/feature-cards";
-import HqArt from "@/components/dashboard/hq-art";
 
 export const revalidate = 0;
 
@@ -164,64 +164,91 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-16">
-      {/* ── HQ command bar ─────────────────────────────────── */}
-      <header className="hq-command px-6 py-7 sm:px-9 sm:py-9">
-        <HqArt />
-        <div className="relative flex flex-col gap-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="leading-none">
-                <p className="text-[15px] font-bold tracking-tight text-[rgb(var(--hq-on-surface))]">
-                  SPICY <span className="text-spicy">HQ</span>
-                </p>
-                <p className="mt-1 type-label-small text-[rgb(var(--hq-on-surface))]/55">
-                  오늘의 운영 현황
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="hidden type-label-medium text-[rgb(var(--hq-on-surface))]/55 sm:inline">
-                {todayLabel}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 type-label-small font-semibold text-[rgb(var(--hq-on-surface))]">
-                <span className="live-dot h-1.5 w-1.5 rounded-full bg-spicy-bright" />
-                LIVE
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <h1 className="text-[32px] font-semibold leading-[1.1] tracking-[-0.02em] text-[rgb(var(--hq-on-surface))] sm:text-[40px]">
+      {/* ── Hero — docs.x.ai "Get started" style ───────────── */}
+      <header className="hq-command">
+        <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[1fr_minmax(0,460px)] lg:items-center lg:gap-12">
+          {/* Left: copy */}
+          <div className="flex flex-col items-start">
+            <h1 className="text-[36px] font-medium leading-[1.08] tracking-[-0.025em] text-[rgb(var(--hq-on-surface))] sm:text-[48px]">
               {greeting}
+              <br />
+              <span className="text-[rgb(var(--hq-on-surface))]/40">
+                with SPICY
+              </span>
             </h1>
-            <p className="mt-3 text-[15px] leading-relaxed text-[rgb(var(--hq-on-surface))]/60 sm:text-base">
+            <p className="mt-5 max-w-md text-[15px] leading-relaxed text-md-on-surface-variant">
               오늘 신규 합류{" "}
               <span className="font-medium text-[rgb(var(--hq-on-surface))]">
                 {newUsers}명
               </span>
-              {" · "}이번 달 누적 참여{" "}
+              , 이번 달 누적 참여{" "}
               <span className="font-medium text-[rgb(var(--hq-on-surface))]">
                 {totalMeetups}회
               </span>
+              . 모임 운영 현황을 한 곳에서 관리하세요.
             </p>
+
+            <div className="mt-7 flex flex-wrap gap-2.5">
+              <a
+                href="/dashboard/seating"
+                className="m3-btn m3-btn-filled h-11 gap-1.5 px-6 text-[14px]"
+              >
+                자리 배치 시작
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="/dashboard/stats"
+                className="inline-flex h-11 items-center gap-2 rounded-full border border-md-on-surface/15 px-6 text-[14px] font-medium text-[rgb(var(--hq-on-surface))]/90 transition-colors hover:bg-md-on-surface/[0.05]"
+              >
+                통계 보기
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
-            <a
-              href="/dashboard/seating"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold tracking-tight text-[#1d1d1f] transition-all hover:bg-white/90"
-            >
-              <Flame className="h-4 w-4 text-spicy" />
-              자리 배치 시작
-            </a>
-            <a
-              href="/dashboard/stats"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-[14px] font-medium tracking-tight text-[rgb(var(--hq-on-surface))]/90 transition-colors hover:bg-white/[0.06]"
-            >
-              <TrendingUp className="h-4 w-4" />
-              통계 보기
-            </a>
+          {/* Right: live status terminal (stays dark in both themes) */}
+          <div className="xai-codeblock overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+              <div className="flex items-center gap-4 text-[13px]">
+                <span className="font-medium text-white">status</span>
+                <span className="text-white/40">members</span>
+                <span className="text-white/40">live</span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-white/70">
+                <span className="live-dot h-1.5 w-1.5 rounded-full bg-spicy-bright" />
+                LIVE
+              </span>
+            </div>
+            <div className="px-5 py-5 font-mono text-[13px] leading-[1.9]">
+              <p className="text-white/85">
+                <span className="text-emerald-400">$</span> spicy status{" "}
+                <span className="text-sky-300">--live</span>
+              </p>
+              <p className="text-white/40"># {todayLabel} · 오늘의 운영 현황</p>
+              <p className="text-white/85">
+                <span className="text-white/45">total_members</span>{" "}
+                <span className="text-sky-300">{totalUsers}</span>
+              </p>
+              <p className="text-white/85">
+                <span className="text-white/45">meetups_month</span>{" "}
+                <span className="text-sky-300">{totalMeetups}</span>
+              </p>
+              <p className="text-white/85">
+                <span className="text-white/45">new_members_30d</span>{" "}
+                <span className="text-sky-300">{newUsers}</span>
+              </p>
+              <p className="text-white/85">
+                <span className="text-white/45">active_rate</span>{" "}
+                <span className="text-sky-300">{activeRate}%</span>
+              </p>
+              <p className="text-white/85">
+                <span className="text-white/45">mvp</span>{" "}
+                <span className="text-[rgb(var(--spicy-bright))]">
+                  {topUsers.length > 0
+                    ? `"${topUsers[0].name}"`
+                    : '"집계 전"'}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </header>
@@ -403,9 +430,7 @@ export default async function DashboardPage() {
                           : "text-md-on-surface-variant"
                     }`}
                   >
-                    {user.name.includes("가람")
-                      ? "가람이는 봐주자 · 알아서 데려갈게"
-                      : isOverdue
+                    {isOverdue
                         ? `${Math.abs(user.diffDays)}일 초과`
                         : `${user.diffDays}일 남음`}
                   </p>

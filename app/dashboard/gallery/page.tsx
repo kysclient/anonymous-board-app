@@ -116,12 +116,12 @@ export default function GalleryPage() {
     <div className="flex flex-col gap-8 pb-16">
       {/* Page header — Apple clean */}
       <header className="pt-1">
-        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+        <p className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-spicy">
           <ImageIcon className="h-3.5 w-3.5" />
           Gallery
         </p>
         <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+          <h1 className="text-[30px] font-medium tracking-[-0.025em] text-md-on-surface sm:text-[36px]">
             모임 갤러리
           </h1>
           {images.length > 0 && (

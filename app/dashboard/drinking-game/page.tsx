@@ -706,7 +706,7 @@ export default function DrinkingGamePage() {
                       }
                     }
                   }}
-                  placeholder="예) 유신, 가람, 차은욱"
+                  placeholder="예) 유신, 차은욱"
                   disabled={phase !== "setup"}
                   className="h-12 flex-1 rounded-2xl bg-muted/40 border-transparent focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 text-sm"
                 />

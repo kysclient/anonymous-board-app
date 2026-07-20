@@ -337,11 +337,11 @@ export default function SeatingV2Page() {
     <div className="flex flex-col gap-8 pb-16">
       {/* Page header — Apple clean */}
       <header className="pt-1">
-        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-spicy">
+        <p className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-spicy">
           <Armchair className="h-3.5 w-3.5" />
           Seating · v2
         </p>
-        <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.02em] text-md-on-surface sm:text-[34px]">
+        <h1 className="mt-2 text-[30px] font-medium tracking-[-0.025em] text-md-on-surface sm:text-[36px]">
           자리 배치
         </h1>
         <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
