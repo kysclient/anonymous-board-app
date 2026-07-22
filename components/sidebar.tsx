@@ -44,6 +44,18 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname.startsWith("/dashboard/gallery"),
     },
     {
+      label: "SEXY 테스트",
+      href: "/dashboard/sexy-test",
+      active: pathname.startsWith("/dashboard/sexy-test"),
+      badge: "Hot",
+    },
+    {
+      label: "이호준 테스트",
+      href: "/dashboard/hojun-test",
+      active: pathname.startsWith("/dashboard/hojun-test"),
+      badge: "ㅋㅋ",
+    },
+    {
       label: "통계",
       href: "/dashboard/stats",
       active: pathname.startsWith("/dashboard/stats"),
