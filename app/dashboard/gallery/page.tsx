@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import {
   Image as ImageIcon,
   X,
@@ -31,14 +37,20 @@ export default function GalleryPage() {
 
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const inFlight = useRef(false);
+  const loadedCursors = useRef(new Set<number>());
   const gid = url.match(/\/([a-f0-9-]+)$/)?.[1] || null;
 
   /* ── pagination (preserved) ──────────────────────────────────── */
   const fetchNextPage = useCallback(async () => {
     if (!gid || !hasMore || s_t === null) return;
     if (inFlight.current) return; // ref guard: prevents duplicate fetches
+    if (loadedCursors.current.has(s_t)) {
+      setHasMore(false);
+      return;
+    }
 
     inFlight.current = true;
+    loadedCursors.current.add(s_t);
     setLoading(true);
     setError(null);
 
@@ -52,15 +64,27 @@ export default function GalleryPage() {
 
       if (result.success && result.data) {
         const newImages = result.data.images || [];
-        setImages((prev) => [...prev, ...newImages]);
+        setImages((prev) => {
+          const existing = new Set(prev);
+          const uniqueImages = newImages.filter((image) => {
+            if (existing.has(image)) return false;
+            existing.add(image);
+            return true;
+          });
+          return [...prev, ...uniqueImages];
+        });
 
-        const nextCursor = (result.data as any).nextCursor ?? null;
+        const nextCursor = result.data.nextCursor ?? null;
         setST(nextCursor);
-        setHasMore(nextCursor !== null);
+        setHasMore(
+          nextCursor !== null && !loadedCursors.current.has(nextCursor)
+        );
       } else {
+        loadedCursors.current.delete(s_t);
         setError(result.error || "데이터를 가져올 수 없습니다.");
       }
     } catch (err) {
+      loadedCursors.current.delete(s_t);
       setError(err instanceof Error ? err.message : "알 수 없는 오류");
     } finally {
       setLoading(false);
@@ -115,39 +139,53 @@ export default function GalleryPage() {
   return (
     <div className="flex flex-col gap-8 pb-16">
       {/* Page header — Apple clean */}
-      <header className="pt-1">
-        <p className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-spicy">
-          <ImageIcon className="h-3.5 w-3.5" />
-          Gallery
-        </p>
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="text-[30px] font-medium tracking-[-0.025em] text-md-on-surface sm:text-[36px]">
-            모임 갤러리
-          </h1>
-          {images.length > 0 && (
-            <span className="text-[14px] font-medium tabular-nums text-md-on-surface-variant/70">
-              {images.length}장
+      <header className="border-b border-md-outline-variant pb-7 pt-1 sm:pb-9">
+        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+          <div>
+            <p className="flex items-center gap-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-spicy">
+              <ImageIcon className="h-3.5 w-3.5" />
+              Spicy Archive
+            </p>
+            <h1 className="mt-3 text-[34px] font-medium tracking-[-0.035em] text-md-on-surface sm:text-[46px]">
+              우리가 함께한 순간들
+            </h1>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
+              사진의 원래 비율을 그대로 담은 SPICY 아카이브입니다.
+            </p>
+          </div>
+
+          <div className="flex min-w-[170px] items-center justify-between gap-8 rounded-2xl bg-md-surface-container-lowest px-5 py-4 sm:block sm:text-right">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-md-on-surface-variant">
+              Photos loaded
             </span>
-          )}
+            <p className="mt-0 text-[25px] font-medium tabular-nums tracking-[-0.03em] text-md-on-surface sm:mt-1">
+              {images.length.toLocaleString()}
+              <span className="ml-1 text-[13px] font-normal text-md-on-surface-variant">장</span>
+            </p>
+          </div>
         </div>
-        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-md-on-surface-variant">
-          SPICY가 함께한 순간들. 사진을 누르면 크게 볼 수 있어요.
-        </p>
       </header>
 
       {/* Error */}
       {error && (
-        <div className="rounded-2xl bg-md-error-container px-5 py-4 type-body-medium text-md-on-error-container">
-          {error}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-md-error-container px-5 py-4 type-body-medium text-md-on-error-container">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={fetchNextPage}
+            className="rounded-full bg-md-on-error-container px-4 py-2 text-[12px] font-medium text-md-error-container"
+          >
+            다시 시도
+          </button>
         </div>
       )}
 
       {/* Masonry grid */}
       <section>
-        {images.length === 0 && !loading ? (
+        {images.length === 0 && !error ? (
           <SkeletonGrid count={10} />
-        ) : (
-          <div className="columns-2 gap-3 sm:columns-3 sm:gap-4 lg:columns-4 xl:columns-5 [column-fill:_balance]">
+        ) : images.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 [grid-auto-flow:dense] [grid-auto-rows:1px] sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {images.map((img, idx) => (
               <PhotoTile
                 key={`${img}-${idx}`}
@@ -157,7 +195,7 @@ export default function GalleryPage() {
               />
             ))}
           </div>
-        )}
+        ) : null}
 
         {/* Load-more sentinel + spinner */}
         <div ref={loaderRef} className="h-12" />
@@ -211,21 +249,59 @@ function PhotoTile({
   const eager = index < 8;
   const [aspect, setAspect] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [rowSpan, setRowSpan] = useState(24);
+  const tileRef = useRef<HTMLButtonElement | null>(null);
+
+  useLayoutEffect(() => {
+    const tile = tileRef.current;
+    if (!tile) return;
+
+    const updateSpan = () => {
+      const grid = tile.parentElement;
+      if (!grid) return;
+
+      const gridStyle = window.getComputedStyle(grid);
+      const rowHeight = Number.parseFloat(gridStyle.gridAutoRows) || 1;
+      const rowGap = Number.parseFloat(gridStyle.rowGap) || 12;
+      const tileWidth = tile.getBoundingClientRect().width;
+      const desiredHeight = tileWidth / (aspect ?? 4 / 5);
+      const nextSpan = Math.max(
+        1,
+        Math.ceil((desiredHeight + rowGap) / (rowHeight + rowGap))
+      );
+
+      setRowSpan((current) => (current === nextSpan ? current : nextSpan));
+    };
+
+    updateSpan();
+    const resizeObserver = new ResizeObserver(updateSpan);
+    resizeObserver.observe(tile);
+
+    return () => resizeObserver.disconnect();
+  }, [aspect]);
 
   return (
     <button
+      ref={tileRef}
       type="button"
       onClick={onClick}
-      className="group relative mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl bg-md-surface-container-highest text-left transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:elev-3 sm:mb-4"
+      style={{ gridRowEnd: `span ${rowSpan}` }}
+      className="group relative block h-full w-full overflow-hidden rounded-2xl bg-md-surface-container-highest text-left opacity-0 animate-m3-fade-in [animation-fill-mode:forwards] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:elev-3"
     >
       {/* Aspect-locked box: matches the image's natural ratio so it always fills */}
       <div
-        className="relative w-full"
-        style={{ aspectRatio: aspect ?? 4 / 5 }}
+        className="relative h-full w-full"
       >
         {/* Skeleton fills the box until image is decoded */}
         {!loaded && (
           <div className="absolute inset-0 animate-pulse bg-md-surface-container-highest" />
+        )}
+
+        {failed && (
+          <div className="absolute inset-0 flex items-center justify-center bg-md-surface-container-high text-md-on-surface-variant">
+            <ImageIcon className="h-5 w-5 opacity-50" />
+          </div>
         )}
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -242,9 +318,13 @@ function PhotoTile({
             }
             setLoaded(true);
           }}
+          onError={() => {
+            setFailed(true);
+            setLoaded(true);
+          }}
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-500",
-            loaded ? "opacity-100" : "opacity-0",
+            loaded && !failed ? "opacity-100" : "opacity-0",
             "group-hover:scale-[1.04]"
           )}
         />
@@ -263,11 +343,11 @@ function PhotoTile({
 
 function SkeletonGrid({ count }: { count: number }) {
   return (
-    <div className="columns-2 gap-3 sm:columns-3 sm:gap-4 lg:columns-4 xl:columns-5">
+    <div className="grid grid-cols-2 items-start gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="mb-3 break-inside-avoid overflow-hidden rounded-2xl bg-md-surface-container-highest sm:mb-4"
+          className="overflow-hidden rounded-2xl bg-md-surface-container-highest"
           style={{ aspectRatio: i % 3 === 0 ? "3/4" : i % 3 === 1 ? "1/1" : "4/5" }}
         >
           <div className="h-full w-full animate-pulse bg-md-surface-container-highest" />
