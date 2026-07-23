@@ -39,6 +39,14 @@ function makeRoomCode() {
   return Array.from({ length: 6 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
 }
 
+function makePlayerName() {
+  const prefixes = ["번개", "돌격", "무적", "잠꾸러기", "매운맛", "묵직한", "날쌘", "침착한"];
+  const animals = ["참새", "호랑이", "수달", "두더지", "여우", "고양이", "판다", "독수리"];
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const animal = animals[Math.floor(Math.random() * animals.length)];
+  return `${prefix}${animal}`;
+}
+
 function stoneName(color: 1 | 2) {
   return color === 1 ? "흑" : "백";
 }
@@ -190,12 +198,8 @@ export default function OnlineOmokPage() {
   };
 
   const enterSelectedRoom = (requestedRoom: string, requestedTitle = "") => {
-    const cleanName = name.trim().slice(0, 12);
+    const cleanName = (name.trim() || makePlayerName()).slice(0, 12);
     const cleanRoom = (requestedRoom || makeRoomCode()).toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
-    if (!cleanName) {
-      setNotice("먼저 대국명을 입력해주세요.");
-      return;
-    }
     if (cleanRoom.length < 4) {
       setNotice("방 코드는 4글자 이상이어야 합니다.");
       return;
@@ -210,8 +214,7 @@ export default function OnlineOmokPage() {
 
   const createRoom = (event: FormEvent) => {
     event.preventDefault();
-    const title = roomTitle.trim() || `${name.trim() || "익명"}의 대국실`;
-    enterSelectedRoom(roomId || makeRoomCode(), title);
+    enterSelectedRoom(roomId || makeRoomCode(), roomTitle.trim());
   };
 
   const shareRoom = async (targetRoomId: string, title = "SPICY 온라인 오목") => {
@@ -272,7 +275,7 @@ export default function OnlineOmokPage() {
             <p>열린 방 골라 들어가도 되고,<br />방 파서 친구 불러도 됨.</p>
             <label className={styles.nicknameField}>
               <span>내 대국명</span>
-              <input value={name} onChange={(event) => setName(event.target.value)} maxLength={12} placeholder="이름 또는 닉네임" autoComplete="nickname" />
+              <input value={name} onChange={(event) => setName(event.target.value)} maxLength={12} placeholder="비우면 랜덤으로 지어줌" autoComplete="nickname" />
             </label>
             {notice && <div className={styles.formNotice}>{notice}</div>}
             <div className={styles.lobbyStats}>
@@ -295,7 +298,7 @@ export default function OnlineOmokPage() {
             {creating && (
               <form className={styles.createRoomPanel} onSubmit={createRoom}>
                 <div><span>방 하나 파기</span><strong>새 대국실 만들기</strong></div>
-                <label><span>방 제목</span><input autoFocus value={roomTitle} onChange={(event) => setRoomTitle(event.target.value)} maxLength={24} placeholder={`${name.trim() || "익명"}의 대국실`} /></label>
+                <label><span>방 제목</span><input autoFocus value={roomTitle} onChange={(event) => setRoomTitle(event.target.value)} maxLength={24} placeholder={`${name.trim() || "랜덤 기사"}의 대국실`} /></label>
                 <label><span>방 코드</span><div className={styles.roomInput}><input value={roomId} onChange={(event) => setRoomId(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8))} maxLength={8} /><button type="button" onClick={() => setRoomId(makeRoomCode())}>랜덤</button></div></label>
                 <div className={styles.createActions}><button type="button" onClick={() => setCreating(false)}>취소</button><button type="submit">방 생성 <Swords /></button></div>
               </form>
@@ -347,7 +350,10 @@ export default function OnlineOmokPage() {
                       key={`${rowIndex}-${colIndex}`}
                       aria-label={`${rowIndex + 1}행 ${colIndex + 1}열${stone ? ` ${stoneName(stone)}돌` : ""}`}
                       className={`${styles.intersection} ${isMyTurn && stone === 0 ? styles.playable : ""}`}
-                      style={{ left: `${(colIndex / 14) * 100}%`, top: `${(rowIndex / 14) * 100}%` }}
+                      style={{
+                        left: `${4.5 + (colIndex / (BOARD_SIZE - 1)) * 91}%`,
+                        top: `${4.5 + (rowIndex / (BOARD_SIZE - 1)) * 91}%`,
+                      }}
                       disabled={!isMyTurn || stone !== 0}
                       onClick={() => send({ type: "place", row: rowIndex, col: colIndex })}
                     >
