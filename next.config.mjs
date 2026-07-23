@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ["ioredis", "ws"],
   eslint: {
     ignoreDuringBuilds: true,
   },

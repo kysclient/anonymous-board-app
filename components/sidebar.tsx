@@ -56,6 +56,12 @@ export function Sidebar({ className }: SidebarProps) {
       badge: "ㅋㅋ",
     },
     {
+      label: "온라인 오목",
+      href: "/dashboard/omok",
+      active: pathname.startsWith("/dashboard/omok"),
+      badge: "Live",
+    },
+    {
       label: "통계",
       href: "/dashboard/stats",
       active: pathname.startsWith("/dashboard/stats"),
