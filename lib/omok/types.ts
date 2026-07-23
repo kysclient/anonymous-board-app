@@ -1,5 +1,5 @@
 export type Stone = 0 | 1 | 2;
-export type GameStatus = "waiting" | "playing" | "finished";
+export type GameStatus = "waiting" | "countdown" | "playing" | "finished";
 
 export interface OmokPlayer {
   clientId: string;
@@ -28,10 +28,12 @@ export interface OmokRoomState {
   roomId: string;
   title: string;
   createdAt: number;
+  hostClientId: string;
   board: Stone[][];
   players: OmokPlayer[];
   spectators: number;
   status: GameStatus;
+  countdownEndsAt: number;
   turn: 1 | 2;
   winner: Stone;
   winningLine: Array<[number, number]>;
@@ -57,6 +59,7 @@ export type OmokClientEvent =
   | { type: "join"; roomId: string; clientId: string; name: string; roomTitle?: string }
   | { type: "place"; row: number; col: number }
   | { type: "chat"; text: string }
+  | { type: "start" }
   | { type: "rematch" }
   | { type: "ping" };
 

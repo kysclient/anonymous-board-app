@@ -21,6 +21,7 @@ interface Session {
 }
 
 const ROOM_TTL_SECONDS = 60 * 60 * 6;
+const COUNTDOWN_MS = 3000;
 const EVENT_CHANNEL = "spicy:omok:events";
 const localRooms = new Map<string, OmokRoomState>();
 const sessions = new Map<WebSocket, Session>();
@@ -79,10 +80,12 @@ function createRoom(roomId: string, title: string): OmokRoomState {
     roomId,
     title: sanitizeRoomTitle(title),
     createdAt: now,
+    hostClientId: "",
     board: createEmptyBoard(),
     players: [],
     spectators: 0,
     status: "waiting",
+    countdownEndsAt: 0,
     turn: 1,
     winner: 0,
     winningLine: [],
@@ -118,6 +121,23 @@ async function saveRoom(room: OmokRoomState) {
       JSON.stringify(room)
     );
   }
+}
+
+async function deleteRoom(roomId: string) {
+  localRooms.delete(roomId);
+  if (redis) {
+    await ensureRedis(redis);
+    await redis.del(`spicy:omok:room:${roomId}`);
+  }
+}
+
+// The host is always the longest-seated remaining player, preferring a connected one.
+function reassignHost(room: OmokRoomState) {
+  if (room.players.some((player) => player.clientId === room.hostClientId && player.connected)) return;
+  room.hostClientId =
+    room.players.find((player) => player.connected)?.clientId ??
+    room.players[0]?.clientId ??
+    "";
 }
 
 async function publishState(room: OmokRoomState) {
@@ -174,6 +194,8 @@ async function joinRoom(socket: WebSocket, event: Extract<OmokClientEvent, { typ
     const room = (await loadRoom(roomId)) ?? createRoom(roomId, event.roomTitle || `${name}의 대국실`);
     room.title ||= `${room.players[0]?.name ?? name}의 대국실`;
     room.createdAt ||= room.updatedAt || Date.now();
+    room.hostClientId ??= "";
+    room.countdownEndsAt ??= 0;
     let player = room.players.find((item) => item.clientId === clientId);
     let spectator = false;
 
@@ -181,10 +203,11 @@ async function joinRoom(socket: WebSocket, event: Extract<OmokClientEvent, { typ
       player.name = name;
       player.connected = true;
     } else if (room.players.length < 2) {
+      const usedColors = new Set(room.players.map((item) => item.color));
       player = {
         clientId,
         name,
-        color: room.players.length === 0 ? 1 : 2,
+        color: usedColors.has(1) ? 2 : 1,
         connected: true,
       };
       room.players.push(player);
@@ -194,11 +217,7 @@ async function joinRoom(socket: WebSocket, event: Extract<OmokClientEvent, { typ
       room.spectators += 1;
     }
 
-    if (room.players.length === 2 && room.status === "waiting") {
-      room.status = "playing";
-      room.chats.push(systemChat("두 기사가 모두 입장했습니다. 대국을 시작합니다."));
-    }
-
+    reassignHost(room);
     room.chats = room.chats.slice(-40);
     sessions.set(socket, { roomId, clientId, name, spectator, lastMoveAt: 0 });
     await publishState(room);
@@ -296,6 +315,56 @@ async function placeStone(socket: WebSocket, row: number, col: number) {
   });
 }
 
+function scheduleCountdown(roomId: string) {
+  setTimeout(() => {
+    void withRoomLock(roomId, async () => {
+      const room = await loadRoom(roomId);
+      if (!room || room.status !== "countdown") return;
+      if (room.players.filter((player) => player.connected).length < 2) {
+        room.status = "waiting";
+        room.countdownEndsAt = 0;
+        await publishState(room);
+        return;
+      }
+      room.status = "playing";
+      room.countdownEndsAt = 0;
+      room.chats.push(systemChat("대국을 시작합니다!"));
+      await publishState(room);
+    }).catch(() => undefined);
+  }, COUNTDOWN_MS);
+}
+
+async function startGame(socket: WebSocket) {
+  const session = sessions.get(socket);
+  if (!session || session.spectator) return;
+
+  await withRoomLock(session.roomId, async () => {
+    const room = await loadRoom(session.roomId);
+    if (!room) return;
+    if (room.hostClientId !== session.clientId) {
+      safeSend(socket, { type: "error", message: "방장만 대국을 시작할 수 있습니다." });
+      return;
+    }
+    if (room.status !== "waiting") return;
+    if (room.players.filter((player) => player.connected).length < 2) {
+      safeSend(socket, { type: "error", message: "두 기사가 모두 접속해야 시작할 수 있습니다." });
+      return;
+    }
+
+    room.board = createEmptyBoard();
+    room.moves = [];
+    room.turn = 1;
+    room.winner = 0;
+    room.winningLine = [];
+    room.rematchVotes = [];
+    room.status = "countdown";
+    room.countdownEndsAt = Date.now() + COUNTDOWN_MS;
+    room.chats.push(systemChat("잠시 후 대국을 시작합니다."));
+    await publishState(room);
+    scheduleCountdown(room.roomId);
+  });
+}
+
 async function postChat(socket: WebSocket, rawText: string) {
   const session = sessions.get(socket);
   const text = rawText.replace(/[<>]/g, "").trim().slice(0, 120);
@@ -352,11 +421,47 @@ async function disconnect(socket: WebSocket) {
   await withRoomLock(session.roomId, async () => {
     const room = await loadRoom(session.roomId);
     if (!room) return;
-    if (session.spectator) room.spectators = Math.max(0, room.spectators - 1);
-    else {
-      const player = room.players.find((item) => item.clientId === session.clientId);
-      if (player) player.connected = false;
+
+    if (session.spectator) {
+      room.spectators = Math.max(0, room.spectators - 1);
+    } else {
+      const index = room.players.findIndex((item) => item.clientId === session.clientId);
+      if (index !== -1) {
+        // Keep a disconnected player seated only during a live game so they can reconnect.
+        if (room.status === "playing") {
+          room.players[index].connected = false;
+        } else {
+          const [left] = room.players.splice(index, 1);
+          room.chats.push(systemChat(`${left.name}님이 퇴장했습니다.`));
+        }
+      }
     }
+
+    reassignHost(room);
+
+    // Delete the room once nobody (player or spectator) is connected any more.
+    const online = room.players.filter((player) => player.connected).length + room.spectators;
+    if (online <= 0) {
+      await deleteRoom(room.roomId);
+      return;
+    }
+
+    // Not enough players to keep counting down or to hold a finished board: reset to waiting.
+    if (
+      room.players.filter((player) => player.connected).length < 2 &&
+      (room.status === "countdown" || room.status === "finished")
+    ) {
+      room.status = "waiting";
+      room.countdownEndsAt = 0;
+      room.board = createEmptyBoard();
+      room.moves = [];
+      room.turn = 1;
+      room.winner = 0;
+      room.winningLine = [];
+      room.rematchVotes = [];
+    }
+
+    room.chats = room.chats.slice(-40);
     await publishState(room);
   }).catch(() => undefined);
 }
@@ -370,6 +475,7 @@ export function registerOmokSocket(socket: WebSocket) {
         if (event.type === "join") await joinRoom(socket, event);
         else if (event.type === "place") await placeStone(socket, event.row, event.col);
         else if (event.type === "chat") await postChat(socket, event.text);
+        else if (event.type === "start") await startGame(socket);
         else if (event.type === "rematch") await voteRematch(socket);
         else if (event.type === "ping") safeSend(socket, { type: "pong" });
       } catch (error) {

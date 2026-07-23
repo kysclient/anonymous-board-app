@@ -8,6 +8,7 @@ import {
   DoorOpen,
   Eye,
   MessageCircle,
+  Play,
   Plus,
   RefreshCw,
   RotateCcw,
@@ -66,6 +67,7 @@ export default function OnlineOmokPage() {
   const [chat, setChat] = useState("");
   const [copied, setCopied] = useState(false);
   const [sound, setSound] = useState(true);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const previousMoveCount = useRef(0);
@@ -176,6 +178,20 @@ export default function OnlineOmokPage() {
     previousMoveCount.current = moveCount;
   }, [sound, state?.moves.length]);
 
+  useEffect(() => {
+    if (state?.status !== "countdown" || !state.countdownEndsAt) {
+      setCountdown(null);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.ceil((state.countdownEndsAt - Date.now()) / 1000);
+      setCountdown(Math.max(0, remaining));
+    };
+    tick();
+    const timer = window.setInterval(tick, 200);
+    return () => window.clearInterval(timer);
+  }, [state?.status, state?.countdownEndsAt]);
+
   const board = state?.board ?? createEmptyBoard();
   const myPlayer = state?.players.find((player) => player.clientId === clientId);
   const opponent = state?.players.find((player) => player.clientId !== clientId);
@@ -187,6 +203,9 @@ export default function OnlineOmokPage() {
     connection === "online"
   );
   const winner = state?.players.find((player) => player.color === state.winner);
+  const connectedPlayerCount = state?.players.filter((player) => player.connected).length ?? 0;
+  const isHost = Boolean(state && myPlayer && state.hostClientId === clientId);
+  const canStart = Boolean(isHost && state?.status === "waiting" && connectedPlayerCount >= 2);
   const lastMove = state?.moves[state.moves.length - 1];
   const winningPoints = useMemo(
     () => new Set((state?.winningLine ?? []).map(([row, col]) => `${row}-${col}`)),
@@ -250,8 +269,12 @@ export default function OnlineOmokPage() {
   const statusCopy = !state
     ? "대국실 동기화 중"
     : state.status === "waiting"
-      ? "상대를 기다리는 중"
-      : state.status === "finished"
+      ? connectedPlayerCount >= 2
+        ? isHost ? "시작 버튼을 눌러주세요" : "방장의 시작을 기다리는 중"
+        : "상대를 기다리는 중"
+      : state.status === "countdown"
+        ? "곧 시작합니다"
+        : state.status === "finished"
         ? winner ? `${winner.name} 승리` : "무승부"
         : state.players.some((player) => !player.connected)
           ? "상대 재접속 대기"
@@ -314,7 +337,7 @@ export default function OnlineOmokPage() {
                 const joinLabel = seated < 2 && room.status === "waiting" ? "참가" : "관전";
                 return (
                   <article key={room.roomId} className={styles.roomCard}>
-                    <div className={`${styles.roomStatus} ${room.status === "playing" ? styles.roomPlaying : room.status === "finished" ? styles.roomFinished : ""}`}><span />{room.status === "waiting" ? "WAITING" : room.status === "playing" ? "PLAYING" : "FINISHED"}</div>
+                    <div className={`${styles.roomStatus} ${room.status === "playing" || room.status === "countdown" ? styles.roomPlaying : room.status === "finished" ? styles.roomFinished : ""}`}><span />{room.status === "waiting" ? "WAITING" : room.status === "finished" ? "FINISHED" : "PLAYING"}</div>
                     <div className={styles.roomInfo}><h3>{room.title}</h3><p>#{room.roomId} · {room.players.map((player) => player.name).join(" vs ") || "대국자 모집 중"}</p></div>
                     <div className={styles.roomMeta}><span><Users /> {seated}/2</span><span><Eye /> {room.spectators}</span><span>{room.moves}수</span></div>
                     <button type="button" className={styles.shareButton} onClick={() => void shareRoom(room.roomId, room.title)} aria-label={`${room.title} 공유`}><Share2 /></button>
@@ -361,6 +384,36 @@ export default function OnlineOmokPage() {
                     </button>
                   );
                 }))}
+                {state?.status === "waiting" && (
+                  <div className={styles.resultOverlay}>
+                    {canStart ? (
+                      <>
+                        <Swords />
+                        <strong>대국 준비 완료</strong>
+                        <span>두 기사가 모두 모였습니다. 시작해보세요.</span>
+                        <button type="button" onClick={() => send({ type: "start" })}><Play /> 게임 시작</button>
+                      </>
+                    ) : connectedPlayerCount >= 2 ? (
+                      <>
+                        <Crown />
+                        <strong>시작 대기 중</strong>
+                        <span>방장이 시작하기를 기다리는 중입니다.</span>
+                      </>
+                    ) : (
+                      <>
+                        <Users />
+                        <strong>상대를 기다리는 중</strong>
+                        <span>초대 링크를 공유해 친구를 불러보세요.</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                {state?.status === "countdown" && (
+                  <div className={styles.resultOverlay}>
+                    <strong key={countdown ?? 3} className={styles.countdownNumber}>{countdown ?? 3}</strong>
+                    <span>대국 시작 준비</span>
+                  </div>
+                )}
                 {state?.status === "finished" && (
                   <div className={styles.resultOverlay}>
                     <Crown />
