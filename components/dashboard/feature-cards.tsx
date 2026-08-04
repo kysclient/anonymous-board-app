@@ -37,11 +37,20 @@ const CARDS: CardDef[] = [
     desc: "함께한 순간들이 차곡차곡 쌓입니다. 모임 사진을 업로드하고 둘러보세요.",
     tags: ["사진", "추억"],
   },
+  {
+    n: "04",
+    kind: "LIVE LOUNGE",
+    href: "/dashboard/smoking-room",
+    title: "흡연실",
+    desc: "길게 말하긴 귀찮을 때 한마디만 띄워두세요. 지금 있는 멤버들과 실시간으로 이어집니다.",
+    badge: "Live",
+    tags: ["실시간", "익명", "한마디"],
+  },
 ];
 
 export default function FeatureCards() {
   return (
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {CARDS.map((c) => (
         <FeatureCard key={c.n} def={c} />
       ))}

@@ -35,7 +35,8 @@ export function findWinningLine(
       else line.push(...side);
     }
 
-    if (line.length >= 5) return line;
+    // Exactly five stones count as a win. An overline (six or more) does not.
+    if (line.length === 5) return line;
   }
 
   return [];

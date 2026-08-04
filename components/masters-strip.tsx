@@ -13,7 +13,6 @@ const MASTERS: Master[] = [
   { id: 1, name: "이휘원", src: "/masters/1.png", hue: "blue" },
   { id: 2, name: "최이윤", src: "/masters/2.png", hue: "purple" },
   { id: 3, name: "박성준", src: "/masters/3.png", hue: "amber" },
-  { id: 4, name: "박수빈", src: "/masters/4.png", hue: "rose" },
   { id: 5, name: "안치현", src: "/masters/5.png", hue: "teal" },
   { id: 6, name: "김우경", src: null, hue: "indigo" },
   { id: 7, name: "이진우", src: null, hue: "green" },
