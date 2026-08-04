@@ -333,33 +333,30 @@
 
 .smokeLayer {
   position: fixed;
-  bottom: calc(var(--cigarette-bottom) + 80px + var(--paper-height) + 12px);
-  left: 50%;
+  inset: 72px 24px 150px;
   z-index: 32;
-  width: min(100vw, 448px);
-  height: 400px;
-  transform: translateX(-50%);
-  transition: bottom 100ms linear;
   pointer-events: none;
 }
 
 .smokeMessage {
   position: absolute;
-  bottom: 0;
-  left: calc(50% + var(--smoke-start));
+  top: var(--smoke-top);
+  left: var(--smoke-left);
   display: flex;
-  max-width: min(16em, 78vw);
+  max-width: min(18em, 72vw);
   flex-direction: column;
   align-items: center;
-  color: #d1d5db;
+  color: rgba(240, 242, 245, 0.9);
   text-align: center;
   white-space: pre-wrap;
-  opacity: 0;
-  animation: smokeTextRise var(--smoke-duration) ease-out var(--smoke-delay) both;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.96), 0 0 24px rgba(0, 0, 0, 0.82);
+  transform: translate(-50%, -50%);
+  will-change: opacity, transform, filter;
+  animation: floatingMessage var(--smoke-duration) ease-in-out var(--smoke-delay) infinite alternate;
 }
 
-.smokeMessage span { color: inherit; font-size: 11px; font-weight: 500; opacity: 0.62; }
-.smokeMessage strong { margin-top: 2px; color: inherit; font-size: 14px; font-weight: 500; line-height: 1.65; overflow-wrap: anywhere; }
+.smokeMessage span { color: inherit; font-size: 10px; font-weight: 500; opacity: 0.58; }
+.smokeMessage strong { margin-top: 2px; color: inherit; font-size: 14px; font-weight: 500; line-height: 1.55; overflow-wrap: anywhere; }
 
 .finishedPanel {
   position: fixed;
@@ -634,12 +631,30 @@
   animation: toastIn 180ms ease-out both;
 }
 
-@keyframes smokeTextRise {
-  0% { opacity: 0; filter: blur(0); transform: translate3d(-50%, 8px, 0) scale(0.88); }
-  8% { opacity: 0.9; }
-  42% { opacity: 0.82; transform: translate3d(calc(-50% + var(--smoke-drift-mid)), -130px, 0) scale(1); }
-  78% { opacity: 0.54; }
-  100% { opacity: 0; filter: blur(1.2px); transform: translate3d(calc(-50% + var(--smoke-drift)), -330px, 0) scale(1.2); }
+@keyframes floatingMessage {
+  0% {
+    opacity: 0.42;
+    filter: blur(0.15px);
+    transform: translate3d(-50%, -50%, 0) scale(0.96) rotate(-1deg);
+  }
+  44% {
+    opacity: 0.88;
+    filter: blur(0);
+    transform: translate3d(
+      calc(-50% + var(--smoke-drift-x-mid)),
+      calc(-50% + var(--smoke-drift-y-mid)),
+      0
+    ) scale(1.015) rotate(0.8deg);
+  }
+  100% {
+    opacity: 0.52;
+    filter: blur(0.45px);
+    transform: translate3d(
+      calc(-50% + var(--smoke-drift-x)),
+      calc(-50% + var(--smoke-drift-y)),
+      0
+    ) scale(1.045) rotate(-0.5deg);
+  }
 }
 
 @keyframes freeSmoke {
@@ -732,6 +747,7 @@
   .reportPanel { bottom: 118px; }
   .noticeBar { height: 30px; font-size: 11px; }
   .toast { top: 56px; font-size: 10px; }
+  .smokeLayer { inset: 60px 8px 138px; }
   .smokeMessage strong { font-size: 13px; }
 }
 
@@ -739,7 +755,6 @@
   .room { --cigarette-bottom: 118px; }
   .helper { top: 11%; }
   .paper { max-height: 220px; }
-  .smokeLayer { height: 330px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -750,5 +765,9 @@
     opacity: 0.42;
     transform: translate3d(-50%, -50%, 0) scale(0.82);
   }
-  .smokeMessage { animation-duration: 1ms; }
+  .smokeMessage {
+    opacity: 0.74;
+    animation: none;
+    transform: translate(-50%, -50%);
+  }
 }

@@ -42,7 +42,6 @@ interface SmokeBurst {
 }
 
 const SESSION_MS = 2 * 60 * 1000;
-const MESSAGE_VISIBLE_MS = 10_000;
 const FILTER_HEIGHT = 80;
 const PAPER_HEIGHT = 280;
 
@@ -110,19 +109,27 @@ function hashString(value: string) {
   return hash >>> 0;
 }
 
-function smokeStyle(message: SmokingRoomMessage, now: number): CSSProperties {
+function smokeStyle(message: SmokingRoomMessage): CSSProperties {
   const hash = hashString(message.id);
   const direction = hash % 2 ? 1 : -1;
-  const drift = direction * (42 + (hash % 84));
-  const duration = 8_600 + (hash % 1_500);
-  const age = Math.max(0, now - message.createdAt);
+  let left = 8 + (hash % 85);
+  const top = 10 + ((hash >>> 8) % 72);
+  if (left > 39 && left < 61 && top > 34) {
+    left += left < 50 ? -21 : 21;
+  }
+  const driftX = direction * (24 + ((hash >>> 16) % 54));
+  const driftY = -18 - ((hash >>> 22) % 42);
+  const duration = 12_000 + (hash % 9_000);
 
   return {
-    "--smoke-drift": `${drift}px`,
-    "--smoke-drift-mid": `${Math.round(drift * 0.42)}px`,
+    "--smoke-left": `${left}%`,
+    "--smoke-top": `${top}%`,
+    "--smoke-drift-x": `${driftX}px`,
+    "--smoke-drift-y": `${driftY}px`,
+    "--smoke-drift-x-mid": `${Math.round(driftX * -0.34)}px`,
+    "--smoke-drift-y-mid": `${Math.round(driftY * 0.46)}px`,
     "--smoke-duration": `${duration}ms`,
-    "--smoke-delay": `${-Math.min(age, duration - 50)}ms`,
-    "--smoke-start": `${((hash >>> 8) % 31) - 15}px`,
+    "--smoke-delay": `${-(hash % duration)}ms`,
   } as CSSProperties;
 }
 
@@ -184,7 +191,6 @@ export default function SmokingRoomPage() {
   const [asmrOn, setAsmrOn] = useState(false);
   const [volume, setVolume] = useState(35);
   const [reportOpen, setReportOpen] = useState(false);
-  const [now, setNow] = useState(Date.now());
   const [smokeBursts, setSmokeBursts] = useState<SmokeBurst[]>([]);
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -322,7 +328,6 @@ export default function SmokingRoomPage() {
   useEffect(() => {
     if (!started) return;
     const timer = window.setInterval(() => {
-      setNow(Date.now());
       setElapsed(Math.min(SESSION_MS, Date.now() - startedAtRef.current));
       setBurnProgress((current) =>
         Math.min(1, current + (100 / SESSION_MS) * (holdingRef.current ? 7 : 1))
@@ -330,11 +335,6 @@ export default function SmokingRoomPage() {
     }, 100);
     return () => window.clearInterval(timer);
   }, [started]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 500);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (!started || burnProgress < 1) return;
@@ -499,10 +499,8 @@ export default function SmokingRoomPage() {
   };
 
   const visibleMessages = useMemo(
-    () => messages
-      .filter((message) => now - message.createdAt < MESSAGE_VISIBLE_MS)
-      .slice(-10),
-    [messages, now]
+    () => messages.slice(-20),
+    [messages]
   );
   const reportableMessages = useMemo(
     () => [...messages].reverse().slice(0, 5),
@@ -591,20 +589,18 @@ export default function SmokingRoomPage() {
       <main className={styles.scene} aria-label="실시간 흡연실">
         {helperText && <p className={styles.helper}>{helperText}</p>}
 
-        {started && (
-          <div className={styles.smokeLayer} aria-live="polite">
-            {visibleMessages.map((message) => (
-              <div
-                className={styles.smokeMessage}
-                style={smokeStyle(message, now)}
-                key={message.id}
-              >
-                <span>{message.name}</span>
-                <strong>{message.text}</strong>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className={styles.smokeLayer} aria-live="polite">
+          {visibleMessages.map((message) => (
+            <div
+              className={styles.smokeMessage}
+              style={smokeStyle(message)}
+              key={message.id}
+            >
+              <span>{message.name}</span>
+              <strong>{message.text}</strong>
+            </div>
+          ))}
+        </div>
 
         {finished ? (
           <div className={styles.finishedPanel} data-room-ui>
