@@ -26,7 +26,8 @@
       "Bash(rm -f /tmp/sched-test.mjs /tmp/somoim-dev.log; echo cleaned)",
       "Bash(node --env-file=.env -e ' *)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(grep -q \"^API_SECRET=tmvkdltlghkdlxld$\" .env)"
     ],
     "deny": [],
     "ask": []

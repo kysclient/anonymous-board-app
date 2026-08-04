@@ -3,6 +3,10 @@
         {
             "path": "/api/reset-meetup-count?token=tmvkdltlghkdlxld",
             "schedule": "0 15 1 * *"
+        },
+        {
+            "path": "/api/community-attendance/settle?token=tmvkdltlghkdlxld",
+            "schedule": "5 15 * * *"
         }
     ]
 }

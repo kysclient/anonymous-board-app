@@ -82,3 +82,41 @@ CREATE INDEX IF NOT EXISTS idx_chat_messages_participant_id
 
 CREATE INDEX IF NOT EXISTS idx_chat_messages_timestamp
   ON chat_messages (message_timestamp);
+
+-- 7. 모임 일정 참여·출석·벙주 관리
+--    settled_at: 일정 날짜가 되어 출석으로 확정되고 users 카운터
+--    (meetup_count / total_meetup_count / meetup_make_count / last_meetup_date)에
+--    반영된 시각. NULL 이면 아직 미반영이라 정산 대상이 된다.
+CREATE TABLE IF NOT EXISTS community_event_participants (
+  event_id TEXT NOT NULL,
+  event_title TEXT NOT NULL,
+  event_date DATE NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_name TEXT NOT NULL,
+  user_image_url TEXT,
+  is_organizer BOOLEAN NOT NULL DEFAULT FALSE,
+  attended BOOLEAN NOT NULL DEFAULT FALSE,
+  settled_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (event_id, user_id)
+);
+
+ALTER TABLE community_event_participants
+  ADD COLUMN IF NOT EXISTS settled_at TIMESTAMPTZ;
+
+CREATE INDEX IF NOT EXISTS idx_community_participants_event_date
+  ON community_event_participants (event_date DESC);
+
+CREATE INDEX IF NOT EXISTS idx_community_participants_user_id
+  ON community_event_participants (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_community_participants_unsettled
+  ON community_event_participants (event_date)
+  WHERE settled_at IS NULL;
+
+-- settled_at 도입 전에 출석으로 체크된 기록은 이미 카운터에 반영돼 있으므로
+-- 정산 완료로 표시한다(중복 반영 방지). 한 번만 실행하면 된다.
+UPDATE community_event_participants
+SET settled_at = COALESCE(updated_at, created_at, NOW())
+WHERE settled_at IS NULL AND attended;

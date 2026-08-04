@@ -33,9 +33,9 @@ export function Sidebar({ className }: SidebarProps) {
       active: pathname === "/dashboard",
     },
     {
-      label: "모임일정",
-      href: "/dashboard/schedule",
-      active: pathname.startsWith("/dashboard/schedule"),
+      label: "모임 피드",
+      href: "/dashboard/community",
+      active: pathname.startsWith("/dashboard/community"),
       badge: "New",
     },
     {
